@@ -1,0 +1,6 @@
+package com.opterra.crystull
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}

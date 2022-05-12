@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "485376729915",
+    "project_id": "crystull-mvp1",
+    "storage_bucket": "crystull-mvp1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:485376729915:android:8fb2eba614afb5016d8d1e",
+        "android_client_info": {
+          "package_name": "com.opterra.crystull"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "485376729915-r1s3h1qqs60n8eip8m5076bph93mqhh6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoonEwREk4-K2kUP8QC93lSCNyuOJCqTg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "485376729915-r1s3h1qqs60n8eip8m5076bph93mqhh6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "485376729915-l2t8dg35075e12lo0ntqjlom83vjddrm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.opterra.crystull"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
