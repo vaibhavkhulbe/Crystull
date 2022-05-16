@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 
 pickImage(ImageSource source) async {
@@ -26,4 +30,16 @@ double getSafeAreaHeight(BuildContext context) {
 double getSafeAreaWidth(BuildContext context) {
   return MediaQuery.of(context).size.width -
       MediaQuery.of(context).padding.left;
+}
+
+Future<Uint8List> comporessList(Uint8List list) async {
+  var result = await FlutterImageCompress.compressWithList(
+    list,
+    minHeight: 192,
+    minWidth: 108,
+    quality: 25,
+  );
+  // print(list.length);
+  // print(result.length);
+  return result;
 }

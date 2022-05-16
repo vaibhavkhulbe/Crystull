@@ -1,6 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:crystull/providers/user_provider.dart';
+import 'package:crystull/resources/drawer_list.dart';
+import 'package:crystull/resources/models/signup.dart';
+import 'package:crystull/screens/search_screen.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -49,7 +54,35 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    CrystullUser? _user = Provider.of<UserProvider>(context).getUser;
     return Scaffold(
+      drawer: Drawer(
+        backgroundColor: Colors.white,
+        child: ListView(children: getDrawerList(context, _user!)),
+      ),
+      appBar: AppBar(
+          backgroundColor: Colors.white,
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: const Icon(
+                  Icons.menu,
+                  color: Colors.black54,
+                ),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+              );
+            },
+          ),
+          actions: [
+            // Navigate to the Search Screen
+            IconButton(
+                onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SearchScreen())),
+                icon: const Icon(Icons.search, color: Colors.black54)),
+          ]),
       backgroundColor: const Color.fromRGBO(0, 0, 0, 0.04),
       body: SingleChildScrollView(
         child: Column(

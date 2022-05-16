@@ -89,4 +89,109 @@ class AuthMethods {
     }
     return res;
   }
+
+  Future<String> updateUserPrivacy(CrystullUser user) async {
+    String res = "Some error occured";
+    try {
+      if (user.bio.isNotEmpty) {
+        // update the user
+        await _firestore.collection('users').doc(user.uid).update({
+          'isPrivate': user.isPrivate,
+        });
+        res = "Success";
+      }
+    } catch (e) {
+      res = e.toString();
+      log(res);
+    }
+    return res;
+  }
+
+  Future<String> updateUserPersonalDetails(CrystullUser user) async {
+    String res = "Some error occured";
+    try {
+      if (user.bio.isNotEmpty) {
+        // update the user
+        await _firestore.collection('users').doc(user.uid).update({
+          'bio': user.bio,
+          'college': user.college,
+          'degree': user.degree,
+        });
+        res = "Success";
+      }
+    } catch (e) {
+      res = e.toString();
+      log(res);
+    }
+    return res;
+  }
+
+  Future<CrystullUser> refreshUser(CrystullUser user) async {
+    String res = "Some error occured";
+    try {
+      if (user.bio.isNotEmpty) {
+        // update the user
+        await _firestore.collection('users').doc(user.uid).get().then((doc) {
+          user = CrystullUser.fromSnapshot(doc);
+        });
+      }
+    } catch (e) {
+      res = e.toString();
+      log(res);
+    }
+    return user;
+  }
+
+  Future<String> addFriendRequest(CrystullUser currentUser, CrystullUser friend,
+      int currentUserStatus, int friendStatus) async {
+    String res = "Some error occured";
+    try {
+      if (currentUser.uid.isNotEmpty && friend.uid.isNotEmpty) {
+        var batch = _firestore.batch();
+        // update the user
+        batch.update(_firestore.collection('users').doc(currentUser.uid), {
+          'connections.${friend.uid}': Friend(
+            id: friend.uid,
+            status: currentUserStatus,
+          ).toMap(),
+        });
+
+        batch.update(_firestore.collection('users').doc(friend.uid), {
+          'connections.${currentUser.uid}': Friend(
+            id: currentUser.uid,
+            status: friendStatus,
+          ).toMap()
+        });
+        await batch.commit();
+        res = "Success";
+      }
+    } catch (e) {
+      res = e.toString();
+      log(res);
+    }
+
+    return res;
+  }
+
+  Future<String> removeFriend(
+      CrystullUser currentUser, CrystullUser otherUser) async {
+    String res = "Some error occured";
+    try {
+      if (currentUser.uid.isNotEmpty && otherUser.uid.isNotEmpty) {
+        // update the user
+        await _firestore.collection('users').doc(currentUser.uid).update({
+          'connections.${otherUser.uid}': FieldValue.delete(),
+        });
+
+        await _firestore.collection('users').doc(otherUser.uid).update({
+          'connections.${currentUser.uid}': FieldValue.delete(),
+        });
+        res = "Success";
+      }
+    } catch (e) {
+      res = e.toString();
+      log(res);
+    }
+    return res;
+  }
 }

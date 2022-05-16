@@ -1,9 +1,7 @@
 import 'package:crystull/providers/user_provider.dart';
-import 'package:crystull/resources/drawer_list.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/home_screen.dart';
 import 'package:crystull/screens/profile_screen.dart';
-import 'package:crystull/screens/search_screen.dart';
 import 'package:crystull/widgets/bottom_nav_bar_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -59,35 +57,6 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
     CrystullUser? _user = Provider.of<UserProvider>(context).getUser;
     return _user != null
         ? Scaffold(
-            drawer: Drawer(
-              backgroundColor: Colors.white,
-              child: ListView(children: getDrawerList(context, _user)),
-            ),
-            appBar: AppBar(
-                backgroundColor: Colors.white,
-                leading: Builder(
-                  builder: (BuildContext context) {
-                    return IconButton(
-                      icon: const Icon(
-                        Icons.menu,
-                        color: Colors.black54,
-                      ),
-                      onPressed: () {
-                        Scaffold.of(context).openDrawer();
-                      },
-                      tooltip: MaterialLocalizations.of(context)
-                          .openAppDrawerTooltip,
-                    );
-                  },
-                ),
-                actions: [
-                  // Navigate to the Search Screen
-                  IconButton(
-                      onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (_) => const SearchScreen())),
-                      icon: const Icon(Icons.search, color: Colors.black54)),
-                ]),
             body: PageView(
               controller: _pageController,
               onPageChanged: onPageChanged,
@@ -97,7 +66,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
                     style: TextStyle(color: Colors.black)),
                 const Text("Notifications",
                     style: TextStyle(color: Colors.black)),
-                ProfileScreen(user: _user),
+                ProfileScreen(user: _user, isHome: true),
               ],
             ),
             bottomNavigationBar: CupertinoTabBar(

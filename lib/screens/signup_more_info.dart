@@ -27,7 +27,7 @@ class MoreInfoScreen extends StatefulWidget {
 class _MoreInfoScreenState extends State<MoreInfoScreen> {
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _collegeController = TextEditingController();
-  final TextEditingController _companyController = TextEditingController();
+  final TextEditingController _degreeController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   Uint8List? _profileImage;
   var _isLoading = false;
@@ -37,15 +37,16 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
     super.dispose();
     _bioController.dispose();
     _collegeController.dispose();
-    _companyController.dispose();
+    _degreeController.dispose();
     _mobileController.dispose();
     _profileImage = null;
   }
 
   void selectImage() async {
     Uint8List _image = await pickImage(ImageSource.gallery);
+    Uint8List _compressedImage = await comporessList(_image);
     setState(() {
-      _profileImage = _image;
+      _profileImage = _compressedImage;
     });
   }
 
@@ -66,7 +67,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
   signUpUser() {
     widget.signupForm.bio = _bioController.text;
     widget.signupForm.college = _collegeController.text;
-    widget.signupForm.company = _companyController.text;
+    widget.signupForm.degree = _degreeController.text;
     widget.signupForm.mobileNumberWithCountryCode = _mobileController.text;
     widget.signupForm.profileImage = _profileImage;
     setState(() {
@@ -200,15 +201,15 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
 
                 // Email text box
                 const Text(
-                  "Company",
+                  "Degree",
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.black54,
                   ),
                 ),
                 TextFieldInput(
-                  textEditingController: _companyController,
-                  hintText: "Enter your Company",
+                  textEditingController: _degreeController,
+                  hintText: "Enter your Degree",
                   textInputType: TextInputType.emailAddress,
                 ),
 
@@ -338,7 +339,6 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                     ),
                   ),
                 ),
-
                 Flexible(child: Container(), flex: 2),
               ],
             ),

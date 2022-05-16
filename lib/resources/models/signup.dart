@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Friend {
   String id;
-  Enum status;
+  int status;
 
   Friend({required this.id, required this.status});
 
@@ -14,6 +14,13 @@ class Friend {
       status: map['status'],
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'status': status,
+    };
+  }
 }
 
 class CrystullUser {
@@ -21,62 +28,72 @@ class CrystullUser {
   String firstName;
   String lastName;
   String email;
+  String uid;
   String password;
   String bio;
+  bool isPrivate;
   String college;
-  String company;
+  String degree;
   String mobileNumberWithCountryCode;
   String profileImageUrl;
   Uint8List? profileImage;
-  List<Friend> connections;
+  Map<String, Friend> connections;
   List posts;
   CrystullUser(
     this.firstName,
     this.lastName,
     this.email,
     this.password, {
+    this.uid = "",
     this.bio = "",
+    this.isPrivate = false,
     this.college = "",
-    this.company = "",
+    this.degree = "",
     this.mobileNumberWithCountryCode = "",
     this.profileImage,
     this.profileImageUrl = "",
-    this.connections = const <Friend>[],
+    this.connections = const <String, Friend>{},
     this.posts = const [],
   });
 
   Map<String, dynamic> toMap() {
+    Map<String, dynamic> updateConnections =
+        Map<String, dynamic>.from(connections)
+            .map((key, value) => MapEntry(key, value.toMap()));
     return {
       "fullName": firstName + " " + lastName,
       'firstName': firstName,
       'lastName': lastName,
       'email': email,
+      "uid": uid,
       'bio': bio,
+      "isPrivate": isPrivate,
       'college': college,
-      'company': company,
+      'degree': degree,
       'mobileNumberWithCountryCode': mobileNumberWithCountryCode,
       'profileImage': profileImage,
       'profileImageUrl': profileImageUrl,
-      'connections': connections,
+      'connections': updateConnections,
       'posts': posts,
     };
   }
 
   static CrystullUser fromMap(Map<String, dynamic> map) {
-    final connections = map['connections']
-        .map<Friend>((friend) => Friend.fromMap(friend))
-        .toList();
+    final connections = Map<String, Friend>.from(map['connections']
+        ?.map((key, value) => MapEntry(key, Friend.fromMap(value))));
     var user = CrystullUser(
       map['firstName'] ?? "",
       map['lastName'] ?? "",
       map['email'] ?? "",
       "",
+      isPrivate: map['isPrivate'] ?? false,
+      uid: map['uid'] ?? "",
       bio: map['bio'] ?? "",
       college: map['college'] ?? "",
-      company: map['company'] ?? "",
+      degree: map['degree'] ?? "",
       mobileNumberWithCountryCode: map['mobileNumberWithCountryCode'] ?? "",
       profileImageUrl: map['profileImageUrl'] ?? "",
-      connections: connections ?? const <Friend>[],
+      connections: connections,
       posts: map['posts'] ?? const [],
     );
     user.fullName = map['fullName'];

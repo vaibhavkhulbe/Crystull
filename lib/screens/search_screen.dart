@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/profile_screen.dart';

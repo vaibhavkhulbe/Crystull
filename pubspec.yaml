@@ -37,6 +37,7 @@ dependencies:
   firebase_storage: ^10.2.15
   flutter:
     sdk: flutter
+  flutter_image_compress: ^1.1.0
   flutter_svg: ^1.0.3
   image_picker: ^0.8.5
   provider: ^6.0.2
@@ -61,6 +62,7 @@ flutter:
     - images/avatar.png
     - images/icons/homeButton.svg
     - images/icons/friendRequests.svg
+    - images/icons/removeFriend.svg
     - images/icons/notifications.svg
     - images/icons/activities.svg
     - images/icons/network.svg
