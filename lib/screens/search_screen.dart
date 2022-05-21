@@ -65,8 +65,11 @@ class _SearchScreenState extends State<SearchScreen> {
           ? FutureBuilder(
               future: FirebaseFirestore.instance
                   .collection("users")
-                  .where('firstName',
-                      isGreaterThanOrEqualTo: _searchController.text)
+                  .where('fullName',
+                      isGreaterThanOrEqualTo:
+                          _searchController.text.toLowerCase(),
+                      isLessThanOrEqualTo:
+                          _searchController.text.toLowerCase() + '\uf8ff')
                   .get(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {

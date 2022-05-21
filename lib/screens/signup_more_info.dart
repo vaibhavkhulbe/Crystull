@@ -89,8 +89,8 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
 
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) {
-          return const ResponsiveLayout(
-              webScreenLayout: WebScreenLayout(),
+          return ResponsiveLayout(
+              webScreenLayout: const WebScreenLayout(),
               mobileScreenLayout: MobileScreenLayout());
         }));
       }

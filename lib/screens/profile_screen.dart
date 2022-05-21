@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:crystull/providers/user_provider.dart';
 import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/resources/models/signup.dart';
+import 'package:crystull/responsive/mobile_screen_layout.dart';
 import 'package:crystull/screens/edit_profile.dart';
 import 'package:crystull/utils/utils.dart';
+import 'package:crystull/widgets/sllider_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:crystull/screens/search_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,11 +24,26 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, Widget> popUpMenuItems = {};
-  
+  Map<String, double> sliderValues = {};
   bool isAnonymousPost = false;
+  bool _isSwapping = false;
+  bool isSwapEnabled = false;
+  CrystullUser? _currentUser;
+  List<CrystullUser> connectedUsers = [];
+  Map<String, double> _swapValues = {};
+
   @override
   void initState() {
+    sliderValues = {
+      'Personality': 0,
+      'Behaviour': 0,
+      'Communication': 0,
+      'Empathy': 0,
+      'Character': 0,
+      'Welfare': 0,
+    };
     refreshUser();
+    UserProvider().refreshUser();
     super.initState();
   }
 
@@ -43,6 +60,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       log(result);
     }
+  }
+
+  swapUser() async {
+    setState(() {
+      _isSwapping = true;
+    });
+    String res = await AuthMethods().swapUser(
+      widget.user.uid,
+      sliderValues,
+    );
+    if (res == "Success") {
+      showSnackBar("Used SWAPPed Successfully", context);
+    } else {
+      showSnackBar("SWAPPing failed. Please try again", context);
+    }
+    setState(() {
+      _isSwapping = false;
+    });
   }
 
   onSelect(item) {
@@ -80,9 +115,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     CrystullUser updatedUser = await AuthMethods().refreshUser(widget.user);
     widget.user = updatedUser;
 
-    if (widget.user.uid != userProvider.getUser!.uid) {
-      Friend? connectionState =
-          widget.user.connections[userProvider.getUser!.uid];
+    if (widget.user.uid != _currentUser!.uid) {
+      Friend? connectionState = widget.user.connections[_currentUser!.uid];
       if (connectionState != null) {
         if (connectionState.status <= 3) {
           popUpMenuItems['Block'] = Row(
@@ -148,13 +182,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         }
       }
+    } else {
+      List<CrystullUser> localConnectedUsers =
+          await AuthMethods.getConnections(widget.user);
+      if (mounted) {
+        setState(() {
+          connectedUsers = localConnectedUsers;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    CrystullUser? _currentUser = Provider.of<UserProvider>(context).getUser;
-    bool isMe = _currentUser!.email == widget.user.email;
+    _currentUser = Provider.of<UserProvider>(context).getUser;
+
+    bool isMe = _currentUser!.uid == widget.user.uid;
     return Scaffold(
         appBar: !widget.isHome
             ? AppBar(
@@ -163,19 +206,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
               )
             : null,
         body: Container(
-          decoration: BoxDecoration(color: Color(0xFFE5E5E5)),
+          decoration: const BoxDecoration(color: Color(0xFFEEEEEE)),
           child: ListView(
             children: [
+              // Card for the profile. Could be self or others
               Card(
+                shadowColor: Colors.white,
                 color: Colors.white,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
+                shape: const ContinuousRectangleBorder(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.25,
+                      height: isMe
+                          ? getSafeAreaHeight(context) * 0.22
+                          : getSafeAreaHeight(context) * 0.25,
                       child: Stack(
                           clipBehavior: Clip.none,
                           alignment: Alignment.topLeft,
@@ -232,8 +277,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 top: MediaQuery.of(context).size.height * 0.06,
                                 left: MediaQuery.of(context).size.width * 0.05,
                                 child: Container(
-                                  width: getSafeAreaWidth(context) * 0.3,
-                                  height: getSafeAreaWidth(context) * 0.3,
+                                  width: getSafeAreaWidth(context) * 0.25,
+                                  height: getSafeAreaWidth(context) * 0.25,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: Colors.black54,
@@ -262,7 +307,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Positioned(
                               width: MediaQuery.of(context).size.width * 0.5,
                               top: MediaQuery.of(context).size.height * 0.11,
-                              left: MediaQuery.of(context).size.width * 0.4,
+                              left: MediaQuery.of(context).size.width * 0.35,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -274,9 +319,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       Text(
                                         widget.user.fullName.capitalize(),
                                         style: const TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: 14,
-                                          // fontWeight: FontWeight.bold,
+                                          color: Color(0xFF575757),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ],
@@ -290,7 +335,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         widget.user.bio,
                                         style: const TextStyle(
                                           color: Colors.black54,
-                                          fontSize: 10,
+                                          fontSize: 9,
                                         ),
                                       ),
                                     ],
@@ -310,12 +355,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   widget.user.college,
                                               style: const TextStyle(
                                                 color: Colors.black54,
-                                                fontSize: 10,
+                                                fontSize: 9,
                                               ),
                                             ),
                                           ],
                                         )
                                       : Container(),
+                                  isMe
+                                      ? Wrap(
+                                          children: [
+                                            InkWell(
+                                              onTap: () async {
+                                                await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          EditProfileScreen(
+                                                              user:
+                                                                  widget.user),
+                                                    ));
+                                                setState(() {});
+                                              },
+                                              child: const Text(
+                                                "Edit Profile",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black54,
+                                                  fontSize: 8,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : Container()
                                 ],
                               ),
                             ),
@@ -345,89 +417,325 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   )
                                 : Container(),
-                            isMe
+                            !isMe
                                 ? Positioned(
                                     top: MediaQuery.of(context).size.height *
-                                        0.17,
-                                    left:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    child: InkWell(
-                                      onTap: () async {
-                                        await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  EditProfileScreen(
-                                                      user: widget.user),
-                                            ));
-                                        setState(() {});
-                                      },
-                                      child: const Text(
-                                        "Edit Profile",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          decoration: TextDecoration.underline,
-                                          color: Colors.black54,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Positioned(
-                                    top: MediaQuery.of(context).size.height *
                                         0.16,
-                                    left:
-                                        MediaQuery.of(context).size.width * 0.4,
+                                    left: MediaQuery.of(context).size.width *
+                                        0.35,
                                     child: getProfileButton(
-                                        _currentUser, widget.user)!),
+                                        _currentUser!, widget.user)!)
+                                : Container(),
                           ]),
                     ),
                   ],
                 ),
               ),
-              Card(
-                  color: Colors.white,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          "Help " +
-                              widget.user.firstName.capitalize() +
-                              " to improve their skills",
-                          style: const TextStyle(
-                            color: Colors.black87,
-                            fontSize: 16,
-                          ),
+
+              // Card for showing the attributes
+              isMe ||
+                      (widget.user.connections[_currentUser!.uid] != null &&
+                          widget.user.connections[_currentUser!.uid]!.status ==
+                              3)
+                  ? Card(
+                      shadowColor: Colors.white,
+                      color: Colors.white,
+                      shape: const ContinuousRectangleBorder(),
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 10),
+                        padding: const EdgeInsets.all(10),
+                        child: const Text(
+                          "Primary Attributes",
+                          style: TextStyle(
+                              fontSize: 14,
+                              // fontWeight: FontWeight.bold,
+                              color: Color(0xFF575757)),
                         ),
-                        Row(
+                      ))
+                  : Card(
+                      shadowColor: Colors.white,
+                      color: Colors.white,
+                      shape: const ContinuousRectangleBorder(),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("SWAP anonymously",
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.black54)),
-                            Flexible(child: Container()),
-                            Switch(
-                              activeColor: Colors.lightBlueAccent,
-                              inactiveTrackColor: Colors.grey,
-                              value: isAnonymousPost,
-                              onChanged: (value) async {
-                                if (value) {
-                                  isAnonymousPost = true;
-                                } else {
-                                  isAnonymousPost = false;
-                                }
-                                setState(() {});
-                              },
+                            Text(
+                              widget.user.firstName.capitalize() +
+                                  "'s Top Attributes",
+                              style: const TextStyle(
+                                  fontSize: 14, color: Color(0xFF575757)),
+                            ),
+                            const Center(
+                              child: Text(
+                                  "Send connection request to see all attributes",
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.black54,
+                                      fontStyle: FontStyle.italic)),
                             ),
                           ],
-                        )
-                      ],
+                        ),
+                      ),
                     ),
-                  ))
+
+              // Card for showing the connections or to post the SWAP
+              isMe
+                  ? Card(
+                      shadowColor: Colors.white,
+                      color: Colors.white,
+                      shape: const ContinuousRectangleBorder(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Connections",
+                              style: TextStyle(
+                                color: Color(0xFF575757),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  connectedUsers.length.toString() +
+                                      " Connections",
+                                  style: const TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 8,
+                                  ),
+                                ),
+                                Flexible(child: Container()),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              MobileScreenLayout(
+                                            screen: 1,
+                                          ),
+                                        ));
+                                  },
+                                  child: const Text(
+                                    "See all",
+                                    style: TextStyle(
+                                      color: Colors.lightBlueAccent,
+                                      fontSize: 8,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                                height: getSafeAreaHeight(context) * 0.3,
+                                child: GridView(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 4,
+                                    childAspectRatio: 0.6,
+                                    // crossAxisSpacing: 10,
+                                    // mainAxisSpacing: 10,
+                                  ),
+                                  children: [
+                                    for (var i = 0;
+                                        i < connectedUsers.length;
+                                        i++)
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProfileScreen(
+                                                  user: connectedUsers[i],
+                                                ),
+                                              ));
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 5),
+                                              width: getSafeAreaWidth(context) *
+                                                  0.2,
+                                              height:
+                                                  getSafeAreaWidth(context) *
+                                                      0.2,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(4)),
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                      connectedUsers[i]
+                                                          .profileImageUrl),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                            Wrap(
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.start,
+                                              children: [
+                                                Text(
+                                                  connectedUsers[i]
+                                                      .fullName
+                                                      .capitalize(),
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                  ],
+                                )),
+                          ],
+                        ),
+                      ))
+                  : Card(
+                      shadowColor: Colors.white,
+                      color: Colors.white,
+                      shape: const ContinuousRectangleBorder(),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Help " +
+                                  widget.user.firstName.capitalize() +
+                                  " to improve their skills",
+                              style: const TextStyle(
+                                color: Colors.black87,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                const Text("SWAP anonymously",
+                                    style: TextStyle(
+                                        fontSize: 13, color: Colors.black54)),
+                                Flexible(child: Container()),
+                                Switch(
+                                  activeColor: Colors.lightBlueAccent,
+                                  inactiveTrackColor: Colors.grey,
+                                  value: isAnonymousPost,
+                                  onChanged: (value) async {
+                                    if (value) {
+                                      isAnonymousPost = true;
+                                    } else {
+                                      isAnonymousPost = false;
+                                    }
+                                    setState(() {});
+                                  },
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: getSafeAreaHeight(context) * 0.23,
+                              child: GridView(
+                                  // padding: const EdgeInsets.all(10),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    childAspectRatio: 2.5,
+                                    crossAxisSpacing: 50,
+                                  ),
+                                  children: [
+                                    for (var entry in sliderValues.entries)
+                                      getSliderWidgetWithLabel(
+                                        entry.key,
+                                        entry.value,
+                                        (value) {
+                                          sliderValues[entry.key] = value;
+                                          setState(() {
+                                            if (sliderValues.values.any(
+                                                (element) => element != 0)) {
+                                              isSwapEnabled = true;
+                                            } else {
+                                              isSwapEnabled = false;
+                                            }
+                                          });
+                                        },
+                                      )
+                                  ]),
+                            ),
+                            Container(
+                              alignment: Alignment.topRight,
+                              child: GestureDetector(
+                                onTap: () => {},
+                                child: const Text("+ More",
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.lightBlueAccent)),
+                              ),
+                            ),
+                            Center(
+                              child: Container(
+                                alignment: Alignment.center,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                margin:
+                                    const EdgeInsets.only(top: 40, bottom: 20),
+                                decoration: BoxDecoration(
+                                  color: isSwapEnabled
+                                      ? Colors.lightBlueAccent
+                                      : Colors.lightBlueAccent.withOpacity(0.5),
+                                ),
+                                width: getSafeAreaWidth(context) * 0.25,
+                                child: isSwapEnabled
+                                    ? InkWell(
+                                        onTap: () {
+                                          swapUser();
+                                        },
+                                        child: _isSwapping
+                                            ? SizedBox(
+                                                width:
+                                                    getSafeAreaHeight(context) *
+                                                        0.02,
+                                                height:
+                                                    getSafeAreaHeight(context) *
+                                                        0.02,
+                                                child:
+                                                    const CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        color: Colors.white),
+                                              )
+                                            : const Text(
+                                                "Submit",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                      )
+                                    : const Text(
+                                        "Submit",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
             ],
           ),
         ));
@@ -553,6 +861,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget getSliderWidgetWithLabel(
+      String columnName, double value, void Function(double) onchanged,
+      {double min = 0, double max = 100}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          columnName,
+          style: const TextStyle(color: Colors.black54, fontSize: 12),
+        ),
+        const SizedBox(height: 10),
+        SliderTheme(
+          data: SliderThemeData(
+            overlayShape: SliderComponentShape.noOverlay,
+            trackHeight: 6,
+            activeTrackColor: Colors.lightBlueAccent,
+            inactiveTrackColor: const Color(0xFFEEEEEE),
+            thumbColor: Colors.white,
+            thumbShape: const CircleThumbShape(),
+            // trackShape:
+          ),
+          child: Slider(
+            value: value,
+            label: value.toString(),
+            min: min,
+            max: max,
+            onChanged: onchanged,
+          ),
+        ),
+      ],
     );
   }
 }

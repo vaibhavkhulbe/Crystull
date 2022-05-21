@@ -2,6 +2,30 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class SwapData {
+  double value;
+
+  SwapData({
+    required this.value,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'value': value,
+      };
+}
+
+class Swap {
+  String fromUid;
+  DateTime addedAt;
+  Map<String, SwapData> swaps;
+
+  Swap({
+    required this.fromUid,
+    required this.addedAt,
+    required this.swaps,
+  });
+}
+
 class Friend {
   String id;
   int status;
@@ -61,7 +85,7 @@ class CrystullUser {
         Map<String, dynamic>.from(connections)
             .map((key, value) => MapEntry(key, value.toMap()));
     return {
-      "fullName": firstName + " " + lastName,
+      "fullName": (firstName + " " + lastName).toLowerCase(),
       'firstName': firstName,
       'lastName': lastName,
       'email': email,

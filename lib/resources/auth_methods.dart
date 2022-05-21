@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/resources/storage_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uuid/uuid.dart';
 
 class AuthMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -193,5 +194,125 @@ class AuthMethods {
       log(res);
     }
     return res;
+  }
+
+  static Future<List<CrystullUser>> getConnections(CrystullUser user,
+      {int status = 3}) async {
+    FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    List<CrystullUser> connections = [];
+    try {
+      List<String> connectionUsers = [];
+      user.connections.forEach((key, value) {
+        if (value.status == status) {
+          connectionUsers.add(key);
+        }
+      });
+      if (connectionUsers.isNotEmpty) {
+        await _firestore
+            .collection('users')
+            .where('uid', whereIn: connectionUsers)
+            .get()
+            .then((QuerySnapshot snapshot) async {
+          for (var doc in snapshot.docs) {
+            connections.add(CrystullUser.fromSnapshot(doc));
+          }
+        });
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return connections;
+  }
+
+  Future<String> swapUser(
+      String userId, Map<String, double> sliderValues) async {
+    String res = "Some error occured";
+    try {
+      if (userId.isNotEmpty) {
+        // remove all the zero values from the map
+        Map<String, double> nonEmptySliderValues = {};
+
+        sliderValues.forEach((key, value) {
+          if (value != 0) {
+            nonEmptySliderValues[key] = value;
+          }
+        });
+
+        // nonEmptySliderValues.removeWhere((key, value) => value == 0);
+
+        DateTime now = DateTime.now();
+        String swapId = const Uuid().v4();
+        Map<String, dynamic> individual = <String, dynamic>{
+          'fromUid': _auth.currentUser!.uid,
+          'toUid': userId,
+          'addedAt': now
+        };
+        nonEmptySliderValues.forEach((key, value) {
+          individual[key] = SwapData(value: value).toJson();
+        });
+        // Map<String, Swap> swap = {};
+        DateTime start = DateTime(now.year, now.month, now.day);
+        List<DateTime> days =
+            List.generate(8, (i) => start.subtract(Duration(days: i)));
+        var batch = _firestore.batch();
+
+        // for each key in the map update the swap collection:
+        // 1. if the user is not swapped for a property then add it
+        // 2. if the user is swapped for a property then append it to individual and update weekly and cumulative
+
+        batch.set(
+          _firestore
+              .collection('swaps')
+              .doc(userId + '_swapped_' + _auth.currentUser!.uid)
+              .collection("individual")
+              .doc(swapId),
+          individual,
+          SetOptions(merge: true),
+        );
+        nonEmptySliderValues.forEach((key, value) {
+          batch.set(
+            _firestore
+                .collection('swaps')
+                .doc(userId + '_swapped_' + _auth.currentUser!.uid),
+            {
+              'lastSwappedAt': now,
+              'lastSwappedID': swapId,
+              'cumulative': {
+                key: {
+                  'sum': FieldValue.increment(value),
+                  'count': FieldValue.increment(1),
+                }
+              },
+              // 'weekly.${days[0].toString()}.sum': FieldValue.increment(value),
+              // 'weekly.${days[0].toString()}.count': FieldValue.increment(1),
+              'weekly': {
+                for (var day in days)
+                  day.toString(): {
+                    key: {
+                      'sum': FieldValue.increment(value),
+                      'count': FieldValue.increment(1)
+                    }
+                  }
+              },
+            },
+            SetOptions(merge: true),
+          );
+        });
+
+        await batch.commit();
+        res = "Success";
+      }
+    } catch (e) {
+      res = e.toString();
+      log(res);
+    }
+    return res;
+  }
+
+  Future<Map<String, Map<String, dynamic>>> getAttributes(String uid) {
+    Map<String, Map<String, dynamic>> attributes = {};
+    var data =  _firestore
+        .collection('swaps').doc(uid + '_swapped_' + _auth.currentUser!.uid).get();
+        
   }
 }

@@ -179,9 +179,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         showSnackBar("User logged in successfully.", context);
                         Navigator.pushReplacement(context,
                             MaterialPageRoute(builder: (context) {
-                              
-                          return const ResponsiveLayout(
-                              webScreenLayout: WebScreenLayout(),
+                          return ResponsiveLayout(
+                              webScreenLayout: const WebScreenLayout(),
                               mobileScreenLayout: MobileScreenLayout());
                         }));
 

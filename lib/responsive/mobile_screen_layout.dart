@@ -8,16 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MobileScreenLayout extends StatefulWidget {
-  const MobileScreenLayout({
-    Key? key,
-  }) : super(key: key);
+  int screen;
+  MobileScreenLayout({Key? key, this.screen = 0}) : super(key: key);
 
   @override
   State<MobileScreenLayout> createState() => _MobileScreenLayoutState();
 }
 
 class _MobileScreenLayoutState extends State<MobileScreenLayout> {
-  int _screen = 0;
   late PageController _pageController;
   // SignupForm _signupForm;
   // final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -27,7 +25,8 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   void initState() {
     super.initState();
     addData();
-    _pageController = PageController();
+    _pageController = PageController(initialPage: widget.screen);
+    // navigateToPage(widget.screen);
   }
 
   addData() async {
@@ -48,7 +47,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
 
   void onPageChanged(int page) {
     setState(() {
-      _screen = page;
+      widget.screen = page;
     });
   }
 
@@ -74,12 +73,12 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
                 onTap: navigateToPage,
                 items: [
                   getBottomNavBarWidget(
-                      _screen, 0, 'images/icons/homeButton.svg'),
+                      widget.screen, 0, 'images/icons/homeButton.svg'),
                   getBottomNavBarWidget(
-                      _screen, 1, 'images/icons/friendRequests.svg'),
+                      widget.screen, 1, 'images/icons/friendRequests.svg'),
                   getBottomNavBarWidget(
-                      _screen, 2, 'images/icons/notifications.svg'),
-                  getBottomNavBarWidget(_screen, 3, 'images/avatar.png',
+                      widget.screen, 2, 'images/icons/notifications.svg'),
+                  getBottomNavBarWidget(widget.screen, 3, 'images/avatar.png',
                       isProfile: true, profileImage: _user.profileImage),
                 ]),
           )

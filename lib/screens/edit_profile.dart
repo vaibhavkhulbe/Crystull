@@ -43,25 +43,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return _nullCheck;
   }
 
-  updateUser() {
+  updateUser() async {
     widget.user.bio = _bioController.text;
     widget.user.college = _collegeController.text;
     widget.user.degree = _degreeController.text;
     setState(() {
       _isLoading = true;
     });
-    Future<String> result =
-        AuthMethods().updateUserPersonalDetails(widget.user);
-    result.then((value) {
-      if (value != "Success") {
-        showSnackBar("User update failed with error: " + value, context);
-      } else {
-        showSnackBar("User updated successfully.", context);
-      }
-    }).catchError((onError) {
-      showSnackBar(
-          "User update failed with error: " + onError.toString(), context);
-    });
+    String result = await AuthMethods().updateUserPersonalDetails(widget.user);
+    if (result != "Success") {
+      showSnackBar("User update failed with error: " + result, context);
+    } else {
+      showSnackBar("User updated successfully.", context);
+    }
+
     setState(() {
       _isLoading = false;
     });
