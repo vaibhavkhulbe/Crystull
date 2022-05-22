@@ -1,4 +1,5 @@
 import 'package:crystull/resources/models/signup.dart';
+import 'package:crystull/screens/connected_friends_screen.dart';
 import 'package:crystull/screens/login_screen.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:crystull/widgets/drawer_widget.dart';
@@ -8,6 +9,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  int friendCount = 0;
+  user.connections.forEach((key, value) {
+    if (value.status == 3) {
+      friendCount++;
+    }
+  });
   return [
     SvgPicture.asset(
       'images/crystull_logo.svg',
@@ -44,22 +51,33 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
         imgURL: 'images/icons/activities.svg',
         drawerKey: 'Activities',
         onTap: () {}),
-    Row(children: [
-      DrawerWidget(
-          imgURL: 'images/icons/network.svg',
-          drawerKey: 'Connections',
-          onTap: () {}),
-      Flexible(
-        child: Container(),
-        flex: 10,
-      ),
-      Text(user.connections.length.toString(),
-          style: const TextStyle(
-              fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black)),
-      Flexible(child: Container()),
-    ]),
+    InkWell(
+      onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const ConnectedFriendsScreen())),
+      child: Row(children: [
+        DrawerWidget(
+            imgURL: 'images/icons/network.svg',
+            drawerKey: 'Connections',
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ConnectedFriendsScreen()))),
+        Flexible(
+          child: Container(),
+          flex: 10,
+        ),
+        Text(friendCount.toString(),
+            style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.black)),
+        Flexible(child: Container()),
+      ]),
+    ),
     SizedBox(
-      height: getSafeAreaHeight(context) * 0.3,
+      height: getSafeAreaHeight(context) * 0.25,
     ),
     DrawerWidget(imgURL: '', drawerKey: 'Terms and Policy', onTap: () {}),
     DrawerWidget(

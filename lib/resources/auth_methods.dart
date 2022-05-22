@@ -49,6 +49,7 @@ class AuthMethods {
 
           if (photoUrl.isNotEmpty) {
             log("Photo uploaded " + photoUrl);
+            signupForm.uid = credValue.user!.uid;
             signupForm.profileImage = null;
             signupForm.profileImageUrl = photoUrl;
             await _firestore
@@ -130,7 +131,7 @@ class AuthMethods {
   Future<CrystullUser> refreshUser(CrystullUser user) async {
     String res = "Some error occured";
     try {
-      if (user.bio.isNotEmpty) {
+      if (user.uid.isNotEmpty) {
         // update the user
         await _firestore.collection('users').doc(user.uid).get().then((doc) {
           user = CrystullUser.fromSnapshot(doc);
@@ -145,6 +146,11 @@ class AuthMethods {
 
   Future<String> addFriendRequest(CrystullUser currentUser, CrystullUser friend,
       int currentUserStatus, int friendStatus) async {
+    // 1 is the current user sending request
+    // 2 is the friend receiving request
+    // 3 is the friends status
+    // 4 is the current user blocking
+    // 5 is the current user blocked
     String res = "Some error occured";
     try {
       if (currentUser.uid.isNotEmpty && friend.uid.isNotEmpty) {
@@ -225,7 +231,7 @@ class AuthMethods {
   }
 
   Future<String> swapUser(
-      String userId, Map<String, double> sliderValues) async {
+      String userId, Map<String, double> sliderValues, bool isAnonymous) async {
     String res = "Some error occured";
     try {
       if (userId.isNotEmpty) {
@@ -241,19 +247,19 @@ class AuthMethods {
         // nonEmptySliderValues.removeWhere((key, value) => value == 0);
 
         DateTime now = DateTime.now();
+        DateTime start = DateTime(now.year, now.month, now.day);
+        List<DateTime> days =
+            List.generate(8, (i) => start.subtract(Duration(days: i)));
         String swapId = const Uuid().v4();
         Map<String, dynamic> individual = <String, dynamic>{
           'fromUid': _auth.currentUser!.uid,
           'toUid': userId,
-          'addedAt': now
+          'addedAt': now,
+          'anonymous': isAnonymous,
         };
         nonEmptySliderValues.forEach((key, value) {
           individual[key] = SwapData(value: value).toJson();
         });
-        // Map<String, Swap> swap = {};
-        DateTime start = DateTime(now.year, now.month, now.day);
-        List<DateTime> days =
-            List.generate(8, (i) => start.subtract(Duration(days: i)));
         var batch = _firestore.batch();
 
         // for each key in the map update the swap collection:
@@ -261,22 +267,18 @@ class AuthMethods {
         // 2. if the user is swapped for a property then append it to individual and update weekly and cumulative
 
         batch.set(
-          _firestore
-              .collection('swaps')
-              .doc(userId + '_swapped_' + _auth.currentUser!.uid)
-              .collection("individual")
-              .doc(swapId),
+          _firestore.collection("individual").doc(swapId),
           individual,
           SetOptions(merge: true),
         );
         nonEmptySliderValues.forEach((key, value) {
           batch.set(
-            _firestore
-                .collection('swaps')
-                .doc(userId + '_swapped_' + _auth.currentUser!.uid),
+            _firestore.collection('swaps').doc(userId),
             {
-              'lastSwappedAt': now,
-              'lastSwappedID': swapId,
+              _auth.currentUser!.uid: {
+                'lastSwappedAt': now,
+                'lastSwappedID': swapId,
+              },
               'cumulative': {
                 key: {
                   'sum': FieldValue.increment(value),
@@ -297,7 +299,23 @@ class AuthMethods {
             },
             SetOptions(merge: true),
           );
+          // for (var day in days) {
+          //   batch.set(
+          //       _firestore
+          //           .collection('swaps')
+          //           .doc(userId)
+          //           .collection("weekly")
+          //           .doc(day.toString()),
+          //       {
+          //         key: {
+          //           'sum': FieldValue.increment(value),
+          //           'count': FieldValue.increment(1)
+          //         }
+          //       },
+          //       SetOptions(merge: true));
+          // }
         });
+        // _firestore.collection('swaps').doc(userId).collection("weekly").where();
 
         await batch.commit();
         res = "Success";
@@ -309,10 +327,43 @@ class AuthMethods {
     return res;
   }
 
-  Future<Map<String, Map<String, dynamic>>> getAttributes(String uid) {
-    Map<String, Map<String, dynamic>> attributes = {};
-    var data =  _firestore
-        .collection('swaps').doc(uid + '_swapped_' + _auth.currentUser!.uid).get();
-        
+  Future<Map<String, double>?>? getCombinedAttributes(String uid,
+      {bool weekly = false}) async {
+    Map<String, double> attributes = {};
+    if (weekly) {
+      // return Future<Map<String, double>>.value(null);
+      // DateTime now = DateTime.now();
+      // DateTime weekBefore = DateTime(now.year, now.month, now.day)
+      //     .subtract(const Duration(days: 7));
+      // var data = _firestore.collection('swaps').doc(uid).get();
+
+      // return data.then((snapshot) {
+      //   if (snapshot.exists) {
+      //     Map<String, double> swap = snapshot.data() ?? {};
+      //     swap.forEach((key, value) {
+      //       Map<String, double> weekly = value;
+      //       weekly.forEach((key, value) {
+      //         attributes[key] = value;
+      //       });
+      //     });
+      //   }
+      //   return attributes;
+      // }).catchError((e) {
+      //   log(e.toString());
+      // });
+    } else {
+      var snapshot = await _firestore.collection('swaps').doc(uid).get();
+      if (snapshot.exists) {
+        Map<String, dynamic> swap = snapshot.data() ?? {};
+        Map<String, dynamic> cumulative = swap['cumulative'] ?? {};
+        cumulative.forEach((key, value) {
+          if (value['count'] != null && value['count'] != 0) {
+            attributes[key] = value['sum'] / value['count'];
+          }
+        });
+      }
+    }
+    log(attributes.toString());
+    return attributes;
   }
 }

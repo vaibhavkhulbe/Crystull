@@ -56,7 +56,9 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          elevation: 1,
+        ),
         body: SingleChildScrollView(
           child: SafeArea(
             child: Container(

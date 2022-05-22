@@ -24,6 +24,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
@@ -35,29 +36,33 @@ class _SearchScreenState extends State<SearchScreen> {
             color: Colors.black12,
             borderRadius: BorderRadius.circular(60),
           ),
-          // margin: const EdgeInsets.symmetric(vertical: 16),
           child: TextFormField(
             controller: _searchController,
             onFieldSubmitted: (value) {
               if (value.isNotEmpty) {
-                setState(() {
-                  _isShowUsers = true;
-                });
+                setState(
+                  () {
+                    _isShowUsers = true;
+                  },
+                );
               } else {
-                setState(() {
-                  _isShowUsers = false;
-                });
+                setState(
+                  () {
+                    _isShowUsers = false;
+                  },
+                );
               }
             },
             style: const TextStyle(color: Colors.black, fontSize: 14),
             decoration: InputDecoration(
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                hintText: 'Search people',
-                hintStyle: const TextStyle(color: Colors.black54),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(60),
-                )),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              hintText: 'Search people',
+              hintStyle: const TextStyle(color: Colors.black54),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(60),
+              ),
+            ),
           ),
         ),
       ),
@@ -107,11 +112,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                   doc['profileImageUrl'].toString()),
                             ),
                             const SizedBox(width: 10),
-                            Text((doc['fullName'] as String).capitalize(),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.black54,
-                                )),
+                            Text(
+                              (doc['fullName'] as String).capitalize(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                color: Colors.black54,
+                              ),
+                            ),
                             Container(
                               margin: const EdgeInsets.symmetric(horizontal: 4),
                               width: 5,
@@ -120,13 +127,15 @@ class _SearchScreenState extends State<SearchScreen> {
                                   color: Colors.black54,
                                   shape: BoxShape.circle),
                             ),
-                            Text(doc['bio'],
-                                strutStyle:
-                                    const StrutStyle(forceStrutHeight: true),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black54,
-                                )),
+                            Text(
+                              doc['bio'],
+                              strutStyle:
+                                  const StrutStyle(forceStrutHeight: true),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black54,
+                              ),
+                            ),
                             // Flexible(child: Container(), flex: 6),
                           ],
                         ),
@@ -134,15 +143,17 @@ class _SearchScreenState extends State<SearchScreen> {
                     );
                   },
                 );
-              })
+              },
+            )
           : const Center(
               child: Text(
-              'Enter a user name to search',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.black54,
+                'Enter a user name to search',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.black54,
+                ),
               ),
-            )),
+            ),
     );
   }
 }

@@ -61,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(children: getDrawerList(context, _user!)),
       ),
       appBar: AppBar(
+          elevation: 1,
           backgroundColor: Colors.white,
           leading: Builder(
             builder: (BuildContext context) {

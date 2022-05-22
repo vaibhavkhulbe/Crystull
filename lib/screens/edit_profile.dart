@@ -66,6 +66,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
@@ -76,10 +77,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const Text("Edit Profile", style: TextStyle(color: Colors.black)),
       ),
       body: Container(
-        decoration: BoxDecoration(color: Color(0xFFE5E5E5)),
+        decoration: const BoxDecoration(color: Color(0xFFE5E5E5)),
         child: ListView(
           children: [
             Card(
+              elevation: 0,
               color: Colors.white,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
@@ -141,6 +143,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   )),
             ),
             Card(
+              elevation: 0,
               color: Colors.white,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,

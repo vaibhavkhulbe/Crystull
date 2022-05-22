@@ -1,5 +1,6 @@
 import 'package:crystull/providers/user_provider.dart';
 import 'package:crystull/resources/models/signup.dart';
+import 'package:crystull/screens/friend_request_screen.dart';
 import 'package:crystull/screens/home_screen.dart';
 import 'package:crystull/screens/profile_screen.dart';
 import 'package:crystull/widgets/bottom_nav_bar_item.dart';
@@ -61,8 +62,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
               onPageChanged: onPageChanged,
               children: [
                 const HomeScreen(),
-                const Text("FriendRequests",
-                    style: TextStyle(color: Colors.black)),
+                const FriendRequestScreen(),
                 const Text("Notifications",
                     style: TextStyle(color: Colors.black)),
                 ProfileScreen(user: _user, isHome: true),

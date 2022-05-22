@@ -43,3 +43,36 @@ class CircleThumbShape extends SliderComponentShape {
     canvas.drawCircle(center, thumbRadius, borderPaint);
   }
 }
+
+Widget getSliderWidgetWithLabel(
+    String columnName, double value, void Function(double) onchanged,
+    {double min = 0, double max = 100}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      Text(
+        columnName,
+        style: const TextStyle(color: Colors.black54, fontSize: 12),
+      ),
+      const SizedBox(height: 10),
+      SliderTheme(
+        data: SliderThemeData(
+          overlayShape: SliderComponentShape.noOverlay,
+          trackHeight: 6,
+          activeTrackColor: Colors.lightBlueAccent,
+          inactiveTrackColor: const Color(0xFFEEEEEE),
+          thumbColor: Colors.white,
+          thumbShape: const CircleThumbShape(),
+          // trackShape:
+        ),
+        child: Slider(
+          value: value,
+          label: value.toString(),
+          min: min,
+          max: max,
+          onChanged: onchanged,
+        ),
+      ),
+    ],
+  );
+}

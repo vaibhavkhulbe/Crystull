@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 class DrawerWidget extends StatelessWidget {
   final String imgURL;
   final String drawerKey;
-  final Function onTap;
+  final Function() onTap;
   const DrawerWidget(
       {Key? key,
       required this.imgURL,
@@ -16,7 +16,7 @@ class DrawerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap(),
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(
             vertical: getSafeAreaHeight(context) * 0.02,

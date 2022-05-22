@@ -49,6 +49,26 @@ class _SignupHomeScreenState extends State<SignupScreen> {
     return res;
   }
 
+  List<String> nullCheck() {
+    List<String> _nullCheck = [];
+    if (_firstNameController.text.isEmpty) {
+      _nullCheck.add("Please add your first name");
+    }
+    if (_emailController.text.isEmpty) {
+      _nullCheck.add("Please add your email");
+    }
+    if (_passwordController.text.isEmpty) {
+      _nullCheck.add("Please add your password");
+    }
+    if (_confirmPasswordController.text.isEmpty) {
+      _nullCheck.add("Please enter the password again");
+    }
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _nullCheck.add("Password does not match");
+    }
+    return _nullCheck;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -216,47 +236,67 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                 // button to sign up
                 InkWell(
                   onTap: () {
-                    // send OTP to user's email and open OTP screen
-                    Future<bool> otpSent = sendOTP();
-                    otpSent.then((value) {
-                      if (!value) {
-                        setState(() {
-                          otpStatus = "OTP Sending failed";
-                        });
-                        showSnackBar(otpStatus, context);
-                        setState(() {
-                          _isLoading = false;
-                        });
-                      } else {
-                        setState(() {
-                          otpStatus = "OTP Sent successfully";
-                        });
-                        showSnackBar(otpStatus, context);
-                        final CrystullUser _signupForm = CrystullUser(
-                          _firstNameController.text,
-                          _lastNameController.text,
-                          _emailController.text,
-                          _passwordController.text,
-                        );
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EmailOTPScreen(
-                              signupForm: _signupForm,
-                              emailAuth: _emailAuth,
+                    List<String> message;
+                    message = nullCheck();
+                    if (message.isEmpty) {
+                      // send OTP to user's email and open OTP screen
+                      Future<bool> otpSent = sendOTP();
+                      otpSent.then((value) {
+                        if (!value) {
+                          setState(
+                            () {
+                              otpStatus = "OTP Sending failed";
+                            },
+                          );
+                          showSnackBar(otpStatus, context);
+                          setState(
+                            () {
+                              _isLoading = false;
+                            },
+                          );
+                        } else {
+                          setState(
+                            () {
+                              otpStatus = "OTP Sent successfully";
+                            },
+                          );
+                          showSnackBar(otpStatus, context);
+                          final CrystullUser _signupForm = CrystullUser(
+                            _firstNameController.text,
+                            _lastNameController.text,
+                            _emailController.text,
+                            _passwordController.text,
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EmailOTPScreen(
+                                signupForm: _signupForm,
+                                emailAuth: _emailAuth,
+                              ),
                             ),
-                          ),
-                        );
-                        setState(() {
-                          _isLoading = false;
-                        });
+                          );
+                          setState(
+                            () {
+                              _isLoading = false;
+                            },
+                          );
+                        }
+                      }).catchError(
+                        (e) {
+                          showSnackBar(e.toString(), context);
+                          setState(
+                            () {
+                              _isLoading = false;
+                            },
+                          );
+                        },
+                      );
+                    } else {
+                      for (String s in message) {
+                        showSnackBar(s, context);
                       }
-                    }).catchError((e) {
-                      showSnackBar(e.toString(), context);
-                      setState(() {
-                        _isLoading = false;
-                      });
-                    });
+                    }
                   },
                   child: Container(
                     child: _isLoading

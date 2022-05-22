@@ -4,7 +4,8 @@ showAlertDialog(BuildContext context, String title, String message,
     Function()? cancelFunction, Function()? confirmFunction) {
   // set up the buttons
   Widget cancelButton = TextButton(
-    child: Text("Cancel", style: TextStyle(color: Colors.lightBlueAccent)),
+    child:
+        const Text("Cancel", style: TextStyle(color: Colors.lightBlueAccent)),
     onPressed: () {
       Navigator.of(context).pop();
       if (cancelFunction != null) {
@@ -13,7 +14,8 @@ showAlertDialog(BuildContext context, String title, String message,
     },
   );
   Widget continueButton = TextButton(
-    child: Text("Continue", style: TextStyle(color: Colors.lightBlueAccent)),
+    child:
+        const Text("Continue", style: TextStyle(color: Colors.lightBlueAccent)),
     onPressed: () {
       Navigator.of(context).pop();
       if (confirmFunction != null) {
@@ -24,8 +26,8 @@ showAlertDialog(BuildContext context, String title, String message,
   // set up the AlertDialog
   AlertDialog alert = AlertDialog(
     backgroundColor: Colors.white,
-    title: Text(title, style: TextStyle(color: Colors.black)),
-    content: Text(message, style: TextStyle(color: Colors.black54)),
+    title: Text(title, style: const TextStyle(color: Colors.black)),
+    content: Text(message, style: const TextStyle(color: Colors.black54)),
     actions: [
       cancelButton,
       continueButton,
