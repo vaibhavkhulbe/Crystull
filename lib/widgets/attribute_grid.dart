@@ -1,3 +1,4 @@
+import 'package:crystull/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 Widget getAttributesGridFromValues(
@@ -24,7 +25,7 @@ Widget getAttributesGridFromValues(
             Text(entry.value.toStringAsFixed(0) + "%",
                 style: const TextStyle(
                   fontSize: 16,
-                  color: Colors.lightBlueAccent,
+                  color: primaryColor,
                   fontWeight: FontWeight.bold,
                 )),
             Flexible(child: Container()),

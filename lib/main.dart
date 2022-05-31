@@ -7,6 +7,7 @@ import 'package:crystull/responsive/web_screen_layout.dart';
 import 'package:crystull/screens/login_screen.dart';
 import 'package:crystull/utils/config.dart';
 import 'package:crystull/utils/colors.dart';
+import 'package:crystull/utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -68,10 +69,16 @@ class MyApp extends StatelessWidget {
               }
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container(
-                color: Colors.white,
-                child: const CircularProgressIndicator(
-                  color: Colors.lightBlueAccent,
+              return SafeArea(
+                child: Container(
+                  height: getSafeAreaHeight(context),
+                  width: getSafeAreaWidth(context),
+                  color: Colors.white,
+                  child: const Center(
+                      child: CircularProgressIndicator(
+                    color: primaryColor,
+                    backgroundColor: Colors.white,
+                  )),
                 ),
               );
             }

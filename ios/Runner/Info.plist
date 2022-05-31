@@ -49,5 +49,35 @@
 	<string>Camera Usage Description</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone Usage Description</string>
+	<key>FacebookAppID</key>
+	<string>540841750745207</string>
+	<key>FacebookClientToken</key>
+	<string>791e272e29c316b1c3c01593cf43ff2a</string>
+	<key>FacebookDisplayName</key>
+	<string>Crystull</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>facebook</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb540841750745207</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.485376729915-l2t8dg35075e12lo0ntqjlom83vjddrm</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

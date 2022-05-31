@@ -3,13 +3,14 @@ import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/responsive/mobile_screen_layout.dart';
 import 'package:crystull/responsive/response_layout_screen.dart';
 import 'package:crystull/responsive/web_screen_layout.dart';
-import 'package:crystull/screens/home_screen.dart';
 import 'package:crystull/screens/login_with_otp_screen.dart';
 import 'package:crystull/screens/signup_screen.dart';
+import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:crystull/widgets/text_field_widget.dart';
 import 'package:email_auth/email_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -30,6 +31,39 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+  }
+
+  void handleLoginResult(Future<String> result) {
+    result.then((value) {
+      if (value != "Success") {
+        showSnackBar("User login failed with error: " + value, context);
+
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        showSnackBar("User logged in successfully.", context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return ResponsiveLayout(
+                  webScreenLayout: const WebScreenLayout(),
+                  mobileScreenLayout: MobileScreenLayout());
+            },
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }).catchError((onError) {
+      showSnackBar(
+          "User login failed with error: " + onError.toString(), context);
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   Future<bool> sendOTP() async {
@@ -68,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    color: Colors.lightBlueAccent,
+                    color: primaryColor,
                   ),
                 ),
 
@@ -132,15 +166,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Container(
                     child: const Text("Login with OTP",
                         style: TextStyle(
-                          color: Colors.lightBlueAccent,
+                          color: primaryColor,
                           fontSize: 18,
                         )),
                     width: double.infinity,
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      border:
-                          Border.all(color: Colors.lightBlueAccent, width: 2),
+                      border: Border.all(color: primaryColor, width: 2),
                       color: Colors.white,
                     ),
                   ),
@@ -163,46 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     });
                     Future<String> result =
                         AuthMethods().loginUser(signupForm: form);
-                    result.then((value) {
-                      if (value != "Success") {
-                        showSnackBar(
-                            "User login failed with error: " + value, context);
-
-                        setState(() {
-                          _isLoading = false;
-                        });
-                        // Navigator.pushReplacement(context,
-                        //     MaterialPageRoute(builder: (context) {
-                        //   return const SignupScreen();
-                        // }));
-                      } else {
-                        showSnackBar("User logged in successfully.", context);
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (context) {
-                          return ResponsiveLayout(
-                              webScreenLayout: const WebScreenLayout(),
-                              mobileScreenLayout: MobileScreenLayout());
-                        }));
-
-                        setState(() {
-                          _isLoading = false;
-                        });
-                      }
-                    }).catchError((onError) {
-                      showSnackBar(
-                          "User login failed with error: " + onError.toString(),
-                          context);
-
-                      setState(() {
-                        _isLoading = false;
-                      });
-                      // Navigator.pushReplacement(context,
-                      //     MaterialPageRoute(builder: (context) {
-                      //   return const ResponsiveLayout(
-                      //       webScreenLayout: WebScreenLayout(),
-                      //       mobileScreenLayout: MobileScreenLayout());
-                      // }));
-                    });
+                    handleLoginResult(result);
                   },
                   child: Container(
                     child: _isLoading
@@ -218,9 +212,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      border:
-                          Border.all(color: Colors.lightBlueAccent, width: 2),
-                      color: Colors.lightBlueAccent,
+                      border: Border.all(color: primaryColor, width: 2),
+                      color: primaryColor,
                     ),
                   ),
                 ),
@@ -247,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text("Sign up",
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.lightBlueAccent,
+                            color: primaryColor,
                           )),
                     ),
                   ],
@@ -256,35 +249,79 @@ class _LoginScreenState extends State<LoginScreen> {
                 Flexible(child: Container(), flex: 1),
 
                 Container(
-                    alignment: Alignment.center,
-                    child: const Text(
-                      "or",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
-                      ),
-                    )),
+                  height: 20,
+                  alignment: Alignment.center,
+                  // padding: EdgeInsets.all(20),
+                  child: const Text(
+                    "or",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+
+                Flexible(child: Container(), flex: 1),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Flexible(child: Container(), flex: 1),
-                    const Icon(
-                      Icons.facebook_rounded,
-                      color: Colors.red,
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        Future<String> result = AuthMethods().loginWithGoogle();
+                        handleLoginResult(result);
+                      },
+                      child: Container(
+                        height: 36,
+                        width: 36,
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFEB4235),
+                          shape: BoxShape.circle,
+                        ),
+                        child: SvgPicture.asset(
+                          'images/google_logo.svg',
+                          color: Colors.white,
+                          height: 18,
+                          width: 18,
+                        ),
+                      ),
                     ),
-                    Flexible(child: Container(), flex: 1),
-                    const Icon(
-                      Icons.facebook_rounded,
-                      color: Colors.blue,
+                    const SizedBox(
+                      width: 40,
                     ),
-                    Flexible(child: Container(), flex: 1)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        Future<String> result =
+                            AuthMethods().loginWithFacebook();
+                        handleLoginResult(result);
+                      },
+                      child: Container(
+                        height: 36,
+                        width: 36,
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF256BB3),
+                          shape: BoxShape.circle,
+                        ),
+                        child: SvgPicture.asset(
+                          'images/fb_logo.svg',
+                          color: Colors.white,
+                          height: 18,
+                          width: 9,
+                        ),
+                      ),
+                    ),
                   ],
-                ),
-
-                Flexible(child: Container(), flex: 2),
+                )
               ],
             ),
           ),

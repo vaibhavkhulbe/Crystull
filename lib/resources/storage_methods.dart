@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:crystull/resources/models/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -19,17 +18,8 @@ class StorageMethods {
     return downloadURL;
   }
 
-  Future<Uint8List?> downloadImage(String childName) async {
-    Reference ref =
-        _storage.ref().child(childName).child(_auth.currentUser!.uid);
-    Uint8List? image = await ref.getData();
-    return image;
-  }
-
-  static Future<Uint8List?> downloadUserImage(
-      String childName, CrystullUser user) async {
-    FirebaseStorage _storage = FirebaseStorage.instance;
-    Reference ref = _storage.ref().child(childName).child(user.uid);
+  Future<Uint8List?> downloadUserImage(String childName, String userUid) async {
+    Reference ref = _storage.ref().child(childName).child(userUid);
     Uint8List? image = await ref.getData();
     return image;
   }

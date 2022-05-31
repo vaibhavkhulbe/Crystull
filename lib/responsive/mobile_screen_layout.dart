@@ -2,7 +2,11 @@ import 'package:crystull/providers/user_provider.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/friend_request_screen.dart';
 import 'package:crystull/screens/home_screen.dart';
+import 'package:crystull/screens/login_screen.dart';
+import 'package:crystull/screens/notifications_screen.dart';
 import 'package:crystull/screens/profile_screen.dart';
+import 'package:crystull/utils/colors.dart';
+import 'package:crystull/utils/utils.dart';
 import 'package:crystull/widgets/bottom_nav_bar_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +22,6 @@ class MobileScreenLayout extends StatefulWidget {
 
 class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   late PageController _pageController;
-  // SignupForm _signupForm;
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
-  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -63,8 +64,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
               children: [
                 const HomeScreen(),
                 const FriendRequestScreen(),
-                const Text("Notifications",
-                    style: TextStyle(color: Colors.black)),
+                const NotificationsScreen(),
                 ProfileScreen(user: _user, isHome: true),
               ],
             ),
@@ -82,10 +82,17 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
                       isProfile: true, profileImage: _user.profileImage),
                 ]),
           )
-        : const Center(
-            child: CircularProgressIndicator(
-            color: Colors.lightBlueAccent,
-            backgroundColor: Colors.white,
-          ));
+        : SafeArea(
+            child: Container(
+              height: getSafeAreaHeight(context),
+              width: getSafeAreaWidth(context),
+              color: Colors.white,
+              child: const Center(
+                  child: CircularProgressIndicator(
+                color: primaryColor,
+                backgroundColor: Colors.white,
+              )),
+            ),
+          );
   }
 }

@@ -6,9 +6,11 @@ import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/connected_friends_screen.dart';
 import 'package:crystull/screens/profile_screen.dart';
 import 'package:crystull/screens/search_screen.dart';
+import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:crystull/widgets/status_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class FriendRequestScreen extends StatefulWidget {
@@ -25,7 +27,8 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
   void handleResult(String result) {
     if (result == "Success") {
       setState(() {
-        // refreshUser();
+        var userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.refreshUser();
       });
     } else {
       showSnackBar(result, context);
@@ -44,6 +47,7 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 1,
+          leading: null,
           centerTitle: false,
           title: const Text(
             'Requests',
@@ -67,16 +71,17 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                   const Text(
                     'Connections',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
+                      fontFamily: "Poppins",
+                      color: color575757,
+                      fontSize: 14,
                       height: 1.5,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   Text(
                     ' (${friendCount[3].toString()})',
                     style: const TextStyle(
-                      color: Colors.lightBlueAccent,
+                      color: primaryColor,
                       fontSize: 16,
                       height: 1.5,
                       fontWeight: FontWeight.bold,
@@ -102,9 +107,21 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
               ),
             ),
             friendCount[2] == 0
-                ? const Center(
-                    child: Text('No new requests',
-                        style: TextStyle(fontSize: 20, color: Colors.black54)),
+                ? Container(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    alignment: Alignment.center,
+                    child: const Center(
+                      child: Text(
+                        'No new requests',
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                          fontSize: 20,
+                          color: Colors.black54,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   )
                 : ListView(
                     shrinkWrap: true,
@@ -159,15 +176,27 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                               ),
                                             ),
                                             connectedFriends.isNotEmpty
-                                                ? Text(
-                                                    '${connectedFriends.length} other shared connections',
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                      height: 1.5,
-                                                      decoration: TextDecoration
-                                                          .underline,
-                                                      color: Colors.black54,
-                                                    ),
+                                                ? Row(
+                                                    children: [
+                                                      SvgPicture.asset(
+                                                        'images/icons/otherConnections.svg',
+                                                        color: Colors.black54,
+                                                        width: 12,
+                                                        height: 12,
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        '${connectedFriends.length} other shared connections',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          height: 1.5,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .underline,
+                                                          color: Colors.black54,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   )
                                                 : Container(),
                                             Text(
@@ -181,9 +210,9 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                             Row(children: [
                                               getStatusButton(
                                                 Colors.white,
-                                                Colors.lightBlueAccent,
+                                                primaryColor,
                                                 "Accept",
-                                                Colors.lightBlueAccent,
+                                                primaryColor,
                                                 () async {
                                                   String result =
                                                       await AuthMethods()

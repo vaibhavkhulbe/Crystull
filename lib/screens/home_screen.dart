@@ -3,8 +3,10 @@ import 'package:crystull/providers/user_provider.dart';
 import 'package:crystull/resources/drawer_list.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/search_screen.dart';
+import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -56,34 +58,42 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     CrystullUser? _user = Provider.of<UserProvider>(context).getUser;
     return Scaffold(
-      drawer: Drawer(
-        backgroundColor: Colors.white,
-        child: ListView(children: getDrawerList(context, _user!)),
+      drawer: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.6,
+        child: Drawer(
+          backgroundColor: Colors.white,
+          child: ListView(children: getDrawerList(context, _user!)),
+        ),
       ),
       appBar: AppBar(
-          elevation: 1,
-          backgroundColor: Colors.white,
-          leading: Builder(
-            builder: (BuildContext context) {
-              return IconButton(
-                icon: const Icon(
-                  Icons.menu,
-                  color: Colors.black54,
-                ),
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-              );
-            },
+        elevation: 1,
+        backgroundColor: Colors.white,
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: SvgPicture.asset(
+                'images/icons/drawer.svg',
+                color: Colors.black54,
+              ),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+            );
+          },
+        ),
+        actions: [
+          // Navigate to the Search Screen
+          IconButton(
+            onPressed: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const SearchScreen())),
+            icon: SvgPicture.asset(
+              'images/icons/search.svg',
+              color: Colors.black54,
+            ),
           ),
-          actions: [
-            // Navigate to the Search Screen
-            IconButton(
-                onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const SearchScreen())),
-                icon: const Icon(Icons.search, color: Colors.black54)),
-          ]),
+        ],
+      ),
       backgroundColor: const Color.fromRGBO(0, 0, 0, 0.04),
       body: SingleChildScrollView(
         child: Column(
@@ -110,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: _current == entry.key
-                                  ? Colors.lightBlueAccent
+                                  ? primaryColor
                                   : Colors.black54,
                             ),
                           ),
@@ -136,9 +146,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     "Trending Crystullites of the week",
                     style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
+                      fontFamily: "Poppins",
+                      color: color575757,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),

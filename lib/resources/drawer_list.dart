@@ -1,6 +1,10 @@
 import 'package:crystull/resources/models/signup.dart';
+import 'package:crystull/responsive/mobile_screen_layout.dart';
+import 'package:crystull/screens/activities_screen.dart';
 import 'package:crystull/screens/connected_friends_screen.dart';
 import 'package:crystull/screens/login_screen.dart';
+import 'package:crystull/screens/search_screen.dart';
+import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:crystull/widgets/drawer_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,10 +30,10 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
     ),
     Container(
       padding:
-          EdgeInsets.symmetric(vertical: getSafeAreaHeight(context) * 0.02),
+          EdgeInsets.symmetric(vertical: getSafeAreaHeight(context) * 0.03),
       height: getSafeAreaHeight(context) * 0.2,
-      decoration: BoxDecoration(
-        color: Colors.lightBlue[50],
+      decoration: const BoxDecoration(
+        color: Color(0xFFE7F7FF),
       ),
       child: Column(
         children: [
@@ -41,16 +45,32 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
                   : const ExactAssetImage('images/avatar.png'),
             ),
           ),
-          SizedBox(height: getSafeAreaHeight(context) * 0.04),
-          Text(user.firstName + " " + user.lastName,
-              style: const TextStyle(color: Colors.black)),
+          Flexible(child: Container()),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MobileScreenLayout(screen: 3),
+                ),
+              );
+            },
+            child: Text(user.fullName.capitalize(),
+                style: const TextStyle(
+                  fontFamily: "Poppins",
+                  color: color575757,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                )),
+          ),
         ],
       ),
     ),
     DrawerWidget(
         imgURL: 'images/icons/activities.svg',
         drawerKey: 'Activities',
-        onTap: () {}),
+        onTap: () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => ActivitiesScreen()))),
     InkWell(
       onTap: () => Navigator.push(
           context,
@@ -70,9 +90,10 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
         ),
         Text(friendCount.toString(),
             style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.black)),
+                fontFamily: "Poppins",
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: color575757)),
         Flexible(child: Container()),
       ]),
     ),
@@ -88,11 +109,16 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
         imgURL: 'images/icons/help.svg', drawerKey: 'Help', onTap: () {}),
     InkWell(
         child: const Center(
-            child: Text('Logout',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.black))),
+          child: Text(
+            'Logout',
+            style: TextStyle(
+              fontFamily: "Poppins",
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+              color: color575757,
+            ),
+          ),
+        ),
         onTap: () {
           _auth.signOut();
           Navigator.pushReplacement(context,

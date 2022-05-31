@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:crystull/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -13,18 +14,15 @@ BottomNavigationBarItem getBottomNavBarWidget(
         border: Border(
           bottom: BorderSide(
               width: 2,
-              color: _currScreen == widgetScreen
-                  ? Colors.lightBlueAccent
-                  : Colors.white),
+              color: _currScreen == widgetScreen ? primaryColor : Colors.white),
         ),
       ),
       child: isProfile && profileImage != null
           ? CircleAvatar(radius: 20, backgroundImage: MemoryImage(profileImage))
           : SvgPicture.asset(
               imgURL,
-              color: _currScreen == widgetScreen
-                  ? Colors.lightBlueAccent
-                  : Colors.black54,
+              color:
+                  _currScreen == widgetScreen ? primaryColor : Colors.black54,
             ),
     ),
   );

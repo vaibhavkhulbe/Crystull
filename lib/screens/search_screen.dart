@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/profile_screen.dart';
+import 'package:crystull/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -53,12 +54,23 @@ class _SearchScreenState extends State<SearchScreen> {
                 );
               }
             },
-            style: const TextStyle(color: Colors.black, fontSize: 14),
+            style: const TextStyle(
+              fontFamily: "Popins",
+              fontSize: 12,
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+            ),
             decoration: InputDecoration(
               contentPadding:
                   const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
               hintText: 'Search people',
-              hintStyle: const TextStyle(color: Colors.black54),
+              hintStyle: const TextStyle(
+                fontFamily: "Poppins",
+                fontSize: 12,
+                height: 1.5,
+                color: Color(0xFFB5B5B5),
+                fontWeight: FontWeight.w400,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(60),
               ),
@@ -80,7 +92,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(
-                      color: Colors.lightBlueAccent,
+                      color: primaryColor,
                     ),
                   );
                 } else if (!snapshot.hasData) {

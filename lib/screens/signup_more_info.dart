@@ -5,6 +5,7 @@ import 'package:crystull/responsive/mobile_screen_layout.dart';
 import 'package:crystull/responsive/response_layout_screen.dart';
 import 'package:crystull/responsive/web_screen_layout.dart';
 import 'package:crystull/screens/signup_screen.dart';
+import 'package:crystull/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:crystull/widgets/text_field_widget.dart';
@@ -43,11 +44,17 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
   }
 
   void selectImage() async {
-    Uint8List _image = await pickImage(ImageSource.gallery);
-    Uint8List _compressedImage = await comporessList(_image);
-    setState(() {
-      _profileImage = _compressedImage;
-    });
+    Uint8List? _image = await pickImage(ImageSource.gallery);
+    Uint8List _compressedImage;
+    if (_image != null) {
+      _compressedImage = await compressList(_image);
+      setState(() {
+        _profileImage = _compressedImage;
+      });
+    } else {
+      //User canceled the picker. You need do something here, or just add return
+      return;
+    }
   }
 
   List<String> nullCheck() {
@@ -127,7 +134,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                   style: const TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    color: Colors.lightBlueAccent,
+                    color: primaryColor,
                   ),
                 ),
 
@@ -161,7 +168,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                     onTap: selectImage,
                     child: const Text("Add Photo",
                         style: TextStyle(
-                          color: Colors.lightBlueAccent,
+                          color: primaryColor,
                           fontWeight: FontWeight.bold,
                         )),
                   ),
@@ -333,9 +340,8 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      border:
-                          Border.all(color: Colors.lightBlueAccent, width: 2),
-                      color: Colors.lightBlueAccent,
+                      border: Border.all(color: primaryColor, width: 2),
+                      color: primaryColor,
                     ),
                   ),
                 ),

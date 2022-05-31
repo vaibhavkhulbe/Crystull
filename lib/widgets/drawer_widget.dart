@@ -1,3 +1,4 @@
+import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -32,7 +33,11 @@ class DrawerWidget extends StatelessWidget {
                       size: getSafeAreaWidth(context) * 0.04),
               SizedBox(width: getSafeAreaWidth(context) * 0.04),
               Text(drawerKey,
-                  style: const TextStyle(color: Colors.black, fontSize: 16)),
+                  style: const TextStyle(
+                    fontFamily: "Poppins",
+                    color: color575757,
+                    fontSize: 11,
+                  )),
             ]),
       ),
     );

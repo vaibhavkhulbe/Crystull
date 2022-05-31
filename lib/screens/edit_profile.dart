@@ -1,5 +1,7 @@
 import 'package:crystull/resources/auth_methods.dart';
+import 'package:crystull/utils/colors.dart';
 import 'package:crystull/widgets/alert_dialog.dart';
+import 'package:crystull/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:crystull/widgets/text_field_widget.dart';
 import 'package:crystull/resources/models/signup.dart';
@@ -65,17 +67,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 1,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        backgroundColor: Colors.white,
-        centerTitle: false,
-        title:
-            const Text("Edit Profile", style: TextStyle(color: Colors.black)),
-      ),
+      appBar: getAppBar(context, "Edit Profile"),
       body: Container(
         decoration: const BoxDecoration(color: Color(0xFFE5E5E5)),
         child: ListView(
@@ -92,13 +84,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   height: getSafeAreaHeight(context) * 0.1,
                   child: Row(
                     children: [
-                      const Text("Private account",
-                          style:
-                              TextStyle(fontSize: 18, color: Colors.black54)),
+                      const Text(
+                        "Private account",
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                          fontSize: 13,
+                          color: color808080,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
                       Flexible(child: Container()),
                       Switch(
-                        activeColor: Colors.lightBlueAccent,
-                        inactiveTrackColor: Colors.grey,
+                        activeColor: primaryColor,
+                        inactiveTrackColor: secondaryColor,
                         value: widget.user.isPrivate,
                         onChanged: (value) async {
                           if (value) {
@@ -245,9 +243,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             alignment: Alignment.center,
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Colors.lightBlueAccent, width: 2),
-                              color: Colors.lightBlueAccent,
+                              border: Border.all(color: primaryColor, width: 2),
+                              color: primaryColor,
                             ),
                           ),
                         ],

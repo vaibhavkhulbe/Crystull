@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -80,7 +81,7 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: Colors.lightBlueAccent,
+                      color: primaryColor,
                     ),
                   ),
 
@@ -94,8 +95,11 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                         "Enter the OTP sent to " + widget.signupForm.email,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
+                          fontFamily: "Poppins",
+                          fontSize: 16,
+                          height: 1.5,
+                          fontWeight: FontWeight.w400,
+                          color: color808080,
                         ),
                       ),
                     ],
@@ -115,7 +119,14 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                     children: [
                       const Text(
                         "Haven't received it yet? ",
-                        style: TextStyle(color: Colors.black54),
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                          fontSize: 12,
+                          height: 1.5,
+                          fontWeight: FontWeight.w400,
+                          letterSpacing: -0.015,
+                          color: color747474,
+                        ),
                       ),
                       InkWell(
                         onTap: () {
@@ -145,11 +156,16 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                             _isLoading = false;
                           });
                         },
-                        child: const Text("Resend",
-                            style: TextStyle(
-                              color: Colors.lightBlueAccent,
-                              fontWeight: FontWeight.bold,
-                            )),
+                        child: const Text(
+                          "Resend",
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontFamily: "Poppins",
+                            fontSize: 12,
+                            height: 1.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       )
                     ],
                   ),
@@ -176,9 +192,7 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                           // show OTP screen
                           showSnackBar("OTP validated successfully", context);
                           widget.isLoginWithOTP
-                              ?
-                              // login()
-                              log("logged in")
+                              ? log("logged in")
                               : Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -199,22 +213,25 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                               child: CircularProgressIndicator(
                                   color: Colors.white),
                             )
-                          : Text(widget.isLoginWithOTP ? "Login" : "Submit",
+                          : Text(
+                              widget.isLoginWithOTP ? "Login" : "Submit",
                               style: const TextStyle(
+                                fontFamily: "Poppins",
                                 fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              )),
+                                height: 1.5,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
                       width: double.infinity,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        border:
-                            Border.all(color: Colors.lightBlueAccent, width: 2),
-                        color: Colors.lightBlueAccent,
+                        border: Border.all(color: primaryColor, width: 2),
+                        color: primaryColor,
                       ),
                     ),
                   ),
-
                   Flexible(child: Container(), flex: 4),
                 ],
               ),

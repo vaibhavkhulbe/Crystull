@@ -1,12 +1,14 @@
 import 'dart:developer' as developer;
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:crystull/providers/user_provider.dart';
 import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/resources/models/signup.dart';
-import 'package:crystull/responsive/mobile_screen_layout.dart';
 import 'package:crystull/screens/connected_friends_screen.dart';
 import 'package:crystull/screens/edit_profile.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
+import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:crystull/widgets/attribute_grid.dart';
 import 'package:crystull/widgets/slider_grid.dart';
@@ -14,7 +16,9 @@ import 'package:crystull/widgets/status_button.dart';
 import 'package:flutter/material.dart';
 import 'package:crystull/screens/search_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 const List<String> primaryAttributes = [
   'Personality',
@@ -23,6 +27,23 @@ const List<String> primaryAttributes = [
   'Empathy',
   'Character',
   'Welfare',
+];
+
+const List<String> otherAttributes = [
+  "Professional Skill",
+  "Creativity",
+  "Optimism",
+  "Leadership",
+  "Integrity",
+  "Courage",
+  "Humour",
+  "Loyalty",
+  "Enthusiasm",
+  "Problem solving",
+  "Imagination",
+  "Ambitious",
+  "Patience",
+  "Resilience"
 ];
 
 class ProfileScreen extends StatefulWidget {
@@ -41,20 +62,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _loadingPage = true;
   bool isAnonymousPost = false;
   bool _isSwapping = false;
+  bool _isUpdatingCoverPhoto = false;
+  bool _isUpdatingProfilePic = false;
   bool isSwapEnabled = false;
   CrystullUser? _currentUser;
   List<CrystullUser> connectedUsers = [];
   Map<String, double> _swapValues = {};
-  Map<String, double> _topSwapValues = {};
-  Map<String, double> _primarySwapValues = {};
-  Map<String, double> _moreSwapValues = {};
+  final Map<String, double> _topSwapValues = {};
+  final Map<String, double> _primarySwapValues = {};
+  final Map<String, double> _moreSwapValues = {};
 
   @override
   void initState() {
+    super.initState();
     sliderValues = {for (var attribute in primaryAttributes) attribute: 0.0};
     refreshUser();
-    _loadingPage = false;
-    super.initState();
   }
 
   @override
@@ -62,14 +84,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.dispose();
   }
 
-  void handleResult(String result) {
+  void handleResult(String result, {bool isLoading = true}) {
     if (result == "Success") {
       setState(() {
-        refreshUser();
+        refreshUser(isLoading: isLoading);
       });
     } else {
       showSnackBar(result, context);
       developer.log(result);
+    }
+  }
+
+  Future<Uint8List?> selectImage() async {
+    Uint8List? _image = await pickImage(ImageSource.gallery);
+    Uint8List _compressedImage;
+    if (_image != null) {
+      _compressedImage = await compressList(_image);
+      return _compressedImage;
+    }
+    return null;
+  }
+
+  void updateProfilePic() async {
+    setState(() {
+      _isUpdatingProfilePic = true;
+    });
+    Uint8List? image = await selectImage();
+    if (image != null) {
+      var result = await AuthMethods().updateProfilePic(image: image);
+      handleResult(result, isLoading: false);
+    }
+    if (mounted) {
+      setState(() {
+        _isUpdatingProfilePic = false;
+      });
+    }
+  }
+
+  void updateCoverPic() async {
+    setState(() {
+      _isUpdatingCoverPhoto = true;
+    });
+    Uint8List? image = await selectImage();
+    if (image != null) {
+      var result = await AuthMethods().updateCoverPic(image: image);
+      handleResult(result, isLoading: false);
+    }
+    if (mounted) {
+      setState(() {
+        _isUpdatingCoverPhoto = false;
+      });
     }
   }
 
@@ -80,6 +144,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
     String res = await AuthMethods().swapUser(
       widget.user.uid,
+      widget.user.firstName,
+      _currentUser!.uid,
+      _currentUser!.firstName,
       sliderValues,
       isAnonymousPost,
     );
@@ -124,7 +191,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  void refreshUser() async {
+  void refreshUser({bool isLoading = true}) async {
+    setState(() {
+      _loadingPage = isLoading;
+    });
     UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: false);
     await userProvider.refreshUser();
@@ -169,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: const [
             Icon(
               Icons.block,
-              color: Colors.black87,
+              color: color808080,
               size: 20,
             ),
             SizedBox(
@@ -178,7 +248,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Text(
               'Block',
               style: TextStyle(
-                color: Colors.black87,
+                fontFamily: "Poppins",
+                color: color808080,
                 fontSize: 14,
               ),
             ),
@@ -189,7 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: const [
             Icon(
               Icons.check_circle,
-              color: Colors.black87,
+              color: color808080,
               size: 20,
             ),
             SizedBox(
@@ -198,7 +269,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Text(
               'Unblock',
               style: TextStyle(
-                color: Colors.black87,
+                fontFamily: "Poppins",
+                color: color808080,
                 fontSize: 14,
               ),
             ),
@@ -210,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             SvgPicture.asset(
               'images/icons/removeFriend.svg',
-              color: Colors.redAccent,
+              color: const Color(0xFFFF3225),
               width: 20,
               height: 20,
             ),
@@ -220,7 +292,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const Text(
               'Remove',
               style: TextStyle(
-                color: Colors.redAccent,
+                fontFamily: "Poppins",
+                color: Color(0xFFFF3225),
                 fontSize: 14,
               ),
             ),
@@ -236,6 +309,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       }
     }
+    if (mounted) {
+      setState(() {
+        _loadingPage = false;
+      });
+    }
   }
 
   @override
@@ -244,11 +322,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     bool isMe = _currentUser!.uid == widget.user.uid;
     return _loadingPage
-        ? Container(
-            color: Colors.white,
-            child: const CircularProgressIndicator(
-              color: Colors.lightBlueAccent,
-              backgroundColor: Colors.white,
+        ? Center(
+            child: Container(
+              width: getSafeAreaWidth(context),
+              color: Colors.white,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                    color: primaryColor,
+                    backgroundColor: Colors.white,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  isMe
+                      ? const Text(
+                          'Loading Profile. Please Wait.',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 14,
+                          ),
+                        )
+                      : SvgPicture.asset(
+                          'images/crystull_logo.svg',
+                          color: primaryColor,
+                          width: getSafeAreaWidth(context) * 0.5,
+                          height: getSafeAreaHeight(context) * 0.05,
+                        ),
+                ],
+              ),
             ),
           )
         : Scaffold(
@@ -256,7 +359,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ? AppBar(
                     elevation: 1,
                     backgroundColor: Colors.white,
-                    iconTheme: const IconThemeData(color: Colors.black),
+                    iconTheme: const IconThemeData(
+                      color: Colors.black,
+                    ),
                   )
                 : null,
             body: Container(
@@ -276,243 +381,350 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ? getSafeAreaHeight(context) * 0.22
                               : getSafeAreaHeight(context) * 0.25,
                           child: Stack(
-                              clipBehavior: Clip.none,
-                              alignment: Alignment.topLeft,
-                              children: [
-                                // background image
-                                Image.asset(
-                                  'images/home/1.png',
-                                  alignment: Alignment.topLeft,
-                                  fit: BoxFit.fitWidth,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.1,
-                                  width: getSafeAreaWidth(context),
-                                ),
-
-                                // edit background image
-                                isMe
-                                    ? Positioned(
-                                        top:
-                                            MediaQuery.of(context).size.height *
-                                                0.01,
-                                        right:
-                                            MediaQuery.of(context).size.width *
-                                                0.05,
-                                        child: InkWell(
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.white,
-                                                  width: 2),
-                                              color:
-                                                  Colors.white.withOpacity(0.5),
-                                            ),
-                                            child: Row(
-                                              children: const [
-                                                Icon(
-                                                  Icons.camera_alt_rounded,
-                                                  color: Colors.black45,
-                                                  size: 8,
-                                                ),
-                                                SizedBox(width: 5),
-                                                Text(
-                                                  'Edit Photo',
-                                                  style: TextStyle(
-                                                      fontSize: 8,
-                                                      color: Colors.black45),
-                                                ),
-                                              ],
-                                            ),
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.topLeft,
+                            children: [
+                              _isUpdatingCoverPhoto
+                                  ? Container(
+                                      alignment: Alignment.center,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.05,
+                                      child: const CircularProgressIndicator(
+                                        color: primaryColor,
+                                        backgroundColor: Colors.white,
+                                      ),
+                                    )
+                                  : widget.user.coverImageUrl.isNotEmpty
+                                      ? FadeInImage(
+                                          placeholder: const svg.Svg(
+                                              'images/crystull_logo.svg'),
+                                          image: NetworkImage(
+                                            widget.user.coverImageUrl,
                                           ),
+                                          alignment: Alignment.topLeft,
+                                          fit: BoxFit.fitWidth,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.1,
+                                          width: getSafeAreaWidth(context),
+                                        )
+                                      : SvgPicture.asset(
+                                          'images/crystull_logo.svg',
+                                          alignment: Alignment.topLeft,
+                                          fit: BoxFit.fitWidth,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.1,
+                                          width: getSafeAreaWidth(context),
+                                        ),
+
+                              // edit background image
+                              isMe
+                                  ? Positioned(
+                                      top: MediaQuery.of(context).size.height *
+                                          0.01,
+                                      right: MediaQuery.of(context).size.width *
+                                          0.05,
+                                      child: InkWell(
+                                        onTap: () async => updateCoverPic(),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 5),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                              Radius.circular(1.71),
+                                            ),
+                                            border: Border.all(
+                                              color: Colors.white,
+                                              width: 0.5,
+                                            ),
+                                            color:
+                                                Colors.white.withOpacity(0.5),
+                                          ),
+                                          child: Row(
+                                            children: const [
+                                              Icon(
+                                                Icons.camera_alt_rounded,
+                                                color: Colors.black45,
+                                                size: 8,
+                                              ),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                'Edit Photo',
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontSize: 8,
+                                                    color: Colors.black45),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+
+                              // User profile image
+                              Positioned(
+                                top: MediaQuery.of(context).size.height * 0.06,
+                                left: MediaQuery.of(context).size.width * 0.05,
+                                child: _isUpdatingProfilePic
+                                    ? Container(
+                                        width: getSafeAreaWidth(context) * 0.25,
+                                        height:
+                                            getSafeAreaWidth(context) * 0.25,
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                        ),
+                                        child: const CircularProgressIndicator(
+                                          color: primaryColor,
+                                          backgroundColor: Colors.white,
                                         ),
                                       )
-                                    : Container(),
-
-                                // User profile image
-                                Positioned(
-                                    top: MediaQuery.of(context).size.height *
-                                        0.06,
-                                    left: MediaQuery.of(context).size.width *
-                                        0.05,
-                                    child: Container(
-                                      width: getSafeAreaWidth(context) * 0.25,
-                                      height: getSafeAreaWidth(context) * 0.25,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.black54,
-                                        image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: widget.user.profileImage !=
-                                                  null
-                                              ? Image.memory(
-                                                      widget.user.profileImage!)
-                                                  .image
-                                              : widget.user.profileImageUrl
-                                                      .isNotEmpty
-                                                  ? Image.network(widget
-                                                          .user.profileImageUrl)
-                                                      .image
-                                                  : const ExactAssetImage(
-                                                      'images/avatar.png'),
-                                        ),
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 4.0,
-                                        ),
-                                      ),
-                                    )),
-
-                                // User details
-                                Positioned(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.5,
-                                  top:
-                                      MediaQuery.of(context).size.height * 0.11,
-                                  left:
-                                      MediaQuery.of(context).size.width * 0.35,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Wrap(
-                                        alignment: WrapAlignment.start,
-                                        crossAxisAlignment:
-                                            WrapCrossAlignment.start,
-                                        children: [
-                                          Text(
-                                            widget.user.fullName.capitalize(),
-                                            style: const TextStyle(
-                                              color: Color(0xFF575757),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Wrap(
-                                        alignment: WrapAlignment.start,
-                                        crossAxisAlignment:
-                                            WrapCrossAlignment.start,
-                                        children: [
-                                          Text(
-                                            widget.user.bio,
-                                            style: const TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 9,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      widget.user.college.isNotEmpty
-                                          ? Wrap(
-                                              alignment: WrapAlignment.start,
-                                              crossAxisAlignment:
-                                                  WrapCrossAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Studied " +
-                                                      (widget.user.degree
-                                                              .isNotEmpty
-                                                          ? widget.user.degree
-                                                          : "") +
-                                                      " at " +
-                                                      widget.user.college,
-                                                  style: const TextStyle(
-                                                    color: Colors.black54,
-                                                    fontSize: 9,
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          : Container(),
-                                      isMe
-                                          ? Wrap(
-                                              children: [
-                                                InkWell(
-                                                  onTap: () async {
-                                                    await Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              EditProfileScreen(
-                                                                  user: widget
-                                                                      .user),
-                                                        ));
-                                                    setState(() {});
-                                                  },
-                                                  child: const Text(
-                                                    "Edit Profile",
-                                                    style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.black54,
-                                                      fontSize: 8,
+                                    : Container(
+                                        width: getSafeAreaWidth(context) * 0.25,
+                                        height:
+                                            getSafeAreaWidth(context) * 0.25,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.black54,
+                                          image: DecorationImage(
+                                            fit: BoxFit.cover,
+                                            image: widget.user.profileImageUrl
+                                                    .isNotEmpty
+                                                ? FadeInImage(
+                                                    placeholder: const svg.Svg(
+                                                        'images/avatar.png'),
+                                                    image: NetworkImage(
+                                                      widget
+                                                          .user.profileImageUrl,
                                                     ),
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          : Wrap(
-                                              // top: MediaQuery.of(context)
-                                              //         .size
-                                              //         .height *
-                                              //     0.16,
-                                              // left: MediaQuery.of(context)
-                                              //         .size
-                                              //         .width *
-                                              //     0.35,
-                                              children: [
-                                                  getProfileButton(
-                                                      _currentUser!,
-                                                      widget.user)!
-                                                ])
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    fit: BoxFit.fitWidth,
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.1,
+                                                    width: getSafeAreaWidth(
+                                                        context),
+                                                  ).image
+                                                : const ExactAssetImage(
+                                                    'images/avatar.png'),
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 2.0,
+                                          ),
+                                        ),
+                                      ),
+                              ),
+
+                              Positioned(
+                                top: MediaQuery.of(context).size.height * 0.15,
+                                left: MediaQuery.of(context).size.width * 0.135,
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 2.5),
+                                  width: getSafeAreaWidth(context) * 0.08,
+                                  height: getSafeAreaWidth(context) * 0.08,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                      border: Border.all(
+                                        color: primaryColor,
+                                        width: 1,
+                                      )),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        _swapValues.isEmpty
+                                            ? '0'
+                                            : (_swapValues.values.reduce(
+                                                        (value, element) =>
+                                                            value + element) /
+                                                    (_swapValues.values.length *
+                                                        10))
+                                                .round()
+                                                .toString(),
+                                        style: const TextStyle(
+                                          fontFamily: "Poppins",
+                                          fontSize: 10,
+                                          height: 1.5,
+                                          fontWeight: FontWeight.w600,
+                                          color: primaryColor,
+                                        ),
+                                      ),
+                                      const Text(
+                                        "SWAP",
+                                        style: TextStyle(
+                                          fontFamily: "Poppins",
+                                          fontSize: 6,
+                                          height: 1.5,
+                                          fontWeight: FontWeight.w400,
+                                          color: primaryColor,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
-                                !isMe
-                                    ? Positioned(
-                                        top:
-                                            MediaQuery.of(context).size.height *
-                                                0.1,
-                                        right:
-                                            MediaQuery.of(context).size.width *
-                                                0.01,
-                                        child: PopupMenuButton<String>(
-                                          icon: const Icon(
-                                            Icons.more_vert,
-                                            color: Colors.black54,
+                              ),
+
+                              // edit profile photo
+                              Positioned(
+                                top: MediaQuery.of(context).size.height * 0.07,
+                                left: MediaQuery.of(context).size.width * 0.24,
+                                child: InkWell(
+                                  child: SvgPicture.asset(
+                                    "images/icons/editPhoto.svg",
+                                    color: Colors.white,
+                                    height: 26,
+                                    width: 26,
+                                  ),
+                                  onTap: () async => updateProfilePic(),
+                                ),
+                              ),
+
+                              // User details
+                              Positioned(
+                                width: MediaQuery.of(context).size.width * 0.5,
+                                top: MediaQuery.of(context).size.height * 0.11,
+                                left: MediaQuery.of(context).size.width * 0.35,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Wrap(
+                                      alignment: WrapAlignment.start,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.start,
+                                      children: [
+                                        Text(
+                                          widget.user.fullName.capitalize(),
+                                          style: const TextStyle(
+                                            fontFamily: "Poppins",
+                                            color: color575757,
+                                            fontSize: 12,
+                                            height: 1.5,
+                                            fontWeight: FontWeight.w600,
                                           ),
-                                          color: Colors.white,
-                                          onSelected: onSelect,
-                                          itemBuilder: (BuildContext context) {
-                                            return popUpMenuItems.entries
-                                                .map(
-                                                  (mapEntry) =>
-                                                      PopupMenuItem<String>(
-                                                          value: mapEntry.key,
-                                                          child:
-                                                              mapEntry.value),
-                                                )
-                                                .toList();
-                                          },
                                         ),
-                                      )
-                                    : Container(),
-                                // !isMe
-                                //     ? Positioned(
-                                //         top:
-                                //             MediaQuery.of(context).size.height *
-                                //                 0.16,
-                                //         left:
-                                //             MediaQuery.of(context).size.width *
-                                //                 0.35,
-                                //         child: getProfileButton(
-                                //             _currentUser!, widget.user)!)
-                                //     : Container(),
-                              ]),
+                                      ],
+                                    ),
+                                    Wrap(
+                                      alignment: WrapAlignment.start,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.start,
+                                      children: [
+                                        Text(
+                                          widget.user.bio,
+                                          style: const TextStyle(
+                                            fontFamily: "Poppins",
+                                            color: color808080,
+                                            fontSize: 9,
+                                            height: 1.5,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    widget.user.college.isNotEmpty
+                                        ? Wrap(
+                                            alignment: WrapAlignment.start,
+                                            crossAxisAlignment:
+                                                WrapCrossAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Studied " +
+                                                    (widget.user.degree
+                                                            .isNotEmpty
+                                                        ? widget.user.degree
+                                                        : "") +
+                                                    " at " +
+                                                    widget.user.college,
+                                                style: const TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  color: color808080,
+                                                  fontSize: 9,
+                                                  height: 1.5,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : Container(),
+                                    isMe
+                                        ? Wrap(
+                                            children: [
+                                              InkWell(
+                                                onTap: () async {
+                                                  await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            EditProfileScreen(
+                                                                user: widget
+                                                                    .user),
+                                                      ));
+                                                  setState(() {});
+                                                },
+                                                child: const Text(
+                                                  "Edit Profile",
+                                                  style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    color: color808080,
+                                                    fontSize: 8,
+                                                    height: 1.5,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : Wrap(
+                                            children: [
+                                              getProfileButton(
+                                                  _currentUser!, widget.user)!
+                                            ],
+                                          )
+                                  ],
+                                ),
+                              ),
+                              !isMe
+                                  ? Positioned(
+                                      top: MediaQuery.of(context).size.height *
+                                          0.1,
+                                      right: MediaQuery.of(context).size.width *
+                                          0.01,
+                                      child: PopupMenuButton<String>(
+                                        icon: const Icon(
+                                          Icons.more_vert,
+                                          color: Colors.black54,
+                                        ),
+                                        color: Colors.white,
+                                        onSelected: onSelect,
+                                        itemBuilder: (BuildContext context) {
+                                          return popUpMenuItems.entries
+                                              .map(
+                                                (mapEntry) =>
+                                                    PopupMenuItem<String>(
+                                                        value: mapEntry.key,
+                                                        child: mapEntry.value),
+                                              )
+                                              .toList();
+                                        },
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -537,9 +749,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: const Text(
                                   "Primary Attributes",
                                   style: TextStyle(
+                                      fontFamily: "Poppins",
                                       fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF575757)),
+                                      height: 1.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: color575757),
                                 ),
                               ),
                               _primarySwapValues.isNotEmpty
@@ -561,9 +775,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: const Text(
                                   "More Attributes",
                                   style: TextStyle(
+                                      fontFamily: "Poppins",
                                       fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF575757)),
+                                      height: 1.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: color575757),
                                 ),
                               ),
                               _moreSwapValues.isNotEmpty
@@ -595,17 +811,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   widget.user.firstName.capitalize() +
                                       "'s Top Attributes",
                                   style: const TextStyle(
-                                      fontSize: 14, color: Color(0xFF575757)),
+                                    fontFamily: "Poppins",
+                                    fontSize: 14,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: color808080,
+                                  ),
                                 ),
                                 getAttributesGridFromValues(
                                     _topSwapValues, context),
                                 const Center(
                                   child: Text(
-                                      "Send connection request to see all attributes",
-                                      style: TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.black54,
-                                          fontStyle: FontStyle.italic)),
+                                    "Send connection request to see all attributes",
+                                    style: TextStyle(
+                                        fontFamily: "Poppins",
+                                        fontSize: 10,
+                                        height: 1.5,
+                                        fontWeight: FontWeight.w400,
+                                        color: color808080,
+                                        fontStyle: FontStyle.italic),
+                                  ),
                                 ),
                               ],
                             ),
@@ -626,9 +851,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 const Text(
                                   "Connections",
                                   style: TextStyle(
-                                    color: Color(0xFF575757),
-                                    fontWeight: FontWeight.bold,
+                                    fontFamily: "Poppins",
                                     fontSize: 14,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: color575757,
                                   ),
                                 ),
                                 Row(
@@ -637,8 +864,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       connectedUsers.length.toString() +
                                           " Connections",
                                       style: const TextStyle(
-                                        color: Colors.black54,
+                                        fontFamily: "Poppins",
                                         fontSize: 8,
+                                        height: 1.5,
+                                        fontWeight: FontWeight.w400,
+                                        color: color808080,
                                       ),
                                     ),
                                     Flexible(child: Container()),
@@ -654,8 +884,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       child: const Text(
                                         "See all",
                                         style: TextStyle(
-                                          color: Colors.lightBlueAccent,
+                                          fontFamily: "Poppins",
                                           fontSize: 8,
+                                          height: 1.5,
+                                          fontWeight: FontWeight.w400,
+                                          color: primaryColor,
                                         ),
                                       ),
                                     ),
@@ -701,9 +934,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     const BorderRadius.all(
                                                         Radius.circular(4)),
                                                 image: DecorationImage(
-                                                  image: NetworkImage(
+                                                  image: FadeInImage(
+                                                    placeholder: const svg.Svg(
+                                                        'images/avatar.png'),
+                                                    image: NetworkImage(
                                                       connectedUsers[i]
-                                                          .profileImageUrl),
+                                                          .profileImageUrl,
+                                                    ),
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    fit: BoxFit.fitWidth,
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.1,
+                                                    width: getSafeAreaWidth(
+                                                        context),
+                                                  ).image,
                                                   fit: BoxFit.cover,
                                                 ),
                                               ),
@@ -717,8 +965,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       .fullName
                                                       .capitalize(),
                                                   style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14,
+                                                    fontFamily: "Poppins",
+                                                    fontSize: 12,
+                                                    height: 1.5,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: color575757,
                                                   ),
                                                 ),
                                               ],
@@ -746,20 +997,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       widget.user.firstName.capitalize() +
                                       " to improve their skills",
                                   style: const TextStyle(
-                                    color: Colors.black87,
+                                    fontFamily: "Poppins",
                                     fontSize: 14,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: color808080,
                                   ),
                                 ),
                                 Row(
                                   children: [
-                                    const Text("SWAP anonymously",
-                                        style: TextStyle(
-                                            fontSize: 13,
-                                            color: Colors.black54)),
+                                    const Text(
+                                      "SWAP anonymously",
+                                      style: TextStyle(
+                                        fontFamily: "Poppins",
+                                        fontSize: 13,
+                                        height: 1.5,
+                                        fontWeight: FontWeight.w400,
+                                        color: color808080,
+                                      ),
+                                    ),
                                     Flexible(child: Container()),
                                     Switch(
-                                      activeColor: Colors.lightBlueAccent,
-                                      inactiveTrackColor: Colors.grey,
+                                      activeColor: primaryColor,
+                                      inactiveTrackColor: secondaryColor,
                                       value: isAnonymousPost,
                                       onChanged: (value) async {
                                         if (value) {
@@ -802,12 +1062,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Container(
                                   alignment: Alignment.topRight,
                                   child: GestureDetector(
-                                    onTap: () => {},
+                                    onTap: () {
+                                      _showMultiSelect(context);
+                                      setState(() {});
+                                    },
                                     child: const Text(
                                       "+ More",
                                       style: TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.lightBlueAccent),
+                                          fontSize: 13, color: primaryColor),
                                     ),
                                   ),
                                 ),
@@ -822,8 +1084,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               margin: const EdgeInsets.only(
                                                   top: 40, bottom: 20),
                                               decoration: const BoxDecoration(
-                                                  color:
-                                                      Colors.lightBlueAccent),
+                                                  color: primaryColor),
                                               width: getSafeAreaWidth(context) *
                                                   0.25,
                                               child:
@@ -844,13 +1105,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 margin: const EdgeInsets.only(
                                                     top: 40, bottom: 20),
                                                 decoration: const BoxDecoration(
-                                                    color:
-                                                        Colors.lightBlueAccent),
+                                                    color: primaryColor),
                                                 width:
                                                     getSafeAreaWidth(context) *
                                                         0.25,
                                                 child: const Text(
-                                                  "Submit",
+                                                  "SWAP",
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.bold,
@@ -865,13 +1125,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           margin: const EdgeInsets.only(
                                               top: 40, bottom: 20),
                                           decoration: BoxDecoration(
-                                            color: Colors.lightBlueAccent
-                                                .withOpacity(0.5),
+                                            color:
+                                                primaryColor.withOpacity(0.5),
                                           ),
                                           width:
                                               getSafeAreaWidth(context) * 0.25,
                                           child: const Text(
-                                            "Submit",
+                                            "SWAP",
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
@@ -894,8 +1154,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // user is not connected or requested
       case 0:
         return getStatusButton(
-          Colors.lightBlueAccent,
-          Colors.lightBlueAccent,
+          primaryColor,
+          primaryColor,
           "Connect",
           Colors.white,
           () async {
@@ -917,8 +1177,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 2:
         return Row(
           children: [
-            getStatusButton(Colors.lightBlueAccent, Colors.lightBlueAccent,
-                "Accept", Colors.white, () async {
+            getStatusButton(primaryColor, primaryColor, "Accept", Colors.white,
+                () async {
               String result = await AuthMethods()
                   .addFriendRequest(currentUser, otherUser, 3, 3);
               handleResult(result);
@@ -942,12 +1202,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Row(
               children: [
                 SvgPicture.asset("images/icons/friendRequests.svg",
-                    color: Colors.lightBlueAccent),
+                    color: primaryColor),
                 const SizedBox(width: 5),
                 const Text(
                   "Connected",
                   style: TextStyle(
-                    color: Colors.lightBlueAccent,
+                    color: primaryColor,
                     fontSize: 14,
                   ),
                 ),
@@ -963,12 +1223,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           child: Row(
             children: const [
-              Icon(Icons.block, color: Colors.red),
+              Icon(Icons.block, color: Color(0xFFFF3225)),
               SizedBox(width: 5),
               Text(
                 "Blocked",
                 style: TextStyle(
-                  color: Colors.red,
+                  color: Color(0xFFFF3225),
                   fontSize: 14,
                 ),
               ),
@@ -986,5 +1246,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
       status = friend.status;
     }
     return status;
+  }
+
+  void _showMultiSelect(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return MultiSelectDialog(
+          items: otherAttributes
+              .map((item) => MultiSelectItem(
+                    item,
+                    item,
+                  ))
+              .toList(),
+          initialValue: sliderValues.keys
+              .toSet()
+              .intersection(otherAttributes.toSet())
+              .toList(),
+          onConfirm: <String>(values) {
+            var sliderSet = Set<String>.from(sliderValues.keys);
+            // remove primary attributes
+            sliderSet = sliderSet.intersection(primaryAttributes.toSet());
+            // remove those keys which are there in values
+            sliderSet = sliderSet.difference(values.toSet());
+            // remove the remaining keys from slider values
+            sliderValues.removeWhere((key, value) => sliderSet.contains(key));
+            // add the new values
+            values.forEach((value) {
+              if (!sliderValues.containsKey(value)) {
+                sliderValues[value] = 0;
+              }
+            });
+          },
+        );
+      },
+    );
   }
 }

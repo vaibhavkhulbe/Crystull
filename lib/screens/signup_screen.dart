@@ -1,10 +1,16 @@
+import 'package:crystull/resources/auth_methods.dart';
+import 'package:crystull/responsive/mobile_screen_layout.dart';
+import 'package:crystull/responsive/response_layout_screen.dart';
+import 'package:crystull/responsive/web_screen_layout.dart';
 import 'package:crystull/screens/login_screen.dart';
+import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:crystull/widgets/text_field_widget.dart';
 import 'package:email_auth/email_auth.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/email_otp_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -33,6 +39,40 @@ class _SignupHomeScreenState extends State<SignupScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+  }
+
+  void handleSignupResult(Future<String> result) {
+    result.then((value) {
+      if (value != "Success") {
+        showSnackBar("User login failed with error: " + value, context);
+
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        showSnackBar("User logged in successfully.", context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return ResponsiveLayout(
+                  webScreenLayout: const WebScreenLayout(),
+                  mobileScreenLayout: MobileScreenLayout());
+            },
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }).catchError((onError) {
+      showSnackBar(
+          "User login failed with error: " + onError.toString(), context);
+
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   Future<bool> sendOTP() async {
@@ -92,7 +132,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    color: Colors.lightBlueAccent,
+                    color: primaryColor,
                   ),
                 ),
 
@@ -313,9 +353,8 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      border:
-                          Border.all(color: Colors.lightBlueAccent, width: 2),
-                      color: Colors.lightBlueAccent,
+                      border: Border.all(color: primaryColor, width: 2),
+                      color: primaryColor,
                     ),
                   ),
                 ),
@@ -343,7 +382,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                       child: const Text("Log in",
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.lightBlueAccent,
+                            color: primaryColor,
                           )),
                     ),
                   ],
@@ -357,30 +396,72 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                       "or",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
+                        fontFamily: "Poppins",
+                        fontSize: 16,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400,
+                        color: color666666,
                       ),
                     )),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Flexible(child: Container(), flex: 1),
-                    const Icon(
-                      Icons.facebook_rounded,
-                      color: Colors.red,
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        Future<String> result = AuthMethods().loginWithGoogle();
+                        handleSignupResult(result);
+                      },
+                      child: Container(
+                        height: 36,
+                        width: 36,
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFEB4235),
+                          shape: BoxShape.circle,
+                        ),
+                        child: SvgPicture.asset(
+                          'images/google_logo.svg',
+                          color: Colors.white,
+                          height: 18,
+                          width: 18,
+                        ),
+                      ),
                     ),
-                    Flexible(child: Container(), flex: 1),
-                    const Icon(
-                      Icons.facebook_rounded,
-                      color: Colors.blue,
+                    const SizedBox(
+                      width: 40,
                     ),
-                    Flexible(child: Container(), flex: 1),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        Future<String> result =
+                            AuthMethods().loginWithFacebook();
+                        handleSignupResult(result);
+                      },
+                      child: Container(
+                        height: 36,
+                        width: 36,
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF256BB3),
+                          shape: BoxShape.circle,
+                        ),
+                        child: SvgPicture.asset(
+                          'images/fb_logo.svg',
+                          color: Colors.white,
+                          height: 18,
+                          width: 9,
+                        ),
+                      ),
+                    ),
                   ],
-                ),
-
-                Flexible(child: Container(), flex: 2),
+                )
               ],
             ),
           ),

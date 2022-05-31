@@ -5,9 +5,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/resources/storage_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:uuid/uuid.dart';
 
 class AuthMethods {
+  final FacebookAuth fbSignIn = FacebookAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -23,7 +28,8 @@ class AuthMethods {
   }
 
   Future<Uint8List?> getUserImage() async {
-    Uint8List? image = await StorageMethods().downloadImage("profilePics");
+    Uint8List? image = await StorageMethods()
+        .downloadUserImage("profilePics", _auth.currentUser!.uid);
     return image;
   }
 
@@ -76,14 +82,192 @@ class AuthMethods {
     required CrystullUser signupForm,
   }) async {
     String res = "Some error occured";
-    try {
-      if (signupForm.email.isNotEmpty || signupForm.password.isNotEmpty) {
+
+    if (signupForm.email.isNotEmpty || signupForm.password.isNotEmpty) {
+      try {
         // register the user
         UserCredential cred = await _auth.signInWithEmailAndPassword(
             email: signupForm.email, password: signupForm.password);
 
         log("User logged in successfully " + cred.user!.uid);
         res = "Success";
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'wrong-password') {
+          var methods =
+              await _auth.fetchSignInMethodsForEmail(signupForm.email);
+          if (methods.contains('facebook.com')) {
+            res = "Account already exists with Facebook";
+          } else if (methods.contains('google.com')) {
+            res = "Account already exists with Google";
+          } else {
+            res = "Wrong password";
+          }
+        } else {
+          res = e.code;
+        }
+      } catch (e) {
+        res = e.toString();
+        log(res);
+      }
+    }
+    return res;
+  }
+
+  Future<String> loginWithGoogle() async {
+    String res = "Some error occured";
+    UserCredential cred;
+    try {
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return res;
+      final googleAuth = await googleUser.authentication;
+      final credentials = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      try {
+        cred = await _auth.signInWithCredential(credentials);
+        if (cred.additionalUserInfo!.isNewUser) {
+          log("New user created");
+          String uid = cred.user!.uid;
+          String photoUrl = "";
+          if (googleUser.photoUrl != null) {
+            Uint8List profilePic =
+                (await NetworkAssetBundle(Uri.parse(googleUser.photoUrl!))
+                        .load(googleUser.photoUrl!))
+                    .buffer
+                    .asUint8List();
+            photoUrl = await StorageMethods()
+                .uploadImage("profilePics", profilePic, false);
+          }
+          if (photoUrl.isNotEmpty) {
+            log("Photo uploaded " + photoUrl);
+            CrystullUser user = CrystullUser(
+              googleUser.displayName!.split(" ")[0],
+              googleUser.displayName!.split(" ")[1],
+              googleUser.email,
+              "",
+              uid: uid,
+              profileImageUrl: photoUrl,
+            );
+            await _firestore
+                .collection('users')
+                .doc(cred.user!.uid)
+                .set(user.toMap());
+            log("User created successfully " + cred.user!.uid);
+          } else {
+            log("Photo upload failed " + photoUrl + "Deleting user");
+            cred.user!.delete();
+          }
+        } else {
+          log("User logged in successfully " + cred.user!.uid);
+        }
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'account-exists-with-different-credential') {
+          var methods = await _auth.fetchSignInMethodsForEmail(e.email!);
+          if (methods.contains('facebook.com')) {
+            res = "Account already exists with Facebook";
+          } else {
+            res = "Account already exists with Email and Password";
+          }
+          // final LoginResult result = await fbSignIn.login();
+          // if (result.status == LoginStatus.success) {
+          //   // you are logged in
+          //   final AccessToken accessToken = result.accessToken!;
+          //   var fbcredentials = FacebookAuthProvider.credential(
+          //     accessToken.token,
+          //   );
+          //   await _auth.signInWithCredential(fbcredentials);
+          //   await _auth.currentUser!.linkWithCredential(credentials);
+          // }
+        }
+      }
+      res = "Success";
+    } catch (e) {
+      res = e.toString();
+      log(res);
+    }
+    return res;
+  }
+
+  Future<String> loginWithFacebook() async {
+    String res = "Some error occured";
+    final OAuthCredential credentials;
+    UserCredential cred;
+    try {
+      final LoginResult result = await fbSignIn.login();
+      // by default we request the email and the public profile or FacebookAuth.i.login()
+      if (result.status == LoginStatus.success) {
+        // you are logged in
+        final AccessToken accessToken = result.accessToken!;
+        credentials = FacebookAuthProvider.credential(
+          accessToken.token,
+        );
+        try {
+          cred = await _auth.signInWithCredential(credentials);
+          if (cred.additionalUserInfo!.isNewUser) {
+            log("New user created");
+            String uid = cred.user!.uid;
+            String photoUrl = "";
+            if (cred.additionalUserInfo!.profile!["picture"] != null &&
+                cred.additionalUserInfo!.profile!["picture"]!["data"]!["url"] !=
+                    null) {
+              String url =
+                  cred.additionalUserInfo!.profile!["picture"]!["data"]!["url"];
+              Uint8List profilePic =
+                  (await NetworkAssetBundle(Uri.parse(url)).load(url))
+                      .buffer
+                      .asUint8List();
+              photoUrl = await StorageMethods()
+                  .uploadImage("profilePics", profilePic, false);
+            }
+            if (photoUrl.isNotEmpty) {
+              log("Photo uploaded " + photoUrl);
+              CrystullUser user = CrystullUser(
+                cred.user!.displayName!.split(" ")[0],
+                cred.user!.displayName!.split(" ")[1],
+                cred.user!.email!,
+                "",
+                uid: uid,
+                profileImageUrl: photoUrl,
+              );
+              await _firestore
+                  .collection('users')
+                  .doc(cred.user!.uid)
+                  .set(user.toMap());
+              log("User created successfully " + cred.user!.uid);
+            } else {
+              log("Photo upload failed " + photoUrl + "Deleting user");
+              cred.user!.delete();
+            }
+          } else {
+            log("User logged in successfully " + cred.user!.uid);
+          }
+          res = "Success";
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'account-exists-with-different-credential') {
+            var methods = await _auth.fetchSignInMethodsForEmail(e.email!);
+            if (methods.contains('google.com')) {
+              res = "Account already exists with Google";
+            } else {
+              res = "Account already exists with Email and Password";
+            }
+            // uncomment this if you want to link two accounts
+            // final googleUser = await googleSignIn.signIn();
+            // if (googleUser == null) return res;
+            // final googleAuth = await googleUser.authentication;
+            // final googleCredentials = GoogleAuthProvider.credential(
+            //   accessToken: googleAuth.accessToken,
+            //   idToken: googleAuth.idToken,
+            // );
+            // await _auth.signInWithCredential(googleCredentials);
+            // await _auth.currentUser!.linkWithCredential(credentials);
+          }
+        }
+      } else {
+        res = "Login failed with status " +
+            result.status.toString() +
+            (result.message != null ? " and error " + result.message! : "");
+        log(res);
       }
     } catch (e) {
       res = e.toString();
@@ -231,10 +415,15 @@ class AuthMethods {
   }
 
   Future<String> swapUser(
-      String userId, Map<String, double> sliderValues, bool isAnonymous) async {
+      String toUserId,
+      String toUserName,
+      String fromUserId,
+      String fromUserName,
+      Map<String, double> sliderValues,
+      bool isAnonymous) async {
     String res = "Some error occured";
     try {
-      if (userId.isNotEmpty) {
+      if (toUserId.isNotEmpty) {
         // remove all the zero values from the map
         Map<String, double> nonEmptySliderValues = {};
 
@@ -244,22 +433,24 @@ class AuthMethods {
           }
         });
 
-        // nonEmptySliderValues.removeWhere((key, value) => value == 0);
-
         DateTime now = DateTime.now();
         DateTime start = DateTime(now.year, now.month, now.day);
         List<DateTime> days =
             List.generate(8, (i) => start.subtract(Duration(days: i)));
         String swapId = const Uuid().v4();
-        Map<String, dynamic> individual = <String, dynamic>{
-          'fromUid': _auth.currentUser!.uid,
-          'toUid': userId,
-          'addedAt': now,
-          'anonymous': isAnonymous,
-        };
-        nonEmptySliderValues.forEach((key, value) {
-          individual[key] = SwapData(value: value).toJson();
-        });
+        Swap individual = Swap(
+          id: swapId,
+          fromUid: fromUserId,
+          fromName: fromUserName,
+          toUid: toUserId,
+          toName: toUserName,
+          addedAt: now,
+          anonymous: isAnonymous,
+          unread: true,
+          swaps: nonEmptySliderValues,
+          swapList: nonEmptySliderValues.keys.toList(),
+        );
+
         var batch = _firestore.batch();
 
         // for each key in the map update the swap collection:
@@ -268,12 +459,12 @@ class AuthMethods {
 
         batch.set(
           _firestore.collection("individual").doc(swapId),
-          individual,
+          individual.toJson(),
           SetOptions(merge: true),
         );
         nonEmptySliderValues.forEach((key, value) {
           batch.set(
-            _firestore.collection('swaps').doc(userId),
+            _firestore.collection('swaps').doc(toUserId),
             {
               _auth.currentUser!.uid: {
                 'lastSwappedAt': now,
@@ -295,6 +486,18 @@ class AuthMethods {
                       'count': FieldValue.increment(1)
                     }
                   }
+              },
+            },
+            SetOptions(merge: true),
+          );
+          batch.set(
+            _firestore.collection('swaps').doc(_auth.currentUser!.uid),
+            {
+              'cumulative_given': {
+                key: {
+                  'sum': FieldValue.increment(value),
+                  'count': FieldValue.increment(1),
+                }
               },
             },
             SetOptions(merge: true),
@@ -365,5 +568,129 @@ class AuthMethods {
     }
     log(attributes.toString());
     return attributes;
+  }
+
+  Future<Map<String, Map<String, int>>> getAttributesCounts(
+    String uid,
+  ) async {
+    Map<String, Map<String, int>> attributes = {
+      "cumulative": {},
+      "cumulative_given": {},
+    };
+
+    var snapshot = await _firestore.collection('swaps').doc(uid).get();
+    if (snapshot.exists) {
+      Map<String, dynamic> swap = snapshot.data() ?? {};
+      Map<String, dynamic> cumulative = swap['cumulative'] ?? {};
+      Map<String, dynamic> cumulativeGiven = swap['cumulative_given'] ?? {};
+      cumulative.forEach((key, value) {
+        if (value['count'] != null && value['count'] != 0) {
+          attributes['cumulative']![key] = value['count'];
+        }
+      });
+      cumulativeGiven.forEach((key, value) {
+        if (value['count'] != null && value['count'] != 0) {
+          attributes['cumulative_given']![key] = value['count'];
+        }
+      });
+    }
+
+    // log(attributes.toString());
+    return attributes;
+  }
+
+  Future<List<Swap>> getIndividualAttributes(
+      String fromUserId, String toUserId, String attribute,
+      {bool unreadOnly = false}) async {
+    List<Swap> swaps = [];
+    var collectionRef = _firestore.collection('individual');
+    Query<Map<String, dynamic>> query;
+    if (fromUserId.isNotEmpty) {
+      query = collectionRef.where('fromUid', isEqualTo: fromUserId);
+    } else {
+      query = collectionRef.where('toUid', isEqualTo: toUserId);
+    }
+    if (attribute.isNotEmpty) {
+      query = query.where('swapList', arrayContains: attribute);
+    }
+    if (unreadOnly) {
+      query = query.where('unread', isEqualTo: true);
+    }
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await query.orderBy('addedAt', descending: true).limit(20).get();
+
+    if (snapshot.size != 0) {
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> swapData =
+          snapshot.docs;
+      for (var element in swapData) {
+        swaps.add(Swap.fromJson(element.data()));
+      }
+    }
+    return swaps;
+  }
+
+  Future<String> markSwapRead(String swapId) async {
+    String res = "Some error occured";
+    try {
+      if (swapId.isNotEmpty) {
+        // update the user
+        await _firestore.collection('individual').doc(swapId).update({
+          'unread': false,
+        });
+        res = "Success";
+      }
+    } catch (e) {
+      res = e.toString();
+      log(res);
+    }
+    return res;
+  }
+
+  Future<String> updateProfilePic({
+    required Uint8List image,
+  }) async {
+    String res = "Some error occurred";
+    try {
+      String photoUrl =
+          await StorageMethods().uploadImage("profilePics", image, false);
+      if (photoUrl.isNotEmpty) {
+        log("Photo uploaded " + photoUrl);
+        await _firestore
+            .collection('users')
+            .doc(_auth.currentUser!.uid)
+            .update({'profileImageUrl': photoUrl});
+        res = "Success";
+      } else {
+        log("Photo upload failed " + photoUrl);
+      }
+    } catch (e) {
+      res = e.toString();
+      log(res);
+    }
+    return res;
+  }
+
+  Future<String> updateCoverPic({
+    required Uint8List image,
+  }) async {
+    String res = "Some error occurred";
+    try {
+      String photoUrl =
+          await StorageMethods().uploadImage("coverPics", image, false);
+      if (photoUrl.isNotEmpty) {
+        log("Photo uploaded " + photoUrl);
+        await _firestore
+            .collection('users')
+            .doc(_auth.currentUser!.uid)
+            .update({'coverImageUrl': photoUrl});
+        res = "Success";
+      } else {
+        log("Photo upload failed " + photoUrl);
+      }
+    } catch (e) {
+      res = e.toString();
+      log(res);
+    }
+    return res;
   }
 }
