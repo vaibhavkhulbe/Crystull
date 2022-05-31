@@ -122,7 +122,7 @@ class CrystullUser {
     this.password, {
     this.uid = "",
     this.bio = "",
-    this.isPrivate = false,
+    this.isPrivate = true,
     this.college = "",
     this.degree = "",
     this.mobileNumberWithCountryCode = "",

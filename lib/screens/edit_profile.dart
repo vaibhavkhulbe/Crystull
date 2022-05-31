@@ -2,6 +2,7 @@ import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/utils/colors.dart';
 import 'package:crystull/widgets/alert_dialog.dart';
 import 'package:crystull/widgets/app_bar.dart';
+import 'package:crystull/widgets/get_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:crystull/widgets/text_field_widget.dart';
 import 'package:crystull/resources/models/signup.dart';
@@ -67,7 +68,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getAppBar(context, "Edit Profile"),
+      appBar: getAppBar(context, "Edit profile"),
       body: Container(
         decoration: const BoxDecoration(color: Color(0xFFE5E5E5)),
         child: ListView(
@@ -94,9 +95,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                       Flexible(child: Container()),
-                      Switch(
+                      getSwitch(
                         activeColor: primaryColor,
-                        inactiveTrackColor: secondaryColor,
+                        inactiveColor: secondaryColor,
                         value: widget.user.isPrivate,
                         onChanged: (value) async {
                           if (value) {

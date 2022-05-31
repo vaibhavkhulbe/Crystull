@@ -7,6 +7,8 @@ import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/connected_friends_screen.dart';
 import 'package:crystull/screens/edit_profile.dart';
+import 'package:crystull/widgets/get_switch.dart';
+import 'package:crystull/widgets/multi_select.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
 import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
@@ -735,7 +737,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           (widget.user.connections[_currentUser!.uid] != null &&
                               widget.user.connections[_currentUser!.uid]!
                                       .status ==
-                                  3)
+                                  3) ||
+                          !widget.user.isPrivate
                       ? Card(
                           elevation: 0,
                           color: Colors.white,
@@ -1004,6 +1007,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: color808080,
                                   ),
                                 ),
+                                const SizedBox(height: 10),
                                 Row(
                                   children: [
                                     const Text(
@@ -1017,11 +1021,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                     ),
                                     Flexible(child: Container()),
-                                    Switch(
+                                    getSwitch(
                                       activeColor: primaryColor,
-                                      inactiveTrackColor: secondaryColor,
+                                      inactiveColor: secondaryColor,
                                       value: isAnonymousPost,
-                                      onChanged: (value) async {
+                                      onChanged: (value) {
                                         if (value) {
                                           isAnonymousPost = true;
                                         } else {
@@ -1032,6 +1036,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 20),
                                 GridView(
                                     shrinkWrap: true,
                                     // padding: const EdgeInsets.all(10),
@@ -1062,9 +1067,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Container(
                                   alignment: Alignment.topRight,
                                   child: GestureDetector(
-                                    onTap: () {
-                                      _showMultiSelect(context);
-                                      setState(() {});
+                                    onTap: () async {
+                                      Map<String, double>? newSliderValues =
+                                          await showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return MultiSelect(
+                                                    selectedValuesMap:
+                                                        sliderValues);
+                                              });
+                                      if (newSliderValues != null) {
+                                        setState(() {
+                                          sliderValues = newSliderValues;
+                                        });
+                                      }
                                     },
                                     child: const Text(
                                       "+ More",
@@ -1247,39 +1263,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     return status;
   }
-
-  void _showMultiSelect(BuildContext context) async {
-    await showDialog(
-      context: context,
-      builder: (ctx) {
-        return MultiSelectDialog(
-          items: otherAttributes
-              .map((item) => MultiSelectItem(
-                    item,
-                    item,
-                  ))
-              .toList(),
-          initialValue: sliderValues.keys
-              .toSet()
-              .intersection(otherAttributes.toSet())
-              .toList(),
-          onConfirm: <String>(values) {
-            var sliderSet = Set<String>.from(sliderValues.keys);
-            // remove primary attributes
-            sliderSet = sliderSet.intersection(primaryAttributes.toSet());
-            // remove those keys which are there in values
-            sliderSet = sliderSet.difference(values.toSet());
-            // remove the remaining keys from slider values
-            sliderValues.removeWhere((key, value) => sliderSet.contains(key));
-            // add the new values
-            values.forEach((value) {
-              if (!sliderValues.containsKey(value)) {
-                sliderValues[value] = 0;
-              }
-            });
-          },
-        );
-      },
-    );
-  }
 }
+
+
+// initialValue: sliderValues.keys
+//               .toSet()
+//               .intersection(otherAttributes.toSet())
+//               .toList(),
