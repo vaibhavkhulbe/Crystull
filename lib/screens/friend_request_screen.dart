@@ -45,7 +45,7 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
     });
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: mobileBackgroundColor,
           elevation: 1,
           leading: null,
           centerTitle: false,
@@ -209,7 +209,7 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                             ),
                                             Row(children: [
                                               getStatusButton(
-                                                Colors.white,
+                                                mobileBackgroundColor,
                                                 primaryColor,
                                                 "Accept",
                                                 primaryColor,
@@ -228,7 +228,7 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                                 fontWeight: null,
                                               ),
                                               getStatusButton(
-                                                Colors.white,
+                                                mobileBackgroundColor,
                                                 Colors.black54,
                                                 "Remove",
                                                 Colors.black54,

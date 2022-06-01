@@ -75,7 +75,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             Card(
               elevation: 0,
-              color: Colors.white,
+              color: mobileBackgroundColor,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
               ),
@@ -143,7 +143,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             Card(
               elevation: 0,
-              color: Colors.white,
+              color: mobileBackgroundColor,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
               ),
@@ -159,9 +159,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const Text(
                       "Personal details",
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: Colors.black87,
+                        fontFamily: "Poppins",
+                        fontSize: 14,
+                        height: 1.5,
+                        fontWeight: FontWeight.w600,
+                        color: color575757,
                       ),
                     ),
                     Flexible(child: Container(), flex: 1),
@@ -169,8 +171,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const Text(
                       "Bio*",
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black54,
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400,
+                        color: color575757,
                       ),
                     ),
                     TextFieldInput(
@@ -185,8 +190,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const Text(
                       "School/College",
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black54,
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400,
+                        color: color575757,
                       ),
                     ),
                     TextFieldInput(
@@ -201,8 +209,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const Text(
                       "Degree",
                       style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black54,
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400,
+                        color: color575757,
                       ),
                     ),
                     TextFieldInput(
@@ -233,13 +244,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           Container(
                             child: _isLoading
                                 ? const CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: mobileBackgroundColor,
                                   )
-                                : const Text("Update",
+                                : const Text(
+                                    "Update",
                                     style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    )),
+                                      fontFamily: "Poppins",
+                                      fontSize: 12,
+                                      height: 1.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: mobileBackgroundColor,
+                                    ),
+                                  ),
                             width: getSafeAreaWidth(context) * 0.3,
                             alignment: Alignment.center,
                             padding: const EdgeInsets.symmetric(vertical: 10),

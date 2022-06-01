@@ -3,7 +3,7 @@
    <application
         android:label="crystull"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/crystull_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

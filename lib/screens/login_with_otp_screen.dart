@@ -172,7 +172,8 @@ class _LoginWithOTPScreenState extends State<LoginWithOTPScreen> {
                 },
                 child: Container(
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const CircularProgressIndicator(
+                          color: mobileBackgroundColor)
                       : const Text("Next",
                           style: TextStyle(
                             fontSize: 18,
@@ -246,12 +247,12 @@ class _LoginWithOTPScreenState extends State<LoginWithOTPScreen> {
                       width: 36,
                       padding: const EdgeInsets.all(8),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFEB4235),
+                        color: googleLogoColor,
                         shape: BoxShape.circle,
                       ),
                       child: SvgPicture.asset(
                         'images/google_logo.svg',
-                        color: Colors.white,
+                        color: mobileBackgroundColor,
                         height: 18,
                         width: 18,
                       ),
@@ -273,12 +274,12 @@ class _LoginWithOTPScreenState extends State<LoginWithOTPScreen> {
                       width: 36,
                       padding: const EdgeInsets.all(8),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF256BB3),
+                        color: fbLogoColor,
                         shape: BoxShape.circle,
                       ),
                       child: SvgPicture.asset(
                         'images/fb_logo.svg',
-                        color: Colors.white,
+                        color: mobileBackgroundColor,
                         height: 18,
                         width: 9,
                       ),

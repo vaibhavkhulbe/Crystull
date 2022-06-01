@@ -22,19 +22,27 @@ Widget getAttributesGridFromValues(
           width: MediaQuery.of(context).size.width * 0.3,
           height: MediaQuery.of(context).size.width * 0.05,
           child: Column(children: [
-            Text(entry.value.toStringAsFixed(0) + "%",
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: primaryColor,
-                  fontWeight: FontWeight.bold,
-                )),
+            Text(
+              entry.value.toStringAsFixed(0) + "%",
+              style: const TextStyle(
+                fontFamily: "Poppins",
+                fontSize: 16,
+                height: 1.5,
+                color: primaryColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             Flexible(child: Container()),
-            Text(entry.key,
-                style: const TextStyle(
-                  fontSize: 12,
-                  height: 1.5,
-                  color: Colors.black54,
-                )),
+            Text(
+              entry.key,
+              style: const TextStyle(
+                fontFamily: "Poppins",
+                fontSize: 12,
+                height: 1.5,
+                color: color808080,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ]),
         )
     ],

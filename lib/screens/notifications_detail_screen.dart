@@ -22,7 +22,7 @@ class NotificationDetail extends StatelessWidget {
           child: Container(
             height: getSafeAreaHeight(context),
             alignment: Alignment.topCenter,
-            color: const Color(0xFFEEEEEE),
+            color: colorEEEEEE,
             child: Container(
               color: const Color(0xFFFBFEFF),
               height: getSafeAreaHeight(context) * 0.6,

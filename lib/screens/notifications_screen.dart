@@ -94,7 +94,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     _currentUser = Provider.of<UserProvider>(context).getUser;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: mobileBackgroundColor,
         elevation: 1,
         leading: null,
         centerTitle: false,
@@ -148,7 +148,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   Widget getActivityDetailsCard(String activity) {
     return Card(
       elevation: 0,
-      color: Colors.white,
+      color: mobileBackgroundColor,
       shape: const ContinuousRectangleBorder(),
       child: isLoadingData
           ? const Center(
@@ -164,7 +164,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                       'No new notifications yet',
                       style: TextStyle(
                         fontFamily: "Poppins",
-                        color: Color(0xFF8F8E8E),
+                        color: color8F8E8E,
                         fontSize: 18,
                         fontWeight: FontWeight.w400,
                       ),
@@ -196,7 +196,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                               child: Container(
                                   color: e.unread
                                       ? const Color(0xFFEDF9FF)
-                                      : Colors.white,
+                                      : mobileBackgroundColor,
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 10,
                                   ),
@@ -238,7 +238,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                                                             e.swapList.first),
                                             style: const TextStyle(
                                                 fontFamily: "Poppins",
-                                                color: Color(0xFF8F8E8E),
+                                                color: color8F8E8E,
                                                 fontSize: 10,
                                                 height: 1.4,
                                                 fontWeight: FontWeight.w400),
@@ -248,7 +248,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                                                 allowFromNow: false),
                                             style: const TextStyle(
                                                 fontFamily: "Poppins",
-                                                color: Color(0xFF8F8E8E),
+                                                color: color8F8E8E,
                                                 fontSize: 8,
                                                 fontWeight: FontWeight.w400),
                                           ),

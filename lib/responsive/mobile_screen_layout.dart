@@ -69,7 +69,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
               ],
             ),
             bottomNavigationBar: CupertinoTabBar(
-                backgroundColor: Colors.white,
+                backgroundColor: mobileBackgroundColor,
                 onTap: navigateToPage,
                 items: [
                   getBottomNavBarWidget(
@@ -86,11 +86,11 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
             child: Container(
               height: getSafeAreaHeight(context),
               width: getSafeAreaWidth(context),
-              color: Colors.white,
+              color: mobileBackgroundColor,
               child: const Center(
                   child: CircularProgressIndicator(
                 color: primaryColor,
-                backgroundColor: Colors.white,
+                backgroundColor: mobileBackgroundColor,
               )),
             ),
           );

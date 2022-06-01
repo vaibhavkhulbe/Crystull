@@ -93,7 +93,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
           children: [
             Container(
               height: getSafeAreaHeight(context) * 0.5,
-              decoration: const BoxDecoration(color: Color(0xFFEEEEEE)),
+              decoration: const BoxDecoration(color: colorEEEEEE),
               child: ListView(
                 children: [
                   getActivitiesSummaryCard(counts['cumulative'],
@@ -105,7 +105,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
             ),
             Container(
               height: getSafeAreaHeight(context) * 0.5,
-              decoration: const BoxDecoration(color: Color(0xFFEEEEEE)),
+              decoration: const BoxDecoration(color: colorEEEEEE),
               child: ListView(
                 shrinkWrap: true,
                 children: [
@@ -126,7 +126,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
       Map<String, int>? counts, Map<String, String> details, String activity) {
     return Card(
       elevation: 0,
-      color: Colors.white,
+      color: mobileBackgroundColor,
       shape: const ContinuousRectangleBorder(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,8 +188,11 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                               Text(
                                 'Total SWAPs $activity',
                                 style: const TextStyle(
-                                  color: Colors.white,
+                                  fontFamily: "Poppins",
+                                  color: mobileBackgroundColor,
                                   fontSize: 14,
+                                  height: 1.5,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                               Flexible(child: Container()),
@@ -198,9 +201,11 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                                     ? '${counts.values.reduce((sum, element) => sum + element)}'
                                     : '0',
                                 style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                                  fontFamily: "Poppins",
+                                  color: mobileBackgroundColor,
                                   fontSize: 14,
+                                  height: 1.5,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               )
                             ],
@@ -263,7 +268,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 4, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: mobileBackgroundColor,
                                       borderRadius: BorderRadius.circular(4),
                                       boxShadow: const [
                                         BoxShadow(
@@ -283,9 +288,11 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                                         Text(
                                           '${value.value}',
                                           style: const TextStyle(
+                                            fontFamily: "Poppins",
                                             color: primaryColor,
                                             fontSize: 14,
-                                            fontWeight: FontWeight.bold,
+                                            height: 1.5,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                         Flexible(child: Container()),
@@ -319,7 +326,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
   Widget getActivityDetailsCard(Map<String, String> details, String activity) {
     return Card(
       elevation: 0,
-      color: Colors.white,
+      color: mobileBackgroundColor,
       shape: const ContinuousRectangleBorder(),
       child: isLoadingData
           ? const Center(
@@ -336,14 +343,18 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                 alignment: Alignment.topRight,
                 child: DropdownButton<String>(
                   menuMaxHeight: getSafeAreaHeight(context) * 0.3,
-                  dropdownColor: Colors.white,
+                  dropdownColor: mobileBackgroundColor,
                   style: const TextStyle(
                     fontFamily: "Poppins",
                     color: color808080,
+                    fontSize: 10,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
                   ),
                   icon: const Icon(
                     Icons.arrow_drop_down_outlined,
                     color: color808080,
+                    size: 9,
                   ),
                   value: activity == 'given'
                       ? dropDownValueGive
@@ -418,19 +429,23 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                                           ? "multiple attributes"
                                           : e.swapList.first),
                                   style: const TextStyle(
-                                      fontFamily: "Poppins",
-                                      color: Color(0xFF8F8E8E),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400),
+                                    fontFamily: "Poppins",
+                                    color: color8F8E8E,
+                                    fontSize: 12,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                                 Text(
                                   timeago.format(e.addedAt,
                                       allowFromNow: false),
                                   style: const TextStyle(
-                                      fontFamily: "Poppins",
-                                      color: Color(0xFF8F8E8E),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w400),
+                                    fontFamily: "Poppins",
+                                    color: color8F8E8E,
+                                    fontSize: 10,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                               ],
                             )),

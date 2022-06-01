@@ -9,17 +9,13 @@ import 'package:crystull/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:crystull/widgets/text_field_widget.dart';
-import 'package:email_auth/email_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crystull/resources/models/signup.dart';
 import '../utils/utils.dart';
 
 class MoreInfoScreen extends StatefulWidget {
   final CrystullUser signupForm;
-  final EmailAuth emailAuth;
-  const MoreInfoScreen(
-      {Key? key, required this.signupForm, required this.emailAuth})
-      : super(key: key);
+  const MoreInfoScreen({Key? key, required this.signupForm}) : super(key: key);
 
   @override
   State<MoreInfoScreen> createState() => _MoreInfoScreenState();
@@ -32,6 +28,15 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
   final TextEditingController _mobileController = TextEditingController();
   Uint8List? _profileImage;
   var _isLoading = false;
+  CountryCode countryCode = CountryCode.fromCountryCode('IN');
+
+  @override
+  void initState() {
+    if (widget.signupForm.profileImage != null) {
+      _profileImage = widget.signupForm.profileImage;
+    }
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -75,7 +80,8 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
     widget.signupForm.bio = _bioController.text;
     widget.signupForm.college = _collegeController.text;
     widget.signupForm.degree = _degreeController.text;
-    widget.signupForm.mobileNumberWithCountryCode = _mobileController.text;
+    widget.signupForm.mobileNumberWithCountryCode =
+        countryCode.dialCode! + _mobileController.text;
     widget.signupForm.profileImage = _profileImage;
     setState(() {
       _isLoading = true;
@@ -255,7 +261,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                             fontSize: 14,
                             color: Colors.black87,
                           ),
-                          initialSelection: '+91',
+                          initialSelection: countryCode.code,
                           showCountryOnly: false,
                           showOnlyCountryWhenClosed: false,
 
@@ -274,7 +280,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                                   color: Colors.black54, width: 0.5),
                             ),
                           ),
-                          backgroundColor: Colors.white,
+                          backgroundColor: mobileBackgroundColor,
                           dialogTextStyle: const TextStyle(
                             fontSize: 14,
                             color: Colors.black87,
@@ -283,6 +289,11 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                             fontSize: 14,
                             color: Colors.black87,
                           ),
+                          onChanged: (value) {
+                            setState(() {
+                              countryCode = value;
+                            });
+                          },
                         ),
                       ),
                     ),
@@ -329,7 +340,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                   child: Container(
                     child: _isLoading
                         ? const CircularProgressIndicator(
-                            color: Colors.white,
+                            color: mobileBackgroundColor,
                           )
                         : const Text("Sign up",
                             style: TextStyle(

@@ -219,25 +219,27 @@ class AuthMethods {
                       .asUint8List();
               photoUrl = await StorageMethods()
                   .uploadImage("profilePics", profilePic, false);
-            }
-            if (photoUrl.isNotEmpty) {
-              log("Photo uploaded " + photoUrl);
-              CrystullUser user = CrystullUser(
-                cred.user!.displayName!.split(" ")[0],
-                cred.user!.displayName!.split(" ")[1],
-                cred.user!.email!,
-                "",
-                uid: uid,
-                profileImageUrl: photoUrl,
-              );
-              await _firestore
-                  .collection('users')
-                  .doc(cred.user!.uid)
-                  .set(user.toMap());
-              log("User created successfully " + cred.user!.uid);
-            } else {
-              log("Photo upload failed " + photoUrl + "Deleting user");
-              cred.user!.delete();
+
+              if (photoUrl.isNotEmpty) {
+                log("Photo uploaded " + photoUrl);
+                CrystullUser user = CrystullUser(
+                  cred.user!.displayName!.split(" ")[0],
+                  cred.user!.displayName!.split(" ")[1],
+                  cred.user!.email!,
+                  "",
+                  uid: uid,
+                  profileImage: profilePic,
+                  profileImageUrl: photoUrl,
+                );
+                await _firestore
+                    .collection('users')
+                    .doc(cred.user!.uid)
+                    .set(user.toMap());
+                log("User created successfully " + cred.user!.uid);
+              } else {
+                log("Photo upload failed " + photoUrl + "Deleting user");
+                cred.user!.delete();
+              }
             }
           } else {
             log("User logged in successfully " + cred.user!.uid);

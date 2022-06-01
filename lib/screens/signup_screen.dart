@@ -130,8 +130,10 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                 const Text(
                   "Sign up",
                   style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
+                    fontFamily: "Poppins",
+                    fontSize: 24,
+                    height: 0.75,
+                    fontWeight: FontWeight.w600,
                     color: primaryColor,
                   ),
                 ),
@@ -141,8 +143,12 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                 const Text(
                   "Please fill the credentials",
                   style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black87,
+                    fontFamily: "Poppins",
+                    fontSize: 16,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: -0.015,
+                    color: color666666,
                   ),
                 ),
 
@@ -152,8 +158,11 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                 const Text(
                   "First name",
                   style: TextStyle(
+                    fontFamily: "Poppins",
                     fontSize: 14,
-                    color: Colors.black54,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                    color: color808080,
                   ),
                 ),
                 TextFieldInput(
@@ -168,8 +177,11 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                 const Text(
                   "Last name",
                   style: TextStyle(
+                    fontFamily: "Poppins",
                     fontSize: 14,
-                    color: Colors.black54,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                    color: color808080,
                   ),
                 ),
                 TextFieldInput(
@@ -184,8 +196,11 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                 const Text(
                   "Email",
                   style: TextStyle(
+                    fontFamily: "Poppins",
                     fontSize: 14,
-                    color: Colors.black54,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                    color: color808080,
                   ),
                 ),
                 TextFieldInput(
@@ -200,8 +215,11 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                 const Text(
                   "Password",
                   style: TextStyle(
+                    fontFamily: "Poppins",
                     fontSize: 14,
-                    color: Colors.black54,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                    color: color808080,
                   ),
                 ),
                 // text field input for password
@@ -217,8 +235,11 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                 const Text(
                   "Confirm Password",
                   style: TextStyle(
+                    fontFamily: "Poppins",
                     fontSize: 14,
-                    color: Colors.black54,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                    color: color808080,
                   ),
                 ),
                 // text field input for password
@@ -235,39 +256,68 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   alignment: WrapAlignment.start,
                   crossAxisAlignment: WrapCrossAlignment.start,
                   children: const [
-                    Text("By clicking ",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black54,
-                        )),
-                    Text("Sign up",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: Colors.black54,
-                        )),
-                    Text(" you agree to the ",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black54,
-                        )),
-                    Text("Terms of Service",
-                        style: TextStyle(
-                          fontSize: 12,
-                          decoration: TextDecoration.underline,
-                          color: Colors.black,
-                        )),
-                    Text(" and ",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black54,
-                        )),
-                    Text("Privacy policy",
-                        style: TextStyle(
-                          fontSize: 12,
-                          decoration: TextDecoration.underline,
-                          color: Colors.black,
-                        )),
+                    Text(
+                      "By clicking ",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400,
+                        color: color808080,
+                      ),
+                    ),
+                    Text(
+                      "Sign up",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w600,
+                        color: color808080,
+                      ),
+                    ),
+                    Text(
+                      " you agree to the ",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400,
+                        color: color808080,
+                      ),
+                    ),
+                    Text(
+                      "Terms of Service",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                        color: color808080,
+                      ),
+                    ),
+                    Text(
+                      " and ",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400,
+                        color: color808080,
+                      ),
+                    ),
+                    Text(
+                      "Privacy policy",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                        color: color808080,
+                      ),
+                    ),
                   ],
                 ),
 
@@ -341,14 +391,19 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   child: Container(
                     child: _isLoading
                         ? const Center(
-                            child:
-                                CircularProgressIndicator(color: Colors.white),
+                            child: CircularProgressIndicator(
+                                color: mobileBackgroundColor),
                           )
-                        : const Text("Next",
+                        : const Text(
+                            "Next",
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            )),
+                              fontFamily: "Poppins",
+                              fontSize: 20,
+                              height: 1.2,
+                              color: mobileBackgroundColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                     width: double.infinity,
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -365,11 +420,16 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text("Already have an account? ",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                        )),
+                    const Text(
+                      "Already have an account? ",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400,
+                        color: color747474,
+                      ),
+                    ),
                     GestureDetector(
                       onTap: () {
                         Navigator.pushReplacement(
@@ -379,11 +439,16 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                           ),
                         );
                       },
-                      child: const Text("Log in",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: primaryColor,
-                          )),
+                      child: const Text(
+                        "Log in",
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                          fontSize: 12,
+                          height: 1.5,
+                          fontWeight: FontWeight.w600,
+                          color: primaryColor,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -421,12 +486,12 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                         width: 36,
                         padding: const EdgeInsets.all(8),
                         decoration: const BoxDecoration(
-                          color: Color(0xFFEB4235),
+                          color: googleLogoColor,
                           shape: BoxShape.circle,
                         ),
                         child: SvgPicture.asset(
                           'images/google_logo.svg',
-                          color: Colors.white,
+                          color: mobileBackgroundColor,
                           height: 18,
                           width: 18,
                         ),
@@ -449,12 +514,12 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                         width: 36,
                         padding: const EdgeInsets.all(8),
                         decoration: const BoxDecoration(
-                          color: Color(0xFF256BB3),
+                          color: fbLogoColor,
                           shape: BoxShape.circle,
                         ),
                         child: SvgPicture.asset(
                           'images/fb_logo.svg',
-                          color: Colors.white,
+                          color: mobileBackgroundColor,
                           height: 18,
                           width: 9,
                         ),

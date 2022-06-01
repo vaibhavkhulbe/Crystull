@@ -30,7 +30,7 @@ class _SearchScreenState extends State<SearchScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: mobileBackgroundColor,
         centerTitle: false,
         title: Container(
           decoration: BoxDecoration(
@@ -55,7 +55,7 @@ class _SearchScreenState extends State<SearchScreen> {
               }
             },
             style: const TextStyle(
-              fontFamily: "Popins",
+              fontFamily: "Poppins",
               fontSize: 12,
               color: Colors.black,
               fontWeight: FontWeight.w400,
@@ -68,7 +68,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 fontFamily: "Poppins",
                 fontSize: 12,
                 height: 1.5,
-                color: Color(0xFFB5B5B5),
+                color: colorB5B5B5,
                 fontWeight: FontWeight.w400,
               ),
               border: OutlineInputBorder(
@@ -97,8 +97,15 @@ class _SearchScreenState extends State<SearchScreen> {
                   );
                 } else if (!snapshot.hasData) {
                   return const Center(
-                    child: Text('No data',
-                        style: TextStyle(fontSize: 20, color: Colors.black54)),
+                    child: Text(
+                      'No data',
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 20,
+                        color: color808080,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   );
                 }
                 return ListView.builder(
@@ -127,8 +134,11 @@ class _SearchScreenState extends State<SearchScreen> {
                             Text(
                               (doc['fullName'] as String).capitalize(),
                               style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.black54,
+                                fontFamily: "Poppins",
+                                fontSize: 14,
+                                height: 1.5,
+                                fontWeight: FontWeight.w400,
+                                color: color808080,
                               ),
                             ),
                             Container(
@@ -136,16 +146,18 @@ class _SearchScreenState extends State<SearchScreen> {
                               width: 5,
                               height: 5,
                               decoration: const BoxDecoration(
-                                  color: Colors.black54,
-                                  shape: BoxShape.circle),
+                                  color: color808080, shape: BoxShape.circle),
                             ),
                             Text(
                               doc['bio'],
                               strutStyle:
                                   const StrutStyle(forceStrutHeight: true),
                               style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.black54,
+                                fontFamily: "Poppins",
+                                fontSize: 10,
+                                height: 1.5,
+                                fontWeight: FontWeight.w400,
+                                color: color808080,
                               ),
                             ),
                             // Flexible(child: Container(), flex: 6),
@@ -161,8 +173,10 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Text(
                 'Enter a user name to search',
                 style: TextStyle(
+                  fontFamily: "Poppins",
                   fontSize: 20,
-                  color: Colors.black54,
+                  color: color808080,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

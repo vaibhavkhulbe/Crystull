@@ -72,7 +72,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                 )
               : Container(
                   decoration: BoxDecoration(
-                    color: Colors.black12,
+                    color: Color(0xFFF0F2F5),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   height: getSafeAreaHeight(context) * 0.04,
@@ -103,7 +103,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                           vertical: 2, horizontal: 16),
                       prefixIcon: SvgPicture.asset(
                         'images/icons/search.svg',
-                        color: const Color(0xFFB5B5B5),
+                        color: colorB5B5B5,
                         fit: BoxFit.none,
                         height: 14,
                         width: 14,
@@ -113,7 +113,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                         fontFamily: "Poppins",
                         fontSize: 12,
                         height: 1.5,
-                        color: Color(0xFFB5B5B5),
+                        color: colorB5B5B5,
                         fontWeight: FontWeight.w400,
                       ),
                       border: OutlineInputBorder(
@@ -178,7 +178,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                                             children: [
                                               SvgPicture.asset(
                                                 'images/icons/otherConnections.svg',
-                                                color: const Color(0xFF7A7A7A),
+                                                color: color7A7A7A,
                                                 width: 12,
                                                 height: 9,
                                               ),
@@ -192,7 +192,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                                                   fontWeight: FontWeight.w400,
                                                   decoration:
                                                       TextDecoration.underline,
-                                                  color: Color(0xFF7A7A7A),
+                                                  color: color7A7A7A,
                                                 ),
                                               ),
                                             ],
@@ -211,7 +211,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                                               getSafeAreaHeight(context) * 0.2,
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 20),
-                                          color: Colors.white,
+                                          color: mobileBackgroundColor,
                                           child: Center(
                                             child: Column(
                                               mainAxisAlignment:
@@ -295,8 +295,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                                                     children: [
                                                       SvgPicture.asset(
                                                         'images/icons/removeFriend.svg',
-                                                        color: const Color(
-                                                            0xFFFF3225),
+                                                        color: colorFF3225,
                                                         width: 20,
                                                         height: 20,
                                                       ),
@@ -307,8 +306,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                                                         'Remove',
                                                         style: TextStyle(
                                                           fontFamily: "Poppins",
-                                                          color:
-                                                              Color(0xFFFF3225),
+                                                          color: colorFF3225,
                                                           fontSize: 14,
                                                           height: 1.5,
                                                           fontWeight:

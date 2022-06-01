@@ -284,7 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             SvgPicture.asset(
               'images/icons/removeFriend.svg',
-              color: const Color(0xFFFF3225),
+              color: colorFF3225,
               width: 20,
               height: 20,
             ),
@@ -295,7 +295,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               'Remove',
               style: TextStyle(
                 fontFamily: "Poppins",
-                color: Color(0xFFFF3225),
+                color: colorFF3225,
                 fontSize: 14,
               ),
             ),
@@ -327,13 +327,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ? Center(
             child: Container(
               width: getSafeAreaWidth(context),
-              color: Colors.white,
+              color: mobileBackgroundColor,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const CircularProgressIndicator(
                     color: primaryColor,
-                    backgroundColor: Colors.white,
+                    backgroundColor: mobileBackgroundColor,
                   ),
                   const SizedBox(
                     height: 10,
@@ -360,20 +360,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             appBar: !widget.isHome
                 ? AppBar(
                     elevation: 1,
-                    backgroundColor: Colors.white,
+                    backgroundColor: mobileBackgroundColor,
                     iconTheme: const IconThemeData(
                       color: Colors.black,
                     ),
                   )
                 : null,
             body: Container(
-              decoration: const BoxDecoration(color: Color(0xFFEEEEEE)),
+              decoration: const BoxDecoration(color: colorEEEEEE),
               child: ListView(
                 children: [
                   // Card for the profile. Could be self or others
                   Card(
                     elevation: 0,
-                    color: Colors.white,
+                    color: mobileBackgroundColor,
                     shape: const ContinuousRectangleBorder(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -394,7 +394,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               0.05,
                                       child: const CircularProgressIndicator(
                                         color: primaryColor,
-                                        backgroundColor: Colors.white,
+                                        backgroundColor: mobileBackgroundColor,
                                       ),
                                     )
                                   : widget.user.coverImageUrl.isNotEmpty
@@ -441,11 +441,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               Radius.circular(1.71),
                                             ),
                                             border: Border.all(
-                                              color: Colors.white,
+                                              color: mobileBackgroundColor,
                                               width: 0.5,
                                             ),
-                                            color:
-                                                Colors.white.withOpacity(0.5),
+                                            color: mobileBackgroundColor
+                                                .withOpacity(0.5),
                                           ),
                                           child: Row(
                                             children: const [
@@ -480,11 +480,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             getSafeAreaWidth(context) * 0.25,
                                         decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: Colors.white,
+                                          color: mobileBackgroundColor,
                                         ),
                                         child: const CircularProgressIndicator(
                                           color: primaryColor,
-                                          backgroundColor: Colors.white,
+                                          backgroundColor:
+                                              mobileBackgroundColor,
                                         ),
                                       )
                                     : Container(
@@ -520,7 +521,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     'images/avatar.png'),
                                           ),
                                           border: Border.all(
-                                            color: Colors.white,
+                                            color: mobileBackgroundColor,
                                             width: 2.0,
                                           ),
                                         ),
@@ -537,7 +538,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   height: getSafeAreaWidth(context) * 0.08,
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors.white,
+                                      color: mobileBackgroundColor,
                                       border: Border.all(
                                         color: primaryColor,
                                         width: 1,
@@ -587,7 +588,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: InkWell(
                                   child: SvgPicture.asset(
                                     "images/icons/editPhoto.svg",
-                                    color: Colors.white,
+                                    color: mobileBackgroundColor,
                                     height: 26,
                                     width: 26,
                                   ),
@@ -710,7 +711,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           Icons.more_vert,
                                           color: Colors.black54,
                                         ),
-                                        color: Colors.white,
+                                        color: mobileBackgroundColor,
                                         onSelected: onSelect,
                                         itemBuilder: (BuildContext context) {
                                           return popUpMenuItems.entries
@@ -741,7 +742,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           !widget.user.isPrivate
                       ? Card(
                           elevation: 0,
-                          color: Colors.white,
+                          color: mobileBackgroundColor,
                           shape: const ContinuousRectangleBorder(),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -802,7 +803,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ))
                       : Card(
                           elevation: 0,
-                          color: Colors.white,
+                          color: mobileBackgroundColor,
                           shape: const ContinuousRectangleBorder(),
                           child: Container(
                             padding: const EdgeInsets.all(10),
@@ -844,7 +845,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   isMe
                       ? Card(
                           elevation: 0,
-                          color: Colors.white,
+                          color: mobileBackgroundColor,
                           shape: const ContinuousRectangleBorder(),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -987,7 +988,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ))
                       : Card(
                           elevation: 0,
-                          color: Colors.white,
+                          color: mobileBackgroundColor,
                           shape: const ContinuousRectangleBorder(),
                           child: Container(
                             padding: const EdgeInsets.all(10),
@@ -1106,7 +1107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               child:
                                                   const CircularProgressIndicator(
                                                 strokeWidth: 2,
-                                                color: Colors.white,
+                                                color: mobileBackgroundColor,
                                               ),
                                             )
                                           : InkWell(
@@ -1173,7 +1174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           primaryColor,
           primaryColor,
           "Connect",
-          Colors.white,
+          mobileBackgroundColor,
           () async {
             String result = await AuthMethods()
                 .addFriendRequest(currentUser, otherUser, 1, 2);
@@ -1182,9 +1183,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       // Current user is the one requesting
       case 1:
-        return getStatusButton(
-            Colors.white, Colors.black54, "Request sent", Colors.black54,
-            () async {
+        return getStatusButton(mobileBackgroundColor, Colors.black54,
+            "Request sent", Colors.black54, () async {
           String result =
               await AuthMethods().removeFriend(currentUser, otherUser);
           handleResult(result);
@@ -1193,14 +1193,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 2:
         return Row(
           children: [
-            getStatusButton(primaryColor, primaryColor, "Accept", Colors.white,
+            getStatusButton(
+                primaryColor, primaryColor, "Accept", mobileBackgroundColor,
                 () async {
               String result = await AuthMethods()
                   .addFriendRequest(currentUser, otherUser, 3, 3);
               handleResult(result);
             }),
             getStatusButton(
-                Colors.white, Colors.black54, "Remove", Colors.black54,
+                mobileBackgroundColor, Colors.black54, "Remove", Colors.black54,
                 () async {
               String result =
                   await AuthMethods().removeFriend(otherUser, currentUser);
@@ -1213,7 +1214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: mobileBackgroundColor,
             ),
             child: Row(
               children: [
@@ -1235,16 +1236,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: mobileBackgroundColor,
           ),
           child: Row(
             children: const [
-              Icon(Icons.block, color: Color(0xFFFF3225)),
+              Icon(Icons.block, color: colorFF3225),
               SizedBox(width: 5),
               Text(
                 "Blocked",
                 style: TextStyle(
-                  color: Color(0xFFFF3225),
+                  color: colorFF3225,
                   fontSize: 14,
                 ),
               ),
@@ -1264,9 +1265,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return status;
   }
 }
-
-
-// initialValue: sliderValues.keys
-//               .toSet()
-//               .intersection(otherAttributes.toSet())
-//               .toList(),

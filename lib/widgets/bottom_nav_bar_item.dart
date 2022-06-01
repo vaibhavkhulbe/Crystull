@@ -14,7 +14,9 @@ BottomNavigationBarItem getBottomNavBarWidget(
         border: Border(
           bottom: BorderSide(
               width: 2,
-              color: _currScreen == widgetScreen ? primaryColor : Colors.white),
+              color: _currScreen == widgetScreen
+                  ? primaryColor
+                  : mobileBackgroundColor),
         ),
       ),
       child: isProfile && profileImage != null

@@ -31,7 +31,7 @@ class _MultiSelectState extends State<MultiSelect> {
   Widget build(BuildContext context) {
     return AlertDialog(
       alignment: const Alignment(0, -0.25),
-      backgroundColor: Colors.white,
+      backgroundColor: mobileBackgroundColor,
       title: const Text(
         "SWAP on more attributes",
         style: TextStyle(
@@ -60,6 +60,7 @@ class _MultiSelectState extends State<MultiSelect> {
                 Text(
                   "Select",
                   style: TextStyle(
+                    fontFamily: "Roboto",
                     fontSize: 14,
                     height: 1.5,
                     color: color808080,
@@ -76,7 +77,7 @@ class _MultiSelectState extends State<MultiSelect> {
             fontFamily: "Poppins",
             color: color808080,
           ),
-          dropdownColor: Colors.white,
+          dropdownColor: mobileBackgroundColor,
           menuMaxHeight: getSafeAreaHeight(context) * 0.5,
           alignment: AlignmentDirectional.topEnd,
           items: otherAttributes
@@ -90,7 +91,7 @@ class _MultiSelectState extends State<MultiSelect> {
                       StatefulBuilder(
                         builder: (context, setState) => Checkbox(
                           checkColor: color808080,
-                          activeColor: Colors.white,
+                          activeColor: mobileBackgroundColor,
                           onChanged: (value) {
                             setState(() {
                               if (value == true) {
@@ -137,7 +138,7 @@ class _MultiSelectState extends State<MultiSelect> {
                   fontFamily: "Poppins",
                   fontSize: 12,
                   height: 1.5,
-                  color: Colors.white,
+                  color: mobileBackgroundColor,
                   fontWeight: FontWeight.w500,
                 )),
           ),

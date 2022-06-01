@@ -61,13 +61,13 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: SizedBox(
         width: MediaQuery.of(context).size.width * 0.6,
         child: Drawer(
-          backgroundColor: Colors.white,
+          backgroundColor: mobileBackgroundColor,
           child: ListView(children: getDrawerList(context, _user!)),
         ),
       ),
       appBar: AppBar(
         elevation: 1,
-        backgroundColor: Colors.white,
+        backgroundColor: mobileBackgroundColor,
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.all(8),
               width: getSafeAreaWidth(context),
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: mobileBackgroundColor,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,

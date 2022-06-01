@@ -45,6 +45,7 @@ dependencies:
   image_picker: ^0.8.5
   multi_select_flutter: ^4.1.2
   provider: ^6.0.2
+  shared_preferences: ^2.0.15
   timeago: ^3.2.2
   uuid: ^3.0.6
 
@@ -63,12 +64,15 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
+    # logos
     - images/google_logo.svg
     - images/fb_logo.svg
     - images/crystull_logo.svg
     - images/otp_verification.svg
     - images/avatar.png
     - images/notificationFilled.svg
+
+    # icons
     - images/icons/homeButton.svg
     - images/icons/friendRequests.svg
     - images/icons/removeFriend.svg
@@ -81,8 +85,15 @@ flutter:
     - images/icons/network.svg
     - images/icons/settings.svg
     - images/icons/help.svg
+
+    # home screen
     - images/home/1.png
     - images/home/2.png
+
+    # onboarding screen
+    - images/onboarding/1.svg
+    - images/onboarding/2.svg
+    - images/onboarding/3.svg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

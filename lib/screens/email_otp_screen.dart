@@ -79,8 +79,10 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                   const Text(
                     "OTP verification",
                     style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
+                      fontFamily: "Poppins",
+                      fontSize: 24,
+                      height: 0.75,
+                      fontWeight: FontWeight.w600,
                       color: primaryColor,
                     ),
                   ),
@@ -139,15 +141,6 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                             } else {
                               // show OTP screen
                               showSnackBar("OTP resent successfully", context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MoreInfoScreen(
-                                    signupForm: widget.signupForm,
-                                    emailAuth: widget.emailAuth,
-                                  ),
-                                ),
-                              );
                             }
                           }).catchError((e) {
                             showSnackBar(e.toString(), context);
@@ -159,11 +152,11 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                         child: const Text(
                           "Resend",
                           style: TextStyle(
-                            color: primaryColor,
                             fontFamily: "Poppins",
                             fontSize: 12,
                             height: 1.5,
                             fontWeight: FontWeight.w600,
+                            color: primaryColor,
                           ),
                         ),
                       )
@@ -198,7 +191,6 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                                   MaterialPageRoute(
                                     builder: (context) => MoreInfoScreen(
                                       signupForm: widget.signupForm,
-                                      emailAuth: widget.emailAuth,
                                     ),
                                   ),
                                 );
@@ -211,7 +203,7 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                       child: _isLoading
                           ? const Center(
                               child: CircularProgressIndicator(
-                                  color: Colors.white),
+                                  color: mobileBackgroundColor),
                             )
                           : Text(
                               widget.isLoginWithOTP ? "Login" : "Submit",
@@ -220,7 +212,7 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                                 fontSize: 18,
                                 height: 1.5,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: mobileBackgroundColor,
                               ),
                             ),
                       width: double.infinity,

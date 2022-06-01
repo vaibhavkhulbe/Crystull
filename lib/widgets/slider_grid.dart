@@ -32,7 +32,7 @@ class CircleThumbShape extends SliderComponentShape {
     final Canvas canvas = context.canvas;
 
     final fillPaint = Paint()
-      ..color = Colors.white
+      ..color = mobileBackgroundColor
       ..style = PaintingStyle.fill;
 
     final borderPaint = Paint()
@@ -71,14 +71,14 @@ Widget getSliderWidgetWithLabel(
           showValueIndicator: ShowValueIndicator.always,
           valueIndicatorTextStyle: const TextStyle(
             fontFamily: "Poppins",
-            color: Colors.white,
+            color: mobileBackgroundColor,
             fontSize: 12,
           ),
           overlayShape: SliderComponentShape.noOverlay,
           trackHeight: 8,
           activeTrackColor: primaryColor,
-          inactiveTrackColor: const Color(0xFFEEEEEE),
-          thumbColor: Colors.white,
+          inactiveTrackColor: colorEEEEEE,
+          thumbColor: mobileBackgroundColor,
           thumbShape: const CircleThumbShape(thumbRadius: 11),
         ),
         child: Slider(

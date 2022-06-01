@@ -18,9 +18,11 @@ Widget getStatusButton(Color boxColor, Color borderColor, String text,
       child: Text(
         text,
         style: TextStyle(
+          fontFamily: "Poppins",
           fontWeight: fontWeight,
           color: textColor,
           fontSize: fontSize,
+          height: 1.5,
         ),
       ),
     ),

@@ -12,7 +12,7 @@ PreferredSizeWidget getAppBar(
       icon: const Icon(Icons.arrow_back, color: color575757),
       onPressed: () => Navigator.of(context).pop(),
     ),
-    backgroundColor: Colors.white,
+    backgroundColor: mobileBackgroundColor,
     centerTitle: centerTitle,
     title: Text(
       title,

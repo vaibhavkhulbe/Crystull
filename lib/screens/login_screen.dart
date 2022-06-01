@@ -174,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
                       border: Border.all(color: primaryColor, width: 2),
-                      color: Colors.white,
+                      color: mobileBackgroundColor,
                     ),
                   ),
                 ),
@@ -201,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Container(
                     child: _isLoading
                         ? const CircularProgressIndicator(
-                            color: Colors.white,
+                            color: mobileBackgroundColor,
                           )
                         : const Text("Login",
                             style: TextStyle(
@@ -281,12 +281,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: 36,
                         padding: const EdgeInsets.all(8),
                         decoration: const BoxDecoration(
-                          color: Color(0xFFEB4235),
+                          color: googleLogoColor,
                           shape: BoxShape.circle,
                         ),
                         child: SvgPicture.asset(
                           'images/google_logo.svg',
-                          color: Colors.white,
+                          color: mobileBackgroundColor,
                           height: 18,
                           width: 18,
                         ),
@@ -309,12 +309,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: 36,
                         padding: const EdgeInsets.all(8),
                         decoration: const BoxDecoration(
-                          color: Color(0xFF256BB3),
+                          color: fbLogoColor,
                           shape: BoxShape.circle,
                         ),
                         child: SvgPicture.asset(
                           'images/fb_logo.svg',
-                          color: Colors.white,
+                          color: mobileBackgroundColor,
                           height: 18,
                           width: 9,
                         ),
