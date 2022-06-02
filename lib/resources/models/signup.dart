@@ -2,6 +2,20 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class SwapInfo {
+  DateTime lastSwappedAt;
+  String lastSwappedID;
+
+  SwapInfo({required this.lastSwappedAt, required this.lastSwappedID});
+}
+
+class SwapAttributes {
+  Map<String, double> attributes;
+  Map<String, SwapInfo> swapInfo;
+
+  SwapAttributes({required this.attributes, required this.swapInfo});
+}
+
 class SwapData {
   Map<String, double> value;
 

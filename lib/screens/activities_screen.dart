@@ -195,7 +195,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              Flexible(child: Container()),
+                              const Spacer(),
                               Text(
                                 counts != null && counts.isNotEmpty
                                     ? '${counts.values.reduce((sum, element) => sum + element)}'
@@ -224,7 +224,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                 ),
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 10),
-                  height: getSafeAreaHeight(context) * 0.08,
+                  height: getSafeAreaHeight(context) * 0.1,
                   child: isLoadingCounts
                       ? const Center(
                           child: CircularProgressIndicator(
@@ -295,7 +295,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
-                                        Flexible(child: Container()),
+                                        const Spacer(),
                                         Text(
                                           value.key,
                                           overflow: TextOverflow.ellipsis,

@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Flexible(child: Container(), flex: 2),
+                const Spacer(flex: 2),
                 // Add logo
                 // SvgPicture.asset('images/crystull_logo.svg', height: 64),
 
@@ -106,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 const Text(
                   "Enter your email to continue",
@@ -116,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                Flexible(child: Container(), flex: 3),
+                const Spacer(flex: 3),
 
                 const Text(
                   "Email",
@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   textInputType: TextInputType.emailAddress,
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 const Text(
                   "Password",
@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   isPassword: true,
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 // button to login with OTP
                 InkWell(
@@ -179,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 // button to login
                 InkWell(
@@ -218,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -246,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 Container(
                   height: 20,
@@ -262,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

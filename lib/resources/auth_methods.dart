@@ -532,9 +532,10 @@ class AuthMethods {
     return res;
   }
 
-  Future<Map<String, double>?>? getCombinedAttributes(String uid,
+  Future<SwapAttributes> getCombinedAttributes(String uid,
       {bool weekly = false}) async {
     Map<String, double> attributes = {};
+    Map<String, SwapInfo> swapInfo = {};
     if (weekly) {
       // return Future<Map<String, double>>.value(null);
       // DateTime now = DateTime.now();
@@ -566,10 +567,21 @@ class AuthMethods {
             attributes[key] = value['sum'] / value['count'];
           }
         });
+
+        for (var entry in swap.entries) {
+          if (entry.key != 'cumulative' &&
+              entry.key != 'cumulative_given' &&
+              entry.key != 'weekly') {
+            swapInfo[entry.key] = SwapInfo(
+              lastSwappedAt:
+                  (entry.value['lastSwappedAt'] as Timestamp).toDate(),
+              lastSwappedID: entry.value['lastSwappedID'] as String,
+            );
+          }
+        }
       }
     }
-    log(attributes.toString());
-    return attributes;
+    return SwapAttributes(attributes: attributes, swapInfo: swapInfo);
   }
 
   Future<Map<String, Map<String, int>>> getAttributesCounts(
@@ -694,5 +706,14 @@ class AuthMethods {
       log(res);
     }
     return res;
+  }
+
+  Future<Swap?> getSwapFromID(String swapID) async {
+    var snapshot = await _firestore.collection('individual').doc(swapID).get();
+
+    if (snapshot.exists) {
+      return Swap.fromJson(snapshot.data()!);
+    }
+    return null;
   }
 }

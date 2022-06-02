@@ -4,7 +4,7 @@ Widget getStatusButton(Color boxColor, Color borderColor, String text,
     Color textColor, Function() function,
     {double radius = 0,
     double fontSize = 12,
-    FontWeight? fontWeight = FontWeight.bold}) {
+    FontWeight? fontWeight = FontWeight.w400}) {
   return InkWell(
     onTap: function,
     child: Container(

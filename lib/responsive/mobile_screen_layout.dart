@@ -2,7 +2,6 @@ import 'package:crystull/providers/user_provider.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/friend_request_screen.dart';
 import 'package:crystull/screens/home_screen.dart';
-import 'package:crystull/screens/login_screen.dart';
 import 'package:crystull/screens/notifications_screen.dart';
 import 'package:crystull/screens/profile_screen.dart';
 import 'package:crystull/utils/colors.dart';

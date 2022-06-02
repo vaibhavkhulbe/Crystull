@@ -122,7 +122,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Flexible(child: Container(), flex: 3),
+                const Spacer(flex: 3),
                 // Add logo
                 // SvgPicture.asset('images/crystull_logo.svg', height: 64),
 
@@ -138,7 +138,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   ),
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 const Text(
                   "Please fill the credentials",
@@ -152,7 +152,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   ),
                 ),
 
-                Flexible(child: Container(), flex: 3),
+                const Spacer(flex: 3),
 
                 // Email text box
                 const Text(
@@ -171,7 +171,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   textInputType: TextInputType.text,
                 ),
 
-                Flexible(child: Container(), flex: 2),
+                const Spacer(flex: 2),
 
                 // Email text box
                 const Text(
@@ -190,7 +190,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   textInputType: TextInputType.text,
                 ),
 
-                Flexible(child: Container(), flex: 2),
+                const Spacer(flex: 2),
 
                 // Email text box
                 const Text(
@@ -209,7 +209,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   textInputType: TextInputType.emailAddress,
                 ),
 
-                Flexible(child: Container(), flex: 2),
+                const Spacer(flex: 2),
 
                 // Password text box
                 const Text(
@@ -230,7 +230,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   isPassword: true,
                 ),
 
-                Flexible(child: Container(), flex: 2),
+                const Spacer(flex: 2),
 
                 const Text(
                   "Confirm Password",
@@ -250,7 +250,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   isPassword: true,
                 ),
 
-                Flexible(child: Container(), flex: 2),
+                const Spacer(flex: 2),
 
                 Wrap(
                   alignment: WrapAlignment.start,
@@ -321,7 +321,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   ],
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 // button to sign up
                 InkWell(
@@ -453,7 +453,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   ],
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 Container(
                     alignment: Alignment.center,

@@ -94,7 +94,7 @@ class _LoginWithOTPScreenState extends State<LoginWithOTPScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Flexible(child: Container(), flex: 2),
+              const Spacer(flex: 2),
               // Add logo
               // SvgPicture.asset('images/crystull_logo.svg', height: 64),
 
@@ -108,7 +108,7 @@ class _LoginWithOTPScreenState extends State<LoginWithOTPScreen> {
                 ),
               ),
 
-              Flexible(child: Container(), flex: 1),
+              const Spacer(flex: 1),
 
               const Text(
                 "Enter your email to continue",
@@ -118,7 +118,7 @@ class _LoginWithOTPScreenState extends State<LoginWithOTPScreen> {
                 ),
               ),
 
-              Flexible(child: Container(), flex: 3),
+              const Spacer(flex: 3),
 
               const Text(
                 "Email",
@@ -135,7 +135,7 @@ class _LoginWithOTPScreenState extends State<LoginWithOTPScreen> {
                 textInputType: TextInputType.emailAddress,
               ),
 
-              Flexible(child: Container(), flex: 1),
+              const Spacer(flex: 1),
 
               // button to login
               InkWell(
@@ -189,7 +189,7 @@ class _LoginWithOTPScreenState extends State<LoginWithOTPScreen> {
                 ),
               ),
 
-              Flexible(child: Container(), flex: 1),
+              const Spacer(flex: 1),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -217,7 +217,7 @@ class _LoginWithOTPScreenState extends State<LoginWithOTPScreen> {
                 ],
               ),
 
-              Flexible(child: Container(), flex: 1),
+              const Spacer(flex: 1),
 
               Container(
                   alignment: Alignment.center,

@@ -70,11 +70,11 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Flexible(child: Container(), flex: 2),
+                  const Spacer(flex: 2),
                   // Add logo
                   SvgPicture.asset('images/otp_verification.svg'),
 
-                  Flexible(child: Container(), flex: 2),
+                  const Spacer(flex: 2),
                   // Sign up statement
                   const Text(
                     "OTP verification",
@@ -87,7 +87,7 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                     ),
                   ),
 
-                  Flexible(child: Container(), flex: 1),
+                  const Spacer(flex: 1),
 
                   Wrap(
                     alignment: WrapAlignment.center,
@@ -107,7 +107,7 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                     ],
                   ),
 
-                  Flexible(child: Container(), flex: 1),
+                  const Spacer(flex: 1),
 
                   TextFieldInput(
                     textEditingController: _otpController,
@@ -163,7 +163,7 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                     ],
                   ),
 
-                  Flexible(child: Container(), flex: 2),
+                  const Spacer(flex: 2),
 
                   // button to sign up
                   InkWell(
@@ -224,7 +224,7 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                       ),
                     ),
                   ),
-                  Flexible(child: Container(), flex: 4),
+                  const Spacer(flex: 4),
                 ],
               ),
             ),

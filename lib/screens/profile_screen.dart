@@ -7,6 +7,7 @@ import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/connected_friends_screen.dart';
 import 'package:crystull/screens/edit_profile.dart';
+import 'package:crystull/screens/notifications_detail_screen.dart';
 import 'package:crystull/widgets/get_switch.dart';
 import 'package:crystull/widgets/multi_select.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
@@ -20,7 +21,6 @@ import 'package:crystull/screens/search_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 const List<String> primaryAttributes = [
   'Personality',
@@ -70,6 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   CrystullUser? _currentUser;
   List<CrystullUser> connectedUsers = [];
   Map<String, double> _swapValues = {};
+  Map<String, SwapInfo> _swapInfo = {};
   final Map<String, double> _topSwapValues = {};
   final Map<String, double> _primarySwapValues = {};
   final Map<String, double> _moreSwapValues = {};
@@ -208,8 +209,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       widget.user = userProvider.getUser!;
     }
 
-    _swapValues =
-        await AuthMethods().getCombinedAttributes(widget.user.uid) ?? {};
+    var swapAttributes =
+        await AuthMethods().getCombinedAttributes(widget.user.uid);
+
+    _swapValues = swapAttributes.attributes;
+    _swapInfo = swapAttributes.swapInfo;
 
     var mapEntries = _swapValues.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
@@ -795,8 +799,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       child: const Text(
                                         "The user has not been swapped with other attributes yet.",
                                         style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.black54),
+                                          fontSize: 12,
+                                          color: Colors.black54,
+                                        ),
                                       ),
                                     ),
                             ],
@@ -808,7 +813,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: Column(
-                              mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
@@ -828,12 +832,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: Text(
                                     "Send connection request to see all attributes",
                                     style: TextStyle(
-                                        fontFamily: "Poppins",
-                                        fontSize: 10,
-                                        height: 1.5,
-                                        fontWeight: FontWeight.w400,
-                                        color: color808080,
-                                        fontStyle: FontStyle.italic),
+                                      fontFamily: "Poppins",
+                                      fontSize: 10,
+                                      height: 1.5,
+                                      fontWeight: FontWeight.w400,
+                                      color: color808080,
+                                      fontStyle: FontStyle.italic,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -875,7 +880,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         color: color808080,
                                       ),
                                     ),
-                                    Flexible(child: Container()),
+                                    const Spacer(),
                                     GestureDetector(
                                       onTap: () {
                                         Navigator.push(
@@ -992,137 +997,276 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           shape: const ContinuousRectangleBorder(),
                           child: Container(
                             padding: const EdgeInsets.all(10),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Help " +
-                                      widget.user.firstName.capitalize() +
-                                      " to improve their skills",
-                                  style: const TextStyle(
-                                    fontFamily: "Poppins",
-                                    fontSize: 14,
-                                    height: 1.5,
-                                    fontWeight: FontWeight.w500,
-                                    color: color808080,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    const Text(
-                                      "SWAP anonymously",
-                                      style: TextStyle(
-                                        fontFamily: "Poppins",
-                                        fontSize: 13,
-                                        height: 1.5,
-                                        fontWeight: FontWeight.w400,
-                                        color: color808080,
-                                      ),
-                                    ),
-                                    Flexible(child: Container()),
-                                    getSwitch(
-                                      activeColor: primaryColor,
-                                      inactiveColor: secondaryColor,
-                                      value: isAnonymousPost,
-                                      onChanged: (value) {
-                                        if (value) {
-                                          isAnonymousPost = true;
-                                        } else {
-                                          isAnonymousPost = false;
-                                        }
-                                        setState(() {});
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                GridView(
-                                    shrinkWrap: true,
-                                    // padding: const EdgeInsets.all(10),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      childAspectRatio: 2.5,
-                                      crossAxisSpacing: 50,
-                                    ),
-                                    children: [
-                                      for (var entry in sliderValues.entries)
-                                        getSliderWidgetWithLabel(
-                                          entry.key,
-                                          entry.value,
-                                          (value) {
-                                            sliderValues[entry.key] = value;
-                                            setState(() {
-                                              if (sliderValues.values.any(
-                                                  (element) => element != 0)) {
-                                                isSwapEnabled = true;
-                                              } else {
-                                                isSwapEnabled = false;
+                            child: (_swapInfo.containsKey(_currentUser!.uid) &&
+                                    (DateTime.now().difference(
+                                            _swapInfo[_currentUser!.uid]!
+                                                .lastSwappedAt)) <
+                                        const Duration(minutes: 10))
+                                ? Container(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SvgPicture.asset(
+                                          'images/swap_submitted.svg',
+                                          width:
+                                              getSafeAreaWidth(context) * 0.1,
+                                          height:
+                                              getSafeAreaWidth(context) * 0.1,
+                                        ),
+                                        const SizedBox(height: 10),
+                                        const Text(
+                                          "Thank you for your submission",
+                                          style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 14,
+                                            height: 1.5,
+                                            fontWeight: FontWeight.w500,
+                                            color: color808080,
+                                          ),
+                                        ),
+                                        Text(
+                                          "You can again SWAP " +
+                                              widget.user.firstName
+                                                  .capitalize() +
+                                              " after " +
+                                              getStringDuration(
+                                                  _swapInfo[_currentUser!.uid]!
+                                                      .lastSwappedAt
+                                                      .add(const Duration(
+                                                          minutes: 10))
+                                                      .difference(
+                                                          DateTime.now())),
+                                          style: const TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 12,
+                                            height: 1.5,
+                                            fontWeight: FontWeight.w500,
+                                            color: color808080,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        TextButton(
+                                            onPressed: (() async {
+                                              var swap = await AuthMethods()
+                                                  .getSwapFromID(_swapInfo[
+                                                          _currentUser!.uid]!
+                                                      .lastSwappedID);
+                                              if (swap != null) {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        NotificationDetail(
+                                                            swap: swap,
+                                                            uid: _currentUser!
+                                                                .uid),
+                                                  ),
+                                                );
                                               }
-                                            });
-                                          },
-                                        )
-                                    ]),
-                                Container(
-                                  alignment: Alignment.topRight,
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      Map<String, double>? newSliderValues =
-                                          await showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return MultiSelect(
-                                                    selectedValuesMap:
-                                                        sliderValues);
-                                              });
-                                      if (newSliderValues != null) {
-                                        setState(() {
-                                          sliderValues = newSliderValues;
-                                        });
-                                      }
-                                    },
-                                    child: const Text(
-                                      "+ More",
-                                      style: TextStyle(
-                                          fontSize: 13, color: primaryColor),
-                                    ),
-                                  ),
-                                ),
-                                Center(
-                                  child: isSwapEnabled
-                                      ? _isSwapping
-                                          ? Container(
-                                              alignment: Alignment.center,
+                                            }),
+                                            child: Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.3,
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      vertical: 8),
-                                              margin: const EdgeInsets.only(
-                                                  top: 40, bottom: 20),
-                                              decoration: const BoxDecoration(
-                                                  color: primaryColor),
-                                              width: getSafeAreaWidth(context) *
-                                                  0.25,
-                                              child:
-                                                  const CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                color: mobileBackgroundColor,
+                                                      vertical: 10,
+                                                      horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(2),
+                                                color: primaryColor,
                                               ),
-                                            )
-                                          : InkWell(
-                                              onTap: () {
-                                                swapUser();
-                                              },
-                                              child: Container(
+                                              child: const Text(
+                                                'View',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontSize: 12,
+                                                  height: 1.5,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: mobileBackgroundColor,
+                                                ),
+                                              ),
+                                            ))
+                                      ],
+                                    ),
+                                  )
+                                : Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Help " +
+                                            widget.user.firstName.capitalize() +
+                                            " to improve their skills",
+                                        style: const TextStyle(
+                                          fontFamily: "Poppins",
+                                          fontSize: 14,
+                                          height: 1.5,
+                                          fontWeight: FontWeight.w500,
+                                          color: color808080,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          const Text(
+                                            "SWAP anonymously",
+                                            style: TextStyle(
+                                              fontFamily: "Poppins",
+                                              fontSize: 13,
+                                              height: 1.5,
+                                              fontWeight: FontWeight.w400,
+                                              color: color808080,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          getSwitch(
+                                            activeColor: primaryColor,
+                                            inactiveColor: secondaryColor,
+                                            value: isAnonymousPost,
+                                            onChanged: (value) {
+                                              if (value) {
+                                                isAnonymousPost = true;
+                                              } else {
+                                                isAnonymousPost = false;
+                                              }
+                                              setState(() {});
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 20),
+                                      GridView(
+                                          shrinkWrap: true,
+                                          // padding: const EdgeInsets.all(10),
+                                          gridDelegate:
+                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 2,
+                                            childAspectRatio: 2.5,
+                                            crossAxisSpacing: 50,
+                                          ),
+                                          children: [
+                                            for (var entry
+                                                in sliderValues.entries)
+                                              getSliderWidgetWithLabel(
+                                                entry.key,
+                                                entry.value,
+                                                (value) {
+                                                  sliderValues[entry.key] =
+                                                      value;
+                                                  setState(() {
+                                                    if (sliderValues.values.any(
+                                                        (element) =>
+                                                            element != 0)) {
+                                                      isSwapEnabled = true;
+                                                    } else {
+                                                      isSwapEnabled = false;
+                                                    }
+                                                  });
+                                                },
+                                              )
+                                          ]),
+                                      Container(
+                                        alignment: Alignment.topRight,
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            Map<String, double>?
+                                                newSliderValues =
+                                                await showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return MultiSelect(
+                                                          selectedValuesMap:
+                                                              sliderValues);
+                                                    });
+                                            if (newSliderValues != null) {
+                                              setState(() {
+                                                sliderValues = newSliderValues;
+                                              });
+                                            }
+                                          },
+                                          child: const Text(
+                                            "+ More",
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                color: primaryColor),
+                                          ),
+                                        ),
+                                      ),
+                                      Center(
+                                        child: (isSwapEnabled
+                                            ? (_isSwapping
+                                                ? Container(
+                                                    alignment: Alignment.center,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(vertical: 8),
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            top: 40,
+                                                            bottom: 20),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                            color:
+                                                                primaryColor),
+                                                    width: getSafeAreaWidth(
+                                                            context) *
+                                                        0.25,
+                                                    child:
+                                                        const CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color:
+                                                          mobileBackgroundColor,
+                                                    ),
+                                                  )
+                                                : InkWell(
+                                                    onTap: () {
+                                                      swapUser();
+                                                    },
+                                                    child: Container(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          vertical: 8),
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              top: 40,
+                                                              bottom: 20),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                              color:
+                                                                  primaryColor),
+                                                      width: getSafeAreaWidth(
+                                                              context) *
+                                                          0.25,
+                                                      child: const Text(
+                                                        "SWAP",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ))
+                                            : Container(
                                                 alignment: Alignment.center,
                                                 padding:
                                                     const EdgeInsets.symmetric(
                                                         vertical: 8),
                                                 margin: const EdgeInsets.only(
                                                     top: 40, bottom: 20),
-                                                decoration: const BoxDecoration(
-                                                    color: primaryColor),
+                                                decoration: BoxDecoration(
+                                                  color: primaryColor
+                                                      .withOpacity(0.5),
+                                                ),
                                                 width:
                                                     getSafeAreaWidth(context) *
                                                         0.25,
@@ -1133,31 +1277,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
-                                              ),
-                                            )
-                                      : Container(
-                                          alignment: Alignment.center,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
-                                          margin: const EdgeInsets.only(
-                                              top: 40, bottom: 20),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                primaryColor.withOpacity(0.5),
-                                          ),
-                                          width:
-                                              getSafeAreaWidth(context) * 0.25,
-                                          child: const Text(
-                                            "SWAP",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                ),
-                              ],
-                            ),
+                                              )),
+                                      ),
+                                    ],
+                                  ),
                           ),
                         )
                 ],
@@ -1171,20 +1294,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // user is not connected or requested
       case 0:
         return getStatusButton(
-          primaryColor,
-          primaryColor,
-          "Connect",
-          mobileBackgroundColor,
-          () async {
-            String result = await AuthMethods()
-                .addFriendRequest(currentUser, otherUser, 1, 2);
-            handleResult(result);
-          },
-        );
+            primaryColor, primaryColor, "Connect", mobileBackgroundColor,
+            () async {
+          String result = await AuthMethods()
+              .addFriendRequest(currentUser, otherUser, 1, 2);
+          handleResult(result);
+        }, fontWeight: FontWeight.w600);
       // Current user is the one requesting
       case 1:
-        return getStatusButton(mobileBackgroundColor, Colors.black54,
-            "Request sent", Colors.black54, () async {
+        return getStatusButton(
+            mobileBackgroundColor, color666666, "Request sent", color666666,
+            () async {
           String result =
               await AuthMethods().removeFriend(currentUser, otherUser);
           handleResult(result);
@@ -1263,5 +1383,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
       status = friend.status;
     }
     return status;
+  }
+
+  String getStringDuration(Duration duration) {
+    String result = "";
+    if (duration.inDays > 0) {
+      result += "${duration.inDays} days ";
+      duration = duration - Duration(days: duration.inDays);
+    }
+    if (duration.inHours > 0) {
+      result += "${duration.inHours} hours ";
+      duration = duration - Duration(hours: duration.inHours);
+    }
+    if (duration.inMinutes > 0) {
+      result += "${duration.inMinutes} minutes ";
+      duration = duration - Duration(minutes: duration.inMinutes);
+    }
+    if (duration.inSeconds > 0) {
+      result += "${duration.inSeconds} seconds ";
+    }
+    return result;
   }
 }

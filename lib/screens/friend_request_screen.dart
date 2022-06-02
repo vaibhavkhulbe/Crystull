@@ -87,7 +87,7 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Flexible(child: Container()),
+                  const Spacer(),
                   GestureDetector(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(

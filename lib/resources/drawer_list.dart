@@ -45,7 +45,7 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
                   : const ExactAssetImage('images/avatar.png'),
             ),
           ),
-          Flexible(child: Container()),
+          const Spacer(),
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -84,8 +84,7 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
                 context,
                 MaterialPageRoute(
                     builder: (context) => const ConnectedFriendsScreen()))),
-        Flexible(
-          child: Container(),
+        const Spacer(
           flex: 10,
         ),
         Text(friendCount.toString(),
@@ -94,7 +93,7 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
                 color: color575757)),
-        Flexible(child: Container()),
+        const Spacer(),
       ]),
     ),
     SizedBox(

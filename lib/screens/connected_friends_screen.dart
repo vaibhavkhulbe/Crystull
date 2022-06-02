@@ -200,7 +200,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                                         : Container(),
                                   ],
                                 ),
-                                Flexible(child: Container()),
+                                const Spacer(),
                                 IconButton(
                                   onPressed: () => {
                                     showModalBottomSheet(

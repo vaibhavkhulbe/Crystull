@@ -94,7 +94,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-                      Flexible(child: Container()),
+                      const Spacer(),
                       getSwitch(
                         activeColor: primaryColor,
                         inactiveColor: secondaryColor,
@@ -155,7 +155,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Flexible(child: Container(), flex: 1),
+                    const Spacer(flex: 1),
                     const Text(
                       "Personal details",
                       style: TextStyle(
@@ -166,7 +166,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: color575757,
                       ),
                     ),
-                    Flexible(child: Container(), flex: 1),
+                    const Spacer(flex: 1),
                     // Bio text box
                     const Text(
                       "Bio*",
@@ -184,7 +184,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       textInputType: TextInputType.text,
                     ),
 
-                    Flexible(child: Container(), flex: 2),
+                    const Spacer(flex: 2),
 
                     // College text box
                     const Text(
@@ -203,7 +203,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       textInputType: TextInputType.text,
                     ),
 
-                    Flexible(child: Container(), flex: 2),
+                    const Spacer(flex: 2),
 
                     // Email text box
                     const Text(
@@ -222,7 +222,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       textInputType: TextInputType.emailAddress,
                     ),
 
-                    Flexible(child: Container(), flex: 2),
+                    const Spacer(flex: 2),
 
                     // button to sign up
                     InkWell(
@@ -267,7 +267,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ],
                       ),
                     ),
-                    Flexible(child: Container(), flex: 5),
+                    const Spacer(flex: 5),
                   ],
                 ),
               ),

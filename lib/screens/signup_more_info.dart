@@ -133,7 +133,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Flexible(child: Container(), flex: 4),
+                const Spacer(flex: 4),
                 // Welcome statement
                 Text(
                   "Welcome " + widget.signupForm.firstName + "!",
@@ -144,7 +144,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                   ),
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 const Text(
                   "Help us to know more about you",
@@ -154,7 +154,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                   ),
                 ),
 
-                Flexible(child: Container(), flex: 2),
+                const Spacer(flex: 2),
                 _profileImage != null
                     ? Center(
                         child: CircleAvatar(
@@ -194,7 +194,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                   textInputType: TextInputType.text,
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 // Email text box
                 const Text(
@@ -210,7 +210,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                   textInputType: TextInputType.text,
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 // Email text box
                 const Text(
@@ -226,7 +226,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                   textInputType: TextInputType.emailAddress,
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 // Password text box
                 const Text(
@@ -297,8 +297,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                         ),
                       ),
                     ),
-                    Flexible(
-                      child: Container(),
+                    const Spacer(
                       flex: 1,
                     ),
                     Flexible(
@@ -322,7 +321,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                   ],
                 ),
 
-                Flexible(child: Container(), flex: 1),
+                const Spacer(flex: 1),
 
                 // button to sign up
                 InkWell(
@@ -356,7 +355,7 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
                     ),
                   ),
                 ),
-                Flexible(child: Container(), flex: 2),
+                const Spacer(flex: 2),
               ],
             ),
           ),

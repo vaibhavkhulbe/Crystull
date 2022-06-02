@@ -160,7 +160,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 color: color808080,
                               ),
                             ),
-                            // Flexible(child: Container(), flex: 6),
+                            // const Spacer( flex: 6),
                           ],
                         ),
                       ),
