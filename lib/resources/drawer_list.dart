@@ -39,7 +39,7 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
         children: [
           Center(
             child: CircleAvatar(
-              radius: getSafeAreaWidth(context) * 0.1,
+              radius: getSafeAreaHeight(context) * 0.05,
               backgroundImage: user.profileImage != null
                   ? Image.memory(user.profileImage!).image
                   : const ExactAssetImage('images/avatar.png'),
@@ -55,13 +55,15 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
                 ),
               );
             },
-            child: Text(user.fullName.capitalize(),
-                style: const TextStyle(
-                  fontFamily: "Poppins",
-                  color: color575757,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                )),
+            child: Text(
+              user.fullName.capitalize(),
+              style: const TextStyle(
+                fontFamily: "Poppins",
+                color: color575757,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -120,7 +122,10 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
         ),
         onTap: () {
           _auth.signOut();
-          Navigator.pushReplacement(context,
+          while (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
+          Navigator.push(context,
               MaterialPageRoute(builder: (context) => const LoginScreen()));
         }),
   ];

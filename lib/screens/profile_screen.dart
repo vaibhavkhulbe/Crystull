@@ -203,8 +203,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await userProvider.refreshUser();
 
     if (_currentUser!.uid != widget.user.uid) {
-      CrystullUser updatedUser = await AuthMethods().refreshUser(widget.user);
-      widget.user = updatedUser;
+      CrystullUser? updatedUser =
+          await AuthMethods().refreshUser(widget.user.uid);
+      if (updatedUser != null) {
+        _currentUser = updatedUser;
+        if (mounted) {
+          setState(() {
+            _loadingPage = false;
+          });
+        }
+      }
     } else {
       widget.user = userProvider.getUser!;
     }
@@ -382,14 +390,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        // cover photo
                         SizedBox(
                           height: isMe
-                              ? getSafeAreaHeight(context) * 0.22
-                              : getSafeAreaHeight(context) * 0.25,
+                              ? getSafeAreaHeight(context) * 0.25
+                              : getSafeAreaHeight(context) * 0.3,
                           child: Stack(
                             clipBehavior: Clip.none,
                             alignment: Alignment.topLeft,
                             children: [
+                              // cover photo
                               _isUpdatingCoverPhoto
                                   ? Container(
                                       alignment: Alignment.center,
@@ -493,9 +503,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                       )
                                     : Container(
-                                        width: getSafeAreaWidth(context) * 0.25,
+                                        width:
+                                            MediaQuery.of(context).size.height *
+                                                0.12,
                                         height:
-                                            getSafeAreaWidth(context) * 0.25,
+                                            MediaQuery.of(context).size.height *
+                                                0.12,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           color: Colors.black54,
@@ -532,23 +545,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                               ),
 
+                              // SWAP
                               Positioned(
-                                top: MediaQuery.of(context).size.height * 0.15,
-                                left: MediaQuery.of(context).size.width * 0.135,
+                                top: (MediaQuery.of(context).size.height *
+                                        0.18) -
+                                    16,
+                                left:
+                                    (MediaQuery.of(context).size.width * 0.05) +
+                                        (MediaQuery.of(context).size.height *
+                                            0.06) -
+                                        16,
                                 child: Container(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 2.5),
-                                  width: getSafeAreaWidth(context) * 0.08,
-                                  height: getSafeAreaWidth(context) * 0.08,
+                                  width: 32,
+                                  height: 32,
                                   decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: mobileBackgroundColor,
-                                      border: Border.all(
-                                        color: primaryColor,
-                                        width: 1,
-                                      )),
+                                    shape: BoxShape.circle,
+                                    color: mobileBackgroundColor,
+                                    border: Border.all(
+                                      color: primaryColor,
+                                      width: 1,
+                                    ),
+                                  ),
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
@@ -588,7 +611,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               // edit profile photo
                               Positioned(
                                 top: MediaQuery.of(context).size.height * 0.07,
-                                left: MediaQuery.of(context).size.width * 0.24,
+                                left: (MediaQuery.of(context).size.width *
+                                        0.05) +
+                                    (MediaQuery.of(context).size.height * 0.09),
                                 child: InkWell(
                                   child: SvgPicture.asset(
                                     "images/icons/editPhoto.svg",
@@ -600,11 +625,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
 
-                              // User details
+                              // User details edit profile and connection status
                               Positioned(
                                 width: MediaQuery.of(context).size.width * 0.5,
                                 top: MediaQuery.of(context).size.height * 0.11,
-                                left: MediaQuery.of(context).size.width * 0.35,
+                                left: (MediaQuery.of(context).size.width *
+                                        0.05) +
+                                    (MediaQuery.of(context).size.height * 0.14),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -704,12 +731,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ],
                                 ),
                               ),
+
+                              // block/unblock/remove
                               !isMe
                                   ? Positioned(
-                                      top: MediaQuery.of(context).size.height *
-                                          0.1,
-                                      right: MediaQuery.of(context).size.width *
-                                          0.01,
+                                      top: getSafeAreaHeight(context) * 0.1,
+                                      right: getSafeAreaWidth(context) * 0.01,
                                       child: PopupMenuButton<String>(
                                         icon: const Icon(
                                           Icons.more_vert,
@@ -757,11 +784,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: const Text(
                                   "Primary Attributes",
                                   style: TextStyle(
-                                      fontFamily: "Poppins",
-                                      fontSize: 14,
-                                      height: 1.5,
-                                      fontWeight: FontWeight.w600,
-                                      color: color575757),
+                                    fontFamily: "Poppins",
+                                    fontSize: 14,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: color575757,
+                                  ),
                                 ),
                               ),
                               _primarySwapValues.isNotEmpty
@@ -973,6 +1001,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   connectedUsers[i]
                                                       .fullName
                                                       .capitalize(),
+                                                  textAlign: TextAlign.center,
                                                   style: const TextStyle(
                                                     fontFamily: "Poppins",
                                                     fontSize: 12,

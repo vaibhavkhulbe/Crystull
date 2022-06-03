@@ -38,7 +38,9 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _currentUser = Provider.of<UserProvider>(context).getUser;
+    var userProvider = Provider.of<UserProvider>(context);
+    _currentUser = userProvider.getUser;
+
     friendCount = [0, 0, 0, 0, 0, 0];
     _currentUser!.connections.forEach((key, value) {
       friendCount[value.status]++;

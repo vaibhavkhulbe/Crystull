@@ -72,7 +72,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                 )
               : Container(
                   decoration: BoxDecoration(
-                    color: Color(0xFFF0F2F5),
+                    color: const Color(0xFFF0F2F5),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   height: getSafeAreaHeight(context) * 0.04,

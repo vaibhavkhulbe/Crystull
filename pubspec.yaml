@@ -87,6 +87,7 @@ flutter:
     - images/icons/network.svg
     - images/icons/settings.svg
     - images/icons/help.svg
+    - images/icons/trending.svg
 
     # home screen
     - images/home/1.png

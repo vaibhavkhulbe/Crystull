@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
+import 'package:crystull/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:crystull/widgets/text_field_widget.dart';
@@ -57,9 +58,7 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          elevation: 1,
-        ),
+        appBar: getAppBar(context, "", elevation: 0),
         body: SingleChildScrollView(
           child: SafeArea(
             child: Container(

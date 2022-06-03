@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crystull/resources/models/signup.dart';
+import 'package:crystull/resources/models/weekly_attributes.dart';
 import 'package:crystull/resources/storage_methods.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
@@ -314,12 +315,13 @@ class AuthMethods {
     return res;
   }
 
-  Future<CrystullUser> refreshUser(CrystullUser user) async {
+  Future<CrystullUser?> refreshUser(String userId) async {
     String res = "Some error occured";
+    CrystullUser? user;
     try {
-      if (user.uid.isNotEmpty) {
+      if (userId.isNotEmpty) {
         // update the user
-        await _firestore.collection('users').doc(user.uid).get().then((doc) {
+        await _firestore.collection('users').doc(userId).get().then((doc) {
           user = CrystullUser.fromSnapshot(doc);
         });
       }
@@ -478,17 +480,6 @@ class AuthMethods {
                   'count': FieldValue.increment(1),
                 }
               },
-              // 'weekly.${days[0].toString()}.sum': FieldValue.increment(value),
-              // 'weekly.${days[0].toString()}.count': FieldValue.increment(1),
-              'weekly': {
-                for (var day in days)
-                  day.toString(): {
-                    key: {
-                      'sum': FieldValue.increment(value),
-                      'count': FieldValue.increment(1)
-                    }
-                  }
-              },
             },
             SetOptions(merge: true),
           );
@@ -504,21 +495,22 @@ class AuthMethods {
             },
             SetOptions(merge: true),
           );
-          // for (var day in days) {
-          //   batch.set(
-          //       _firestore
-          //           .collection('swaps')
-          //           .doc(userId)
-          //           .collection("weekly")
-          //           .doc(day.toString()),
-          //       {
-          //         key: {
-          //           'sum': FieldValue.increment(value),
-          //           'count': FieldValue.increment(1)
-          //         }
-          //       },
-          //       SetOptions(merge: true));
-          // }
+          for (var day in days) {
+            batch.set(
+              _firestore
+                  .collection("weekly")
+                  .doc(day.toString())
+                  .collection('swaps')
+                  .doc(toUserId),
+              {
+                key: {
+                  'sum': FieldValue.increment(value),
+                  'count': FieldValue.increment(1)
+                }
+              },
+              SetOptions(merge: true),
+            );
+          }
         });
         // _firestore.collection('swaps').doc(userId).collection("weekly").where();
 
@@ -532,56 +524,118 @@ class AuthMethods {
     return res;
   }
 
-  Future<SwapAttributes> getCombinedAttributes(String uid,
-      {bool weekly = false}) async {
+  Future<SwapAttributes> getCombinedAttributes(
+    String uid,
+  ) async {
     Map<String, double> attributes = {};
     Map<String, SwapInfo> swapInfo = {};
-    if (weekly) {
-      // return Future<Map<String, double>>.value(null);
-      // DateTime now = DateTime.now();
-      // DateTime weekBefore = DateTime(now.year, now.month, now.day)
-      //     .subtract(const Duration(days: 7));
-      // var data = _firestore.collection('swaps').doc(uid).get();
 
-      // return data.then((snapshot) {
-      //   if (snapshot.exists) {
-      //     Map<String, double> swap = snapshot.data() ?? {};
-      //     swap.forEach((key, value) {
-      //       Map<String, double> weekly = value;
-      //       weekly.forEach((key, value) {
-      //         attributes[key] = value;
-      //       });
-      //     });
-      //   }
-      //   return attributes;
-      // }).catchError((e) {
-      //   log(e.toString());
-      // });
-    } else {
-      var snapshot = await _firestore.collection('swaps').doc(uid).get();
-      if (snapshot.exists) {
-        Map<String, dynamic> swap = snapshot.data() ?? {};
-        Map<String, dynamic> cumulative = swap['cumulative'] ?? {};
-        cumulative.forEach((key, value) {
-          if (value['count'] != null && value['count'] != 0) {
-            attributes[key] = value['sum'] / value['count'];
-          }
-        });
+    var snapshot = await _firestore.collection('swaps').doc(uid).get();
+    if (snapshot.exists) {
+      Map<String, dynamic> swap = snapshot.data() ?? {};
+      Map<String, dynamic> cumulative = swap['cumulative'] ?? {};
+      cumulative.forEach((key, value) {
+        if (value['count'] != null && value['count'] != 0) {
+          attributes[key] = value['sum'] / value['count'];
+        }
+      });
 
-        for (var entry in swap.entries) {
-          if (entry.key != 'cumulative' &&
-              entry.key != 'cumulative_given' &&
-              entry.key != 'weekly') {
-            swapInfo[entry.key] = SwapInfo(
-              lastSwappedAt:
-                  (entry.value['lastSwappedAt'] as Timestamp).toDate(),
-              lastSwappedID: entry.value['lastSwappedID'] as String,
-            );
-          }
+      for (var entry in swap.entries) {
+        if (entry.key != 'cumulative' &&
+            entry.key != 'cumulative_given' &&
+            entry.key != 'weekly') {
+          swapInfo[entry.key] = SwapInfo(
+            lastSwappedAt: (entry.value['lastSwappedAt'] as Timestamp).toDate(),
+            lastSwappedID: entry.value['lastSwappedID'] as String,
+          );
         }
       }
     }
     return SwapAttributes(attributes: attributes, swapInfo: swapInfo);
+  }
+
+  Future<WeeklyAttributes> getWeeklyUserWiseAttributes(
+      CrystullUser _user) async {
+    Map<String, Map<String, dynamic>> attributes = {};
+    Map<String, CrystullUser> users = {};
+    List<String> uids = [];
+    _user.connections.forEach(
+      (key, value) {
+        if (value.status == 3) {
+          uids.add(key);
+        }
+      },
+    );
+
+    // return Future<Map<String, double>>.value(null);
+    DateTime now = DateTime.now();
+    DateTime weekBefore = DateTime(now.year, now.month, now.day)
+        .subtract(const Duration(days: 7));
+    var snapshot = await _firestore
+        .collection('weekly')
+        .doc(weekBefore.toString())
+        .collection('swaps')
+        .where(FieldPath.documentId, whereIn: uids)
+        .get();
+
+    if (snapshot.size != 0) {
+      for (var doc in snapshot.docs) {
+        Map<String, dynamic> swap = doc.data();
+        for (var entry in swap.entries) {
+          double score = entry.value['count'] > 0
+              ? entry.value['sum'] / entry.value['count']
+              : 0;
+          if (attributes.containsKey(entry.key)) {
+            if (attributes[entry.key]!['score'] < score) {
+              attributes[entry.key] = {
+                'score': score,
+                'uid': doc.id,
+              };
+            }
+          } else if (score > 50) {
+            attributes[entry.key] = {
+              'attribute': entry.key,
+              'score': score,
+              'uid': doc.id,
+            };
+          }
+        }
+      }
+    }
+    // log(attributes.toString());
+
+    Set<String> uniqueUids = Set.from(attributes.values.map((e) => e['uid']));
+
+    if (uniqueUids.isNotEmpty) {
+      await _firestore
+          .collection('users')
+          .where('uid', whereIn: uniqueUids.toList())
+          .get()
+          .then((QuerySnapshot snapshot) async {
+        for (var doc in snapshot.docs) {
+          users[doc.id] = CrystullUser.fromSnapshot(doc);
+        }
+      });
+    }
+
+    return WeeklyAttributes(attributes: attributes, users: users);
+
+    // return data.then((snapshot) {
+    //   if (snapshot.exists) {
+    //     Map<String, double> swap = snapshot.data() ?? {};
+    //     swap.forEach((key, value) {
+    //       Map<String, double> weekly = value;
+    //       weekly.forEach((key, value) {
+    //         attributes[key] = value;
+    //       });
+    //     });
+    //   }
+    //   return attributes;
+    // }).catchError((e) {
+    //   log(e.toString());
+    // });
+
+    // return SwapAttributes(attributes: attributes, swapInfo: swapInfo);
   }
 
   Future<Map<String, Map<String, int>>> getAttributesCounts(

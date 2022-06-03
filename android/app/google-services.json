@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "485376729915-bodf2glio87jfa9blt77165jpvgcot91.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.opterra.crystull",
+            "certificate_hash": "fd82d761275cb665c59d5f79f1eed84406998b07"
+          }
+        },
+        {
           "client_id": "485376729915-r1s3h1qqs60n8eip8m5076bph93mqhh6.apps.googleusercontent.com",
           "client_type": 3
         }

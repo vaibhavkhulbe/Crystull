@@ -1,10 +1,5 @@
-import 'package:crystull/responsive/mobile_screen_layout.dart';
-import 'package:crystull/responsive/response_layout_screen.dart';
-import 'package:crystull/responsive/web_screen_layout.dart';
 import 'package:crystull/screens/signup_screen.dart';
 import 'package:crystull/utils/colors.dart';
-import 'package:crystull/utils/utils.dart';
-import 'package:crystull/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -80,7 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPressed: (() async {
                   final pref = await SharedPreferences.getInstance();
                   pref.setBool('onboardingDone', true);
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const SignupScreen(),

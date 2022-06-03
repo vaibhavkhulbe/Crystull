@@ -1,7 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:crystull/providers/user_provider.dart';
+import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/resources/drawer_list.dart';
 import 'package:crystull/resources/models/signup.dart';
+import 'package:crystull/resources/models/weekly_attributes.dart';
+import 'package:crystull/screens/profile_screen.dart';
 import 'package:crystull/screens/search_screen.dart';
 import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
@@ -20,6 +23,18 @@ class _HomeScreenState extends State<HomeScreen> {
   int _current = 0;
   final CarouselController _controller = CarouselController();
   List<String> imgList = ['images/home/1.png', 'images/home/2.png'];
+  CrystullUser? _user;
+  bool loadingWeeklyAttributes = true;
+
+  @override
+  initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   // this is the image slider for home screen images
   sliderPlugin(images, double height) {
@@ -56,7 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    CrystullUser? _user = Provider.of<UserProvider>(context).getUser;
+    _user = Provider.of<UserProvider>(context).getUser;
+    // getWeeklyAttributes();
     return Scaffold(
       drawer: SizedBox(
         width: MediaQuery.of(context).size.width * 0.6,
@@ -95,9 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       backgroundColor: const Color.fromRGBO(0, 0, 0, 0.04),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: Container(
+        decoration: const BoxDecoration(color: colorEEEEEE),
+        child: ListView(
           children: [
             Stack(
               children: [
@@ -142,8 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
+                children: [
+                  const Text(
                     "Trending Crystullites of the week",
                     style: TextStyle(
                       fontFamily: "Poppins",
@@ -152,6 +168,81 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  FutureBuilder<WeeklyAttributes>(
+                    future: AuthMethods().getWeeklyUserWiseAttributes(_user!),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        List<Map<String, dynamic>> attributes =
+                            snapshot.data != null
+                                ? snapshot.data!.attributes.values.toList()
+                                : [];
+                        Map<String, CrystullUser> users =
+                            snapshot.data != null ? snapshot.data!.users : {};
+                        return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount:
+                                snapshot.data == null ? 0 : attributes.length,
+                            itemBuilder: (context, index) {
+                              var doc = attributes[index];
+                              return ListTile(
+                                title: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProfileScreen(
+                                            user: users[doc['uid']]!),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 5),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        SvgPicture.asset(
+                                          "images/icons/trending.svg",
+                                          height: 14,
+                                          width: 14,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              users[doc['uid']]!
+                                                  .profileImageUrl
+                                                  .toString()),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          users[doc['uid']]!
+                                                  .firstName
+                                                  .capitalize() +
+                                              " trending in " +
+                                              doc['attribute'] +
+                                              " attribute",
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            height: 1.5,
+                                            color: color808080,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            });
+                      } else if (snapshot.hasError) {
+                        return Text("${snapshot.error}");
+                      }
+
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                  )
                 ],
               ),
             ),

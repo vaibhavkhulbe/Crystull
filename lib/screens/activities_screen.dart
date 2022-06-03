@@ -223,8 +223,9 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                   ),
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  height: getSafeAreaHeight(context) * 0.1,
+                  margin: EdgeInsets.symmetric(
+                      vertical: getSafeAreaHeight(context) * 0.01),
+                  height: getSafeAreaHeight(context) * 0.12,
                   child: isLoadingCounts
                       ? const Center(
                           child: CircularProgressIndicator(

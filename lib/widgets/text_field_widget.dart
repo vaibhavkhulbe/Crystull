@@ -38,7 +38,7 @@ class _TextFieldInputState extends State<TextFieldInput> {
             color: widget.borderColor, width: widget.borderWidth));
 
     return Flexible(
-      flex: 3,
+      flex: 2,
       child: TextField(
         cursorColor: color666666,
         controller: widget.textEditingController,
@@ -51,7 +51,7 @@ class _TextFieldInputState extends State<TextFieldInput> {
           hintStyle: const TextStyle(
             fontFamily: "Poppins",
             color: colorBCBCBC,
-            fontSize: 16,
+            fontSize: 14,
           ),
           border: focusedBorder,
           focusedBorder: focusedBorder,
@@ -64,6 +64,7 @@ class _TextFieldInputState extends State<TextFieldInput> {
                     // Based on passwordVisible state choose the icon
                     _passwordVisible ? Icons.visibility : Icons.visibility_off,
                     color: colorBCBCBC,
+                    size: MediaQuery.of(context).size.height * 0.02,
                   ),
                   onPressed: () {
                     // Update the state i.e. toogle the state of passwordVisible variable
@@ -89,15 +90,15 @@ class TextFieldWidgetNoFlex extends StatelessWidget {
   final Color borderColor;
   final double borderWidth;
 
-  const TextFieldWidgetNoFlex(
-      {Key? key,
-      required this.textEditingController,
-      this.isPassword = false,
-      required this.hintText,
-      required this.textInputType,
-      this.borderColor = Colors.black38,
-      this.borderWidth = 0.5})
-      : super(key: key);
+  const TextFieldWidgetNoFlex({
+    Key? key,
+    required this.textEditingController,
+    this.isPassword = false,
+    required this.hintText,
+    required this.textInputType,
+    this.borderColor = Colors.black38,
+    this.borderWidth = 0.5,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final focusedBorder = OutlineInputBorder(

@@ -5,9 +5,10 @@ PreferredSizeWidget getAppBar(
   BuildContext context,
   String title, {
   bool centerTitle = false,
+  double elevation = 1,
 }) {
   return AppBar(
-    elevation: 1,
+    elevation: elevation,
     leading: IconButton(
       icon: const Icon(Icons.arrow_back, color: color575757),
       onPressed: () => Navigator.of(context).pop(),

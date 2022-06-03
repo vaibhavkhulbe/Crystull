@@ -171,7 +171,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   textInputType: TextInputType.text,
                 ),
 
-                const Spacer(flex: 2),
+                const Spacer(flex: 1),
 
                 // Email text box
                 const Text(
@@ -186,11 +186,11 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                 ),
                 TextFieldInput(
                   textEditingController: _lastNameController,
-                  hintText: "Enter your last name",
+                  hintText: "Enter your Last name",
                   textInputType: TextInputType.text,
                 ),
 
-                const Spacer(flex: 2),
+                const Spacer(flex: 1),
 
                 // Email text box
                 const Text(
@@ -209,7 +209,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   textInputType: TextInputType.emailAddress,
                 ),
 
-                const Spacer(flex: 2),
+                const Spacer(flex: 1),
 
                 // Password text box
                 const Text(
@@ -230,7 +230,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   isPassword: true,
                 ),
 
-                const Spacer(flex: 2),
+                const Spacer(flex: 1),
 
                 const Text(
                   "Confirm Password",
@@ -250,7 +250,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   isPassword: true,
                 ),
 
-                const Spacer(flex: 2),
+                const Spacer(flex: 1),
 
                 Wrap(
                   alignment: WrapAlignment.start,
@@ -321,7 +321,7 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                   ],
                 ),
 
-                const Spacer(flex: 1),
+                const Spacer(flex: 2),
 
                 // button to sign up
                 InkWell(
@@ -392,7 +392,8 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                     child: _isLoading
                         ? const Center(
                             child: CircularProgressIndicator(
-                                color: mobileBackgroundColor),
+                              color: mobileBackgroundColor,
+                            ),
                           )
                         : const Text(
                             "Next",
@@ -526,7 +527,8 @@ class _SignupHomeScreenState extends State<SignupScreen> {
                       ),
                     ),
                   ],
-                )
+                ),
+                const Spacer()
               ],
             ),
           ),
