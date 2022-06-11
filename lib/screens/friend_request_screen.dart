@@ -177,30 +177,28 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            connectedFriends.isNotEmpty
-                                                ? Row(
-                                                    children: [
-                                                      SvgPicture.asset(
-                                                        'images/icons/otherConnections.svg',
-                                                        color: Colors.black54,
-                                                        width: 12,
-                                                        height: 12,
-                                                      ),
-                                                      const SizedBox(width: 5),
-                                                      Text(
-                                                        '${connectedFriends.length} other shared connections',
-                                                        style: const TextStyle(
-                                                          fontSize: 12,
-                                                          height: 1.5,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .underline,
-                                                          color: Colors.black54,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                : Container(),
+                                            if (connectedFriends.isNotEmpty)
+                                              Row(
+                                                children: [
+                                                  SvgPicture.asset(
+                                                    'images/icons/otherConnections.svg',
+                                                    color: Colors.black54,
+                                                    width: 12,
+                                                    height: 12,
+                                                  ),
+                                                  const SizedBox(width: 5),
+                                                  Text(
+                                                    '${connectedFriends.length} other shared connections',
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      height: 1.5,
+                                                      decoration: TextDecoration
+                                                          .underline,
+                                                      color: Colors.black54,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             Text(
                                               doc.bio,
                                               style: const TextStyle(

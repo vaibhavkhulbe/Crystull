@@ -438,50 +438,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
 
                               // edit background image
-                              isMe
-                                  ? Positioned(
-                                      top: MediaQuery.of(context).size.height *
-                                          0.01,
-                                      right: MediaQuery.of(context).size.width *
-                                          0.05,
-                                      child: InkWell(
-                                        onTap: () async => updateCoverPic(),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 5),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              Radius.circular(1.71),
-                                            ),
-                                            border: Border.all(
-                                              color: mobileBackgroundColor,
-                                              width: 0.5,
-                                            ),
-                                            color: mobileBackgroundColor
-                                                .withOpacity(0.5),
-                                          ),
-                                          child: Row(
-                                            children: const [
-                                              Icon(
-                                                Icons.camera_alt_rounded,
-                                                color: Colors.black45,
-                                                size: 8,
-                                              ),
-                                              SizedBox(width: 5),
-                                              Text(
-                                                'Edit Photo',
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontSize: 8,
-                                                    color: Colors.black45),
-                                              ),
-                                            ],
-                                          ),
+                              if (isMe)
+                                Positioned(
+                                  top:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                  right:
+                                      MediaQuery.of(context).size.width * 0.05,
+                                  child: InkWell(
+                                    onTap: () async => updateCoverPic(),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5),
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(1.71),
                                         ),
+                                        border: Border.all(
+                                          color: mobileBackgroundColor,
+                                          width: 0.5,
+                                        ),
+                                        color: mobileBackgroundColor
+                                            .withOpacity(0.5),
                                       ),
-                                    )
-                                  : Container(),
+                                      child: Row(
+                                        children: const [
+                                          Icon(
+                                            Icons.camera_alt_rounded,
+                                            color: Colors.black45,
+                                            size: 8,
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            'Edit Photo',
+                                            style: TextStyle(
+                                                fontFamily: "Poppins",
+                                                fontSize: 8,
+                                                color: Colors.black45),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
 
                               // User profile image
                               Positioned(
@@ -609,21 +607,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
 
                               // edit profile photo
-                              Positioned(
-                                top: MediaQuery.of(context).size.height * 0.07,
-                                left: (MediaQuery.of(context).size.width *
-                                        0.05) +
-                                    (MediaQuery.of(context).size.height * 0.09),
-                                child: InkWell(
-                                  child: SvgPicture.asset(
-                                    "images/icons/editPhoto.svg",
-                                    color: mobileBackgroundColor,
-                                    height: 26,
-                                    width: 26,
+                              if (isMe)
+                                Positioned(
+                                  top:
+                                      MediaQuery.of(context).size.height * 0.07,
+                                  left: (MediaQuery.of(context).size.width *
+                                          0.05) +
+                                      (MediaQuery.of(context).size.height *
+                                          0.09),
+                                  child: InkWell(
+                                    child: SvgPicture.asset(
+                                      "images/icons/editPhoto.svg",
+                                      color: mobileBackgroundColor,
+                                      height: 26,
+                                      width: 26,
+                                    ),
+                                    onTap: () async => updateProfilePic(),
                                   ),
-                                  onTap: () async => updateProfilePic(),
                                 ),
-                              ),
 
                               // User details edit profile and connection status
                               Positioned(
@@ -733,30 +734,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
 
                               // block/unblock/remove
-                              !isMe
-                                  ? Positioned(
-                                      top: getSafeAreaHeight(context) * 0.1,
-                                      right: getSafeAreaWidth(context) * 0.01,
-                                      child: PopupMenuButton<String>(
-                                        icon: const Icon(
-                                          Icons.more_vert,
-                                          color: Colors.black54,
-                                        ),
-                                        color: mobileBackgroundColor,
-                                        onSelected: onSelect,
-                                        itemBuilder: (BuildContext context) {
-                                          return popUpMenuItems.entries
-                                              .map(
-                                                (mapEntry) =>
-                                                    PopupMenuItem<String>(
-                                                        value: mapEntry.key,
-                                                        child: mapEntry.value),
-                                              )
-                                              .toList();
-                                        },
-                                      ),
-                                    )
-                                  : Container(),
+                              if (!isMe)
+                                Positioned(
+                                  top: getSafeAreaHeight(context) * 0.1,
+                                  right: getSafeAreaWidth(context) * 0.01,
+                                  child: PopupMenuButton<String>(
+                                    icon: const Icon(
+                                      Icons.more_vert,
+                                      color: Colors.black54,
+                                    ),
+                                    color: mobileBackgroundColor,
+                                    onSelected: onSelect,
+                                    itemBuilder: (BuildContext context) {
+                                      return popUpMenuItems.entries
+                                          .map(
+                                            (mapEntry) => PopupMenuItem<String>(
+                                                value: mapEntry.key,
+                                                child: mapEntry.value),
+                                          )
+                                          .toList();
+                                    },
+                                  ),
+                                ),
                             ],
                           ),
                         ),

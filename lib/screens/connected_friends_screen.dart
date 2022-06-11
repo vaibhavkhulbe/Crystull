@@ -131,7 +131,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                   if (snapshot.hasData) {
                     return ListView.builder(
                       shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(),
                       itemCount:
                           snapshot.data == null ? 0 : snapshot.data!.length,
                       itemBuilder: (context, index) {
@@ -173,31 +173,30 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                                         color: color808080,
                                       ),
                                     ),
-                                    connectedFriends.isNotEmpty
-                                        ? Row(
-                                            children: [
-                                              SvgPicture.asset(
-                                                'images/icons/otherConnections.svg',
-                                                color: color7A7A7A,
-                                                width: 12,
-                                                height: 9,
-                                              ),
-                                              const SizedBox(width: 5),
-                                              Text(
-                                                '${connectedFriends.length} other shared connections',
-                                                style: const TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontSize: 9,
-                                                  height: 1.5,
-                                                  fontWeight: FontWeight.w400,
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                  color: color7A7A7A,
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        : Container(),
+                                    if (connectedFriends.isNotEmpty)
+                                      Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'images/icons/otherConnections.svg',
+                                            color: color7A7A7A,
+                                            width: 12,
+                                            height: 9,
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            '${connectedFriends.length} other shared connections',
+                                            style: const TextStyle(
+                                              fontFamily: "Poppins",
+                                              fontSize: 9,
+                                              height: 1.5,
+                                              fontWeight: FontWeight.w400,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              color: color7A7A7A,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                   ],
                                 ),
                                 const Spacer(),

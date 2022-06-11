@@ -216,18 +216,48 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   .toString()),
                                         ),
                                         const SizedBox(width: 10),
-                                        Text(
-                                          users[doc['uid']]!
-                                                  .firstName
-                                                  .capitalize() +
-                                              " trending in " +
-                                              doc['attribute'] +
-                                              " attribute",
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            height: 1.5,
-                                            color: color808080,
-                                            fontWeight: FontWeight.w500,
+                                        Expanded(
+                                          child: Wrap(
+                                            children: [
+                                              Text(
+                                                users[doc['uid']]!
+                                                    .firstName
+                                                    .capitalize(),
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  height: 1.5,
+                                                  color: color808080,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const Text(
+                                                " trending in ",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  height: 1.5,
+                                                  color: color808080,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              Text(
+                                                doc['attribute'],
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  height: 1.5,
+                                                  color: color808080,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const Text(
+                                                " attribute",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  height: 1.5,
+                                                  color: color808080,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],

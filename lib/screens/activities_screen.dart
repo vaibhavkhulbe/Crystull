@@ -71,8 +71,10 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
     eventsGive = await AuthMethods().getIndividualAttributes(_currentUser!.uid,
         "", dropDownOptions["cumulative_given"]![dropDownValueGive]!);
     setState(() {
-      isLoadingCounts = false;
-      isLoadingData = false;
+      if (mounted) {
+        isLoadingCounts = false;
+        isLoadingData = false;
+      }
     });
   }
 
@@ -86,40 +88,33 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
   Widget build(BuildContext context) {
     _currentUser = Provider.of<UserProvider>(context).getUser;
     return Scaffold(
-      appBar: getAppBar(context, "Activities"),
-      body: SafeArea(
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            Container(
-              height: getSafeAreaHeight(context) * 0.5,
-              decoration: const BoxDecoration(color: colorEEEEEE),
-              child: ListView(
-                children: [
-                  getActivitiesSummaryCard(counts['cumulative'],
-                      dropDownOptions['cumulative']!, 'received'),
-                  getActivityDetailsCard(
-                      dropDownOptions['cumulative']!, 'received'),
-                ],
-              ),
+        appBar: getAppBar(context, "Activities"),
+        body: SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(color: colorEEEEEE),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                ListView(
+                  children: [
+                    getActivitiesSummaryCard(counts['cumulative'],
+                        dropDownOptions['cumulative']!, 'received'),
+                    getActivityDetailsCard(
+                        dropDownOptions['cumulative']!, 'received'),
+                  ],
+                ),
+                ListView(
+                  children: [
+                    getActivitiesSummaryCard(counts['cumulative_given'],
+                        dropDownOptions['cumulative_given']!, 'given'),
+                    getActivityDetailsCard(
+                        dropDownOptions['cumulative_given']!, 'given'),
+                  ],
+                ),
+              ],
             ),
-            Container(
-              height: getSafeAreaHeight(context) * 0.5,
-              decoration: const BoxDecoration(color: colorEEEEEE),
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  getActivitiesSummaryCard(counts['cumulative_given'],
-                      dropDownOptions['cumulative_given']!, 'given'),
-                  getActivityDetailsCard(
-                      dropDownOptions['cumulative_given']!, 'given'),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   Widget getActivitiesSummaryCard(
@@ -335,126 +330,134 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                 color: primaryColor,
               ),
             )
-          : Column(children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                alignment: Alignment.topRight,
-                child: DropdownButton<String>(
-                  menuMaxHeight: getSafeAreaHeight(context) * 0.3,
-                  dropdownColor: mobileBackgroundColor,
-                  style: const TextStyle(
-                    fontFamily: "Poppins",
-                    color: color808080,
-                    fontSize: 10,
-                    height: 1.5,
-                    fontWeight: FontWeight.w400,
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
                   ),
-                  icon: const Icon(
-                    Icons.arrow_drop_down_outlined,
-                    color: color808080,
-                    size: 9,
-                  ),
-                  value: activity == 'given'
-                      ? dropDownValueGive
-                      : widget.dropDownValueRec,
-                  items: details.keys
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e,
-                          child: Text(e),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (e) async {
-                    setState(() {
-                      isLoadingData = true;
+                  alignment: Alignment.topRight,
+                  child: DropdownButton<String>(
+                    menuMaxHeight: getSafeAreaHeight(context) * 0.3,
+                    dropdownColor: mobileBackgroundColor,
+                    style: const TextStyle(
+                      fontFamily: "Poppins",
+                      color: color808080,
+                      fontSize: 10,
+                      height: 1.5,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    icon: const Icon(
+                      Icons.arrow_drop_down_outlined,
+                      color: color808080,
+                      size: 9,
+                    ),
+                    value: activity == 'given'
+                        ? dropDownValueGive
+                        : widget.dropDownValueRec,
+                    items: details.keys
+                        .map(
+                          (e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(e),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (e) async {
+                      setState(() {
+                        isLoadingData = true;
+                        if (activity == 'given') {
+                          dropDownValueGive = e!;
+                        } else {
+                          widget.dropDownValueRec = e!;
+                        }
+                      });
                       if (activity == 'given') {
-                        dropDownValueGive = e!;
+                        eventsGive = await AuthMethods()
+                            .getIndividualAttributes(_currentUser!.uid, "",
+                                details[dropDownValueGive]!);
                       } else {
-                        widget.dropDownValueRec = e!;
+                        eventsRec = await AuthMethods().getIndividualAttributes(
+                            "",
+                            _currentUser!.uid,
+                            details[widget.dropDownValueRec]!);
                       }
-                    });
-                    if (activity == 'given') {
-                      eventsGive = await AuthMethods().getIndividualAttributes(
-                          _currentUser!.uid, "", details[dropDownValueGive]!);
-                    } else {
-                      eventsRec = await AuthMethods().getIndividualAttributes(
-                          "",
-                          _currentUser!.uid,
-                          details[widget.dropDownValueRec]!);
-                    }
-                    // log(events.toString());
-                    setState(() {
-                      isLoadingData = false;
-                    });
+                      // log(events.toString());
+                      setState(() {
+                        isLoadingData = false;
+                      });
+                    },
+                  ),
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount:
+                      (activity == 'given' ? eventsGive : eventsRec).length,
+                  itemBuilder: (context, index) {
+                    var e =
+                        (activity == 'given' ? eventsGive : eventsRec)[index];
+                    return InkWell(
+                      onTap: () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NotificationDetail(
+                                swap: e, uid: _currentUser!.uid),
+                          ),
+                        )
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 26,
+                          vertical: 10,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              (e.fromUid == _currentUser!.uid
+                                      ? "You"
+                                      : (e.anonymous
+                                          ? "Someone"
+                                          : e.fromName.capitalize())) +
+                                  " has SWAPed " +
+                                  (e.toUid == _currentUser!.uid
+                                      ? "you"
+                                      : e.toName.capitalize()) +
+                                  " for " +
+                                  (e.swaps.length > 1
+                                      ? "multiple attributes"
+                                      : e.swapList.first),
+                              style: const TextStyle(
+                                fontFamily: "Poppins",
+                                color: color8F8E8E,
+                                fontSize: 12,
+                                height: 1.5,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            Text(
+                              timeago.format(e.addedAt, allowFromNow: false),
+                              style: const TextStyle(
+                                fontFamily: "Poppins",
+                                color: color8F8E8E,
+                                fontSize: 10,
+                                height: 1.5,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
                   },
                 ),
-              ),
-              ListView(
-                shrinkWrap: true,
-                children: (activity == 'given' ? eventsGive : eventsRec)
-                    .map(
-                      (e) => InkWell(
-                        onTap: () => {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => NotificationDetail(
-                                  swap: e, uid: _currentUser!.uid),
-                            ),
-                          )
-                        },
-                        child: Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 26,
-                              vertical: 10,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  (e.fromUid == _currentUser!.uid
-                                          ? "You"
-                                          : (e.anonymous
-                                              ? "Someone"
-                                              : e.fromName.capitalize())) +
-                                      " has SWAPed " +
-                                      (e.toUid == _currentUser!.uid
-                                          ? "you"
-                                          : e.toName.capitalize()) +
-                                      " for " +
-                                      (e.swaps.length > 1
-                                          ? "multiple attributes"
-                                          : e.swapList.first),
-                                  style: const TextStyle(
-                                    fontFamily: "Poppins",
-                                    color: color8F8E8E,
-                                    fontSize: 12,
-                                    height: 1.5,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                Text(
-                                  timeago.format(e.addedAt,
-                                      allowFromNow: false),
-                                  style: const TextStyle(
-                                    fontFamily: "Poppins",
-                                    color: color8F8E8E,
-                                    fontSize: 10,
-                                    height: 1.5,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            )),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ]),
+              ],
+            ),
     );
   }
 }

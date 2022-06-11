@@ -63,7 +63,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
               children: [
                 const HomeScreen(),
                 const FriendRequestScreen(),
-                const NotificationsScreen(),
+                NotificationsScreen(user: _user),
                 ProfileScreen(user: _user, isHome: true),
               ],
             ),

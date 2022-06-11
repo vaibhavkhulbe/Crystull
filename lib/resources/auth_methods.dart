@@ -588,6 +588,7 @@ class AuthMethods {
           if (attributes.containsKey(entry.key)) {
             if (attributes[entry.key]!['score'] < score) {
               attributes[entry.key] = {
+                'attribute': entry.key,
                 'score': score,
                 'uid': doc.id,
               };
