@@ -27,6 +27,16 @@ class _MultiSelectState extends State<MultiSelect> {
     super.initState();
   }
 
+  onChanged(String e, Function setState) {
+    setState(() {
+      if (selectedValues[e] == false) {
+        selectedValues[e] = true;
+      } else {
+        selectedValues[e] = false;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -84,27 +94,22 @@ class _MultiSelectState extends State<MultiSelect> {
               .map(
                 (e) => DropdownMenuItem(
                   enabled: false,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(e),
-                      StatefulBuilder(
-                        builder: (context, setState) => Checkbox(
-                          checkColor: color808080,
-                          activeColor: mobileBackgroundColor,
-                          onChanged: (value) {
-                            setState(() {
-                              if (value == true) {
-                                selectedValues[e] = true;
-                              } else {
-                                selectedValues[e] = false;
-                              }
-                            });
-                          },
-                          value: selectedValues[e],
-                        ),
+                  child: StatefulBuilder(
+                    builder: (context, setState) => InkWell(
+                      onTap: () => onChanged(e, setState),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(e),
+                          Checkbox(
+                            checkColor: color808080,
+                            activeColor: mobileBackgroundColor,
+                            onChanged: (value) => onChanged(e, setState),
+                            value: selectedValues[e],
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                   value: e,
                 ),
