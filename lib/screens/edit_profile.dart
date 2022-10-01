@@ -17,6 +17,8 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _collegeController = TextEditingController();
   final TextEditingController _degreeController = TextEditingController();
@@ -25,6 +27,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _firstNameController.text = widget.user.firstName;
+    _lastNameController.text = widget.user.lastName;
     _bioController.text = widget.user.bio;
     _collegeController.text = widget.user.college;
     _degreeController.text = widget.user.degree;
@@ -33,6 +37,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void dispose() {
     super.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _bioController.dispose();
     _collegeController.dispose();
     _degreeController.dispose();
@@ -43,10 +49,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (_bioController.text.isEmpty) {
       _nullCheck.add("Please add your Bio");
     }
+    if (_firstNameController.text.isEmpty) {
+      _nullCheck.add("Please add your first name");
+    }
     return _nullCheck;
   }
 
   updateUser() async {
+    widget.user.firstName = _firstNameController.text;
+    widget.user.lastName = _lastNameController.text;
     widget.user.bio = _bioController.text;
     widget.user.college = _collegeController.text;
     widget.user.degree = _degreeController.text;
@@ -175,6 +186,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                     ),
                     const Spacer(flex: 1),
+
+                    // First name text box
+                    const Text(
+                      "First Name*",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400,
+                        color: color575757,
+                      ),
+                    ),
+                    TextFieldInput(
+                      textEditingController: _firstNameController,
+                      hintText: "Enter your First Name",
+                      textInputType: TextInputType.text,
+                    ),
+
+                    const Spacer(flex: 2),
+
+                    // Last name text box
+                    const Text(
+                      "Last Name",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 12,
+                        height: 1.5,
+                        fontWeight: FontWeight.w400,
+                        color: color575757,
+                      ),
+                    ),
+                    TextFieldInput(
+                      textEditingController: _lastNameController,
+                      hintText: "Enter your Last Name",
+                      textInputType: TextInputType.text,
+                    ),
+
+                    const Spacer(flex: 2),
                     // Bio text box
                     const Text(
                       "Bio*",

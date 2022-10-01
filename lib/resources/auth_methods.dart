@@ -28,6 +28,21 @@ class AuthMethods {
     }
   }
 
+  Future<Map<String, CrystullUser>> getUserDetailsFromid(
+      List<String> uids) async {
+    Map<String, CrystullUser> users = {};
+    await _firestore
+        .collection('users')
+        .where('uid', whereIn: uids)
+        .get()
+        .then((QuerySnapshot snapshot) async {
+      for (var doc in snapshot.docs) {
+        users[doc['uid']] = CrystullUser.fromSnapshot(doc);
+      }
+    });
+    return users;
+  }
+
   Future<Uint8List?> getUserImage() async {
     Uint8List? image = await StorageMethods()
         .downloadUserImage("profilePics", _auth.currentUser!.uid);
@@ -302,6 +317,9 @@ class AuthMethods {
       if (user.bio.isNotEmpty) {
         // update the user
         await _firestore.collection('users').doc(user.uid).update({
+          'firstName': user.firstName,
+          'lastName': user.lastName,
+          'fullName': (user.firstName + " " + user.lastName).toLowerCase(),
           'bio': user.bio,
           'college': user.college,
           'degree': user.degree,

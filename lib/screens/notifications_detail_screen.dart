@@ -10,7 +10,14 @@ import 'package:flutter_svg/svg.dart';
 class NotificationDetail extends StatelessWidget {
   final Swap swap;
   final String uid;
-  const NotificationDetail({Key? key, required this.swap, required this.uid})
+  final String fromUserName;
+  final String toUserName;
+  const NotificationDetail(
+      {Key? key,
+      required this.swap,
+      required this.uid,
+      required this.fromUserName,
+      required this.toUserName})
       : super(key: key);
 
   @override
@@ -45,11 +52,11 @@ class NotificationDetail extends StatelessWidget {
                                     ? "You"
                                     : (swap.anonymous
                                         ? "Someone"
-                                        : swap.fromName.capitalize())) +
+                                        : fromUserName.capitalize())) +
                                 " has SWAPed " +
                                 (swap.toUid == uid
                                     ? "you"
-                                    : swap.toName.capitalize()) +
+                                    : toUserName.capitalize()) +
                                 " for " +
                                 (swap.swaps.length > 1
                                     ? "multiple attributes"

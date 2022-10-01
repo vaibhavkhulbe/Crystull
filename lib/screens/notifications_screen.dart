@@ -31,6 +31,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     'unread': [],
   };
   Map<String, Uint8List> eventsPics = {};
+  Set<String> userIds = {};
+  Map<String, CrystullUser> users = {};
 
   final List<String> tabs = ['All', 'Unread'];
 
@@ -42,6 +44,12 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         vsync: this, length: tabs.length, animationDuration: Duration.zero);
 
     super.initState();
+  }
+
+  String getUserName(String uid) {
+    return users.containsKey(uid)
+        ? users[uid]!.firstName.capitalize()
+        : "Deleted user";
   }
 
   @override
@@ -68,6 +76,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         if (eventsPics.containsKey(event.fromUid)) {
           continue;
         }
+        userIds.addAll([event.fromUid, event.toUid]);
         var eventPic = await StorageMethods()
             .downloadUserImage("profilePics", event.fromUid);
         if (eventPic != null) {
@@ -75,6 +84,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         }
       }
     }
+    users = await AuthMethods().getUserDetailsFromid(userIds.toList());
     if (mounted) {
       setState(() {
         isLoadingData = false;
@@ -191,8 +201,11 @@ class _NotificationsScreenState extends State<NotificationsScreen>
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      NotificationDetail(swap: e, uid: widget.user.uid),
+                  builder: (context) => NotificationDetail(
+                      swap: e,
+                      uid: widget.user.uid,
+                      fromUserName: getUserName(e.fromUid),
+                      toUserName: getUserName(e.toUid)),
                 ),
               );
             },
@@ -227,7 +240,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                         Wrap(
                           children: [
                             Text(
-                              e.anonymous ? "Someone" : e.fromName.capitalize(),
+                              e.anonymous ? "Someone" : getUserName(e.fromUid),
                               style: const TextStyle(
                                 fontFamily: "Poppins",
                                 color: color8F8E8E,

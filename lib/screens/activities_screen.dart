@@ -30,6 +30,8 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
   int cachedToIdx = 1;
   List<Swap> eventsRec = [];
   List<Swap> eventsGive = [];
+  Set<String> userIds = {};
+  Map<String, CrystullUser> users = {};
   Map<String, Map<String, int>> counts = {
     'cumulative': {},
     'cumulative_given': {},
@@ -51,6 +53,12 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
     super.didChangeDependencies();
   }
 
+  String getUserName(String uid) {
+    return users.containsKey(uid)
+        ? users[uid]!.firstName.capitalize()
+        : "Deleted user";
+  }
+
   void getCounts() async {
     setState(() {
       isLoadingCounts = true;
@@ -70,6 +78,15 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
         dropDownOptions["cumulative"]![widget.dropDownValueRec]!);
     eventsGive = await AuthMethods().getIndividualAttributes(_currentUser!.uid,
         "", dropDownOptions["cumulative_given"]![dropDownValueGive]!);
+
+    for (var event in eventsRec) {
+      userIds.addAll([event.fromUid, event.toUid]);
+    }
+    for (var event in eventsGive) {
+      userIds.addAll([event.fromUid, event.toUid]);
+    }
+
+    users = await AuthMethods().getUserDetailsFromid(userIds.toList());
     setState(() {
       if (mounted) {
         isLoadingCounts = false;
@@ -405,7 +422,11 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                           context,
                           MaterialPageRoute(
                             builder: (context) => NotificationDetail(
-                                swap: e, uid: _currentUser!.uid),
+                              swap: e,
+                              uid: _currentUser!.uid,
+                              fromUserName: getUserName(e.fromUid),
+                              toUserName: getUserName(e.toUid),
+                            ),
                           ),
                         )
                       },
@@ -423,11 +444,12 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                                       ? "You"
                                       : (e.anonymous
                                           ? "Someone"
-                                          : e.fromName.capitalize())) +
+                                          : getUserName(e.fromUid)
+                                              .capitalize())) +
                                   " has SWAPed " +
                                   (e.toUid == _currentUser!.uid
                                       ? "you"
-                                      : e.toName.capitalize()) +
+                                      : getUserName(e.toUid).capitalize()) +
                                   " for " +
                                   (e.swaps.length > 1
                                       ? "multiple attributes"

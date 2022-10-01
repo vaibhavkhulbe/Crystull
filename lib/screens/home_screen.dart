@@ -1,5 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:crystull/providers/user_provider.dart';
 import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/resources/drawer_list.dart';
 import 'package:crystull/resources/models/signup.dart';
@@ -10,7 +9,6 @@ import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   CrystullUser user;

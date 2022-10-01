@@ -1117,9 +1117,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         NotificationDetail(
-                                                            swap: swap,
-                                                            uid: _currentUser!
-                                                                .uid),
+                                                      swap: swap,
+                                                      uid: _currentUser!.uid,
+                                                      fromUserName:
+                                                          _currentUser!
+                                                              .firstName,
+                                                      toUserName:
+                                                          widget.user.firstName,
+                                                    ),
                                                   ),
                                                 );
                                               }
