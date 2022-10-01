@@ -13,12 +13,14 @@ import 'package:crystull/widgets/multi_select.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
 import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
+import 'package:crystull/widgets/alert_dialog.dart';
 import 'package:crystull/widgets/attribute_grid.dart';
 import 'package:crystull/widgets/slider_grid.dart';
 import 'package:crystull/widgets/status_button.dart';
 import 'package:flutter/material.dart';
 import 'package:crystull/screens/search_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -98,13 +100,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<Uint8List?> selectImage() async {
-    Uint8List? _image = await pickImage(ImageSource.gallery);
-    Uint8List _compressedImage;
+  Future<Uint8List?> selectImage(
+      double ratiox, double ratioy, double maxHeight, double maxWidth) async {
+    XFile? _image = await pickImage(ImageSource.gallery);
+    CroppedFile? _croppedImage;
     if (_image != null) {
-      _compressedImage = await compressList(_image);
-      return _compressedImage;
+      _croppedImage = await ImageCropper().cropImage(
+          sourcePath: _image.path,
+          aspectRatio: CropAspectRatio(ratioX: ratiox, ratioY: ratioy),
+          maxHeight: 100,
+          maxWidth: 100);
+      if (_croppedImage != null) {
+        Uint8List _croppedImageAsList = await _croppedImage.readAsBytes();
+        Uint8List _compressedImage;
+        _compressedImage = await compressList(_croppedImageAsList);
+        return _compressedImage;
+      }
     }
+
     return null;
   }
 
@@ -112,7 +125,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _isUpdatingProfilePic = true;
     });
-    Uint8List? image = await selectImage();
+    Uint8List? image = await selectImage(
+      1,
+      1,
+      100,
+      100,
+    );
     if (image != null) {
       var result = await AuthMethods().updateProfilePic(image: image);
       handleResult(result, isLoading: false);
@@ -128,7 +146,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _isUpdatingCoverPhoto = true;
     });
-    Uint8List? image = await selectImage();
+    Uint8List? image = await selectImage(
+      16,
+      9,
+      100,
+      100,
+    );
     if (image != null) {
       var result = await AuthMethods().updateCoverPic(image: image);
       handleResult(result, isLoading: false);
@@ -171,25 +194,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Provider.of<UserProvider>(context, listen: false);
     switch (item) {
       case "Block":
-        () async {
-          String result = await AuthMethods()
-              .addFriendRequest(userProvider.getUser!, widget.user, 4, 5);
-          handleResult(result);
-        }();
+        String message = "Are you sure you want to block " +
+            widget.user.firstName.capitalize() +
+            "?";
+        showAlertDialog(
+          context,
+          "Block " + widget.user.firstName.capitalize(),
+          message,
+          () {},
+          () async {
+            String result = await AuthMethods()
+                .addFriendRequest(userProvider.getUser!, widget.user, 4, 5);
+            handleResult(result);
+            Navigator.pop(context);
+          },
+        );
         break;
       case "Unblock":
-        () async {
-          String result = await AuthMethods()
-              .removeFriend(userProvider.getUser!, widget.user);
-          handleResult(result);
-        }();
+        String message = "Are you sure you want to unblock " +
+            widget.user.firstName.capitalize() +
+            "?";
+        showAlertDialog(
+          context,
+          "Unblock " + widget.user.firstName.capitalize(),
+          message,
+          () {},
+          () async {
+            String result = await AuthMethods()
+                .removeFriend(userProvider.getUser!, widget.user);
+            handleResult(result);
+          },
+        );
         break;
       case "Remove":
-        () async {
-          String result = await AuthMethods()
-              .removeFriend(userProvider.getUser!, widget.user);
-          handleResult(result);
-        }();
+        String message = "Are you sure you want to remove " +
+            widget.user.firstName.capitalize() +
+            "?";
+        showAlertDialog(
+          context,
+          "Remove " + widget.user.firstName.capitalize(),
+          message,
+          () {},
+          () async {
+            String result = await AuthMethods()
+                .removeFriend(userProvider.getUser!, widget.user);
+            handleResult(result);
+          },
+        );
         break;
     }
   }
@@ -411,7 +462,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         backgroundColor: mobileBackgroundColor,
                                       ),
                                     )
-                                  : widget.user.coverImageUrl.isNotEmpty
+                                  : widget.user.coverImageUrl.isNotEmpty &&
+                                          isUnblocked(
+                                              widget.user, _currentUser!)
                                       ? FadeInImage(
                                           placeholder: const svg.Svg(
                                               'images/crystull_logo.svg'),
@@ -443,40 +496,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   top:
                                       MediaQuery.of(context).size.height * 0.01,
                                   right:
-                                      MediaQuery.of(context).size.width * 0.05,
+                                      MediaQuery.of(context).size.width * 0.04,
                                   child: InkWell(
                                     onTap: () async => updateCoverPic(),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5),
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                          Radius.circular(1.71),
-                                        ),
-                                        border: Border.all(
-                                          color: mobileBackgroundColor,
-                                          width: 0.5,
-                                        ),
-                                        color: mobileBackgroundColor
-                                            .withOpacity(0.5),
-                                      ),
-                                      child: Row(
-                                        children: const [
-                                          Icon(
-                                            Icons.camera_alt_rounded,
-                                            color: Colors.black45,
-                                            size: 8,
-                                          ),
-                                          SizedBox(width: 5),
-                                          Text(
-                                            'Edit Photo',
-                                            style: TextStyle(
-                                                fontFamily: "Poppins",
-                                                fontSize: 8,
-                                                color: Colors.black45),
-                                          ),
-                                        ],
-                                      ),
+                                    child: SvgPicture.asset(
+                                      "images/icons/editPhoto.svg",
+                                      height: 20,
+                                      width: 20,
+                                      // color: color888888,
                                     ),
                                   ),
                                 ),
@@ -513,7 +540,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           image: DecorationImage(
                                             fit: BoxFit.cover,
                                             image: widget.user.profileImageUrl
-                                                    .isNotEmpty
+                                                        .isNotEmpty &&
+                                                    isUnblocked(widget.user,
+                                                        _currentUser!)
                                                 ? FadeInImage(
                                                     placeholder: const svg.Svg(
                                                         'images/avatar.png'),
@@ -618,9 +647,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: InkWell(
                                     child: SvgPicture.asset(
                                       "images/icons/editPhoto.svg",
-                                      color: mobileBackgroundColor,
-                                      height: 26,
-                                      width: 26,
+                                      height: 15,
+                                      width: 15,
+                                      // color: color888888,
                                     ),
                                     onTap: () async => updateProfilePic(),
                                   ),
@@ -1055,10 +1084,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                         ),
                                         Text(
-                                          "You can again SWAP " +
+                                          "You can SWAP " +
                                               widget.user.firstName
                                                   .capitalize() +
-                                              " after " +
+                                              " again after " +
                                               getStringDuration(
                                                   _swapInfo[_currentUser!.uid]!
                                                       .lastSwappedAt
@@ -1066,6 +1095,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           minutes: 10))
                                                       .difference(
                                                           DateTime.now())),
+                                          textAlign: TextAlign.center,
                                           style: const TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 12,

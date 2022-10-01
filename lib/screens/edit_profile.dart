@@ -101,17 +101,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         value: widget.user.isPrivate,
                         onChanged: (value) async {
                           if (value) {
-                            widget.user.isPrivate = true;
-                            String res = await AuthMethods()
-                                .updateUserPrivacy(widget.user);
-                            if (res != "Success") {
-                              showSnackBar(
-                                  "Privacy update failed with error: " + res,
-                                  context);
-                            } else {
-                              showSnackBar(
-                                  "Privacy updated successfully.", context);
-                            }
+                            String message =
+                                "If you change your account to private, only top three attributes will be visible to everyone with scores.";
+                            showAlertDialog(context, "Are you sure?", message,
+                                () {
+                              widget.user.isPrivate = false;
+                              setState(() {});
+                            }, () async {
+                              widget.user.isPrivate = true;
+                              String res = await AuthMethods()
+                                  .updateUserPrivacy(widget.user);
+                              if (res != "Success") {
+                                showSnackBar(
+                                    "Privacy update failed with error: " + res,
+                                    context);
+                              } else {
+                                showSnackBar(
+                                    "Your profile is now private.", context);
+                              }
+                            });
                           } else {
                             String message =
                                 "If you change your account to public, all the attributes will be visible to everyone with scores.";
@@ -129,7 +137,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     context);
                               } else {
                                 showSnackBar(
-                                    "Privacy updated successfully.", context);
+                                    "Your profile is now public.", context);
                               }
                             });
                             widget.user.isPrivate = false;

@@ -16,3 +16,4 @@ const color8F8E8E = Color(0xFF8F8E8E);
 const fbLogoColor = Color(0xFF256BB3);
 const googleLogoColor = Color(0xFFEB4235);
 const colorBCBCBC = Color(0xFFBCBCBC);
+const colorF0F2F5 = Color(0xF0F2F5FF);

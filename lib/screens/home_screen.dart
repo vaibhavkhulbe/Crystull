@@ -13,7 +13,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  CrystullUser user;
+  HomeScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -21,19 +22,28 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _current = 0;
+  Map<String, double> _swapValues = {};
   final CarouselController _controller = CarouselController();
   List<String> imgList = ['images/home/1.png', 'images/home/2.png'];
-  CrystullUser? _user;
+  // CrystullUser? _user;
   bool loadingWeeklyAttributes = true;
 
   @override
   initState() {
     super.initState();
+    refreshSWAPScore();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void refreshSWAPScore() async {
+    var swapAttributes =
+        await AuthMethods().getCombinedAttributes(widget.user.uid);
+
+    _swapValues = swapAttributes.attributes;
   }
 
   // this is the image slider for home screen images
@@ -71,14 +81,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _user = Provider.of<UserProvider>(context).getUser;
+    // _user = Provider.of<UserProvider>(context).getUser;
     // getWeeklyAttributes();
     return Scaffold(
       drawer: SizedBox(
         width: MediaQuery.of(context).size.width * 0.6,
         child: Drawer(
           backgroundColor: mobileBackgroundColor,
-          child: ListView(children: getDrawerList(context, _user!)),
+          child: ListView(
+              children: getDrawerList(context, widget.user, _swapValues)),
         ),
       ),
       appBar: AppBar(
@@ -98,17 +109,17 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ),
-        actions: [
-          // Navigate to the Search Screen
-          IconButton(
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const SearchScreen())),
-            icon: SvgPicture.asset(
-              'images/icons/search.svg',
-              color: Colors.black54,
-            ),
-          ),
-        ],
+        // actions: [
+        //   // Navigate to the Search Screen
+        //   IconButton(
+        //     onPressed: () => Navigator.of(context)
+        //         .push(MaterialPageRoute(builder: (_) => const SearchScreen())),
+        //     icon: SvgPicture.asset(
+        //       'images/icons/search.svg',
+        //       color: Colors.black54,
+        //     ),
+        //   ),
+        // ],
       ),
       backgroundColor: const Color.fromRGBO(0, 0, 0, 0.04),
       body: Container(
@@ -169,7 +180,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   FutureBuilder<WeeklyAttributes>(
-                    future: AuthMethods().getWeeklyUserWiseAttributes(_user!),
+                    future:
+                        AuthMethods().getWeeklyUserWiseAttributes(widget.user),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         List<Map<String, dynamic>> attributes =

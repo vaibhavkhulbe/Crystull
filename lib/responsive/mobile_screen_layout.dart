@@ -6,6 +6,7 @@ import 'package:crystull/screens/notifications_screen.dart';
 import 'package:crystull/screens/profile_screen.dart';
 import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
+import 'package:crystull/screens/search_screen.dart';
 import 'package:crystull/widgets/bottom_nav_bar_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +62,8 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
               controller: _pageController,
               onPageChanged: onPageChanged,
               children: [
-                const HomeScreen(),
+                HomeScreen(user: _user),
+                const SearchScreen(),
                 const FriendRequestScreen(),
                 NotificationsScreen(user: _user),
                 ProfileScreen(user: _user, isHome: true),
@@ -74,10 +76,12 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
                   getBottomNavBarWidget(
                       widget.screen, 0, 'images/icons/homeButton.svg'),
                   getBottomNavBarWidget(
-                      widget.screen, 1, 'images/icons/friendRequests.svg'),
+                      widget.screen, 1, 'images/icons/search.svg'),
                   getBottomNavBarWidget(
-                      widget.screen, 2, 'images/icons/notifications.svg'),
-                  getBottomNavBarWidget(widget.screen, 3, 'images/avatar.png',
+                      widget.screen, 2, 'images/icons/friendRequests.svg'),
+                  getBottomNavBarWidget(
+                      widget.screen, 3, 'images/icons/notifications.svg'),
+                  getBottomNavBarWidget(widget.screen, 4, 'images/avatar.png',
                       isProfile: true, profileImage: _user.profileImage),
                 ]),
           )

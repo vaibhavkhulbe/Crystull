@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:crystull/resources/models/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,7 +10,7 @@ pickImage(ImageSource source) async {
   XFile? _file = await picker.pickImage(source: source);
 
   if (_file != null) {
-    return await _file.readAsBytes();
+    return _file;
   } else {
     return null;
   }
@@ -43,4 +44,10 @@ Future<Uint8List> compressList(Uint8List list) async {
   // print(list.length);
   // print(result.length);
   return result;
+}
+
+bool isUnblocked(CrystullUser user1, CrystullUser user2) {
+  return user1.uid == user2.uid ||
+      (user1.connections.containsKey(user2.uid) &&
+          user1.connections[user2.uid]!.status <= 3);
 }

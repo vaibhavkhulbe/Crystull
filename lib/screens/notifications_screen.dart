@@ -213,7 +213,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                           color: Colors.black54,
                           image: DecorationImage(
                             fit: BoxFit.cover,
-                            image: eventsPics[e.fromUid] != null
+                            image: eventsPics[e.fromUid] != null && !e.anonymous
                                 ? Image.memory(eventsPics[e.fromUid]!).image
                                 : const ExactAssetImage('images/avatar.png'),
                           ),

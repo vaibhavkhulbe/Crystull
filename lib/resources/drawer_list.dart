@@ -11,7 +11,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
+List<Widget> getDrawerList(
+    BuildContext context, CrystullUser user, Map<String, double> _swapValues) {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   int friendCount = 0;
   user.connections.forEach((key, value) {
@@ -35,27 +36,72 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
       decoration: const BoxDecoration(
         color: Color(0xFFE7F7FF),
       ),
-      child: Column(
-        children: [
-          Center(
-            child: CircleAvatar(
-              radius: getSafeAreaHeight(context) * 0.05,
-              backgroundImage: user.profileImage != null
-                  ? Image.memory(user.profileImage!).image
-                  : const ExactAssetImage('images/avatar.png'),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MobileScreenLayout(screen: 4),
             ),
-          ),
-          const Spacer(),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MobileScreenLayout(screen: 3),
+          );
+        },
+        child: Column(
+          children: [
+            SizedBox(
+              height: getSafeAreaHeight(context) * 0.1,
+              child: Center(
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned(
+                      child: CircleAvatar(
+                        radius: getSafeAreaHeight(context) * 0.05,
+                        backgroundImage: user.profileImage != null
+                            ? Image.memory(user.profileImage!).image
+                            : const ExactAssetImage('images/avatar.png'),
+                      ),
+                    ),
+                    // SWAP
+                    Positioned(
+                      top: (MediaQuery.of(context).size.height * 0.08),
+                      left: (MediaQuery.of(context).size.width * 0.0725),
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 2.5),
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: mobileBackgroundColor,
+                          border: Border.all(
+                            color: primaryColor,
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          _swapValues.isEmpty
+                              ? '0'
+                              : (_swapValues.values.reduce(
+                                          (value, element) => value + element) /
+                                      (_swapValues.values.length * 10))
+                                  .round()
+                                  .toString(),
+                          style: const TextStyle(
+                            fontFamily: "Poppins",
+                            fontSize: 9,
+                            height: 1.5,
+                            fontWeight: FontWeight.w600,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              );
-            },
-            child: Text(
+              ),
+            ),
+            const Spacer(),
+            Text(
               user.fullName.capitalize(),
               style: const TextStyle(
                 fontFamily: "Poppins",
@@ -64,8 +110,8 @@ List<Widget> getDrawerList(BuildContext context, CrystullUser user) {
                 fontWeight: FontWeight.w600,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
     DrawerWidget(

@@ -1,8 +1,25 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/profile_screen.dart';
 import 'package:crystull/utils/colors.dart';
 import 'package:flutter/material.dart';
+
+class Debouncer {
+  final int milliseconds;
+  VoidCallback? action;
+  Timer? _timer;
+
+  Debouncer({required this.milliseconds});
+
+  run(VoidCallback action) {
+    if (_timer != null) {
+      _timer!.cancel();
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+}
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -14,6 +31,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool _isShowUsers = false;
+  final _debouncer = Debouncer(milliseconds: 500);
 
   @override
   void dispose() {
@@ -26,47 +44,46 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        automaticallyImplyLeading: false,
         backgroundColor: mobileBackgroundColor,
         centerTitle: false,
         title: Container(
           decoration: BoxDecoration(
-            color: Colors.black12,
+            color: const Color(0xF0F2F5FF),
             borderRadius: BorderRadius.circular(60),
           ),
           child: TextFormField(
             controller: _searchController,
-            onFieldSubmitted: (value) {
-              if (value.isNotEmpty) {
-                setState(
-                  () {
-                    _isShowUsers = true;
-                  },
-                );
-              } else {
-                setState(
-                  () {
-                    _isShowUsers = false;
-                  },
-                );
-              }
+            onChanged: (value) {
+              _debouncer.run(() {
+                if (value.isNotEmpty) {
+                  setState(
+                    () {
+                      _isShowUsers = true;
+                    },
+                  );
+                } else {
+                  setState(
+                    () {
+                      _isShowUsers = false;
+                    },
+                  );
+                }
+              });
             },
             style: const TextStyle(
               fontFamily: "Poppins",
-              fontSize: 12,
+              fontSize: 14,
               color: Colors.black,
               fontWeight: FontWeight.w400,
             ),
             decoration: InputDecoration(
               contentPadding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               hintText: 'Search people',
               hintStyle: const TextStyle(
                 fontFamily: "Poppins",
-                fontSize: 12,
+                fontSize: 14,
                 height: 1.5,
                 color: colorB5B5B5,
                 fontWeight: FontWeight.w400,
@@ -116,6 +133,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     return ListTile(
                       title: InkWell(
                         onTap: () {
+                          // !isUnblocked(CrystullUser.fromSnapshot(doc), )
                           Navigator.push(
                             context,
                             MaterialPageRoute(
