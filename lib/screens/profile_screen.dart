@@ -77,6 +77,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final Map<String, double> _primarySwapValues = {};
   final Map<String, double> _moreSwapValues = {};
 
+  Swap? lastSwap;
+
+  ImageProvider getUserImage() {
+    return widget.user.profileImageUrl.isNotEmpty &&
+            isUnblocked(widget.user, _currentUser!)
+        ? FadeInImage(
+            placeholder: const svg.Svg('images/avatar.png'),
+            image: NetworkImage(
+              widget.user.profileImageUrl,
+            ),
+            alignment: Alignment.topLeft,
+            fit: BoxFit.fitWidth,
+            height: MediaQuery.of(context).size.height * 0.1,
+            width: getSafeAreaWidth(context),
+          ).image
+        : const ExactAssetImage('images/avatar.png');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -91,9 +109,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void handleResult(String result, {bool isLoading = true}) {
     if (result == "Success") {
-      setState(() {
-        refreshUser(isLoading: isLoading);
-      });
+      if (mounted) {
+        setState(() {
+          refreshUser(isLoading: isLoading);
+        });
+      }
     } else {
       showSnackBar(result, context);
       developer.log(result);
@@ -106,16 +126,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     CroppedFile? _croppedImage;
     if (_image != null) {
       _croppedImage = await ImageCropper().cropImage(
-          sourcePath: _image.path,
-          aspectRatio: CropAspectRatio(ratioX: ratiox, ratioY: ratioy),
-          maxHeight: 100,
-          maxWidth: 100);
+        sourcePath: _image.path,
+        aspectRatio: CropAspectRatio(ratioX: ratiox, ratioY: ratioy),
+      );
+
       if (_croppedImage != null) {
         Uint8List _croppedImageAsList = await _croppedImage.readAsBytes();
-        Uint8List _compressedImage;
-        _compressedImage = await compressList(_croppedImageAsList);
-        return _compressedImage;
+        return _croppedImageAsList;
       }
+      // removing compression so that image looks good
+      // if (_croppedImage != null) {
+      //   Uint8List _croppedImageAsList = await _croppedImage.readAsBytes();
+      //   Uint8List _compressedImage;
+      //   _compressedImage = await compressList(_croppedImageAsList);
+      //   return _compressedImage;
+      // }
     }
 
     return null;
@@ -147,8 +172,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _isUpdatingCoverPhoto = true;
     });
     Uint8List? image = await selectImage(
-      16,
-      9,
+      4,
+      3,
       100,
       100,
     );
@@ -257,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       CrystullUser? updatedUser =
           await AuthMethods().refreshUser(widget.user.uid);
       if (updatedUser != null) {
-        _currentUser = updatedUser;
+        widget.user = updatedUser;
         if (mounted) {
           setState(() {
             _loadingPage = false;
@@ -273,7 +298,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     _swapValues = swapAttributes.attributes;
     _swapInfo = swapAttributes.swapInfo;
+    if (_currentUser!.uid != widget.user.uid) {
+      if (_swapInfo.containsKey(_currentUser!.uid)) {
+        lastSwap = await AuthMethods()
+            .getSwapFromID(_swapInfo[_currentUser!.uid]!.lastSwappedID);
+        if (lastSwap != null) {
+          for (var attribute in lastSwap!.swaps.entries) {
+            sliderValues[attribute.key] = attribute.value;
+          }
+        }
+      }
+    }
 
+    // This is for the info shown at the top. This shows the cumulative values of the user
     var mapEntries = _swapValues.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
@@ -508,7 +545,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
 
-                              // User profile image
+                              // User profile photo
                               Positioned(
                                 top: MediaQuery.of(context).size.height * 0.06,
                                 left: MediaQuery.of(context).size.width * 0.05,
@@ -527,46 +564,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               mobileBackgroundColor,
                                         ),
                                       )
-                                    : Container(
-                                        width:
-                                            MediaQuery.of(context).size.height *
-                                                0.12,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.12,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.black54,
-                                          image: DecorationImage(
-                                            fit: BoxFit.cover,
-                                            image: widget.user.profileImageUrl
-                                                        .isNotEmpty &&
-                                                    isUnblocked(widget.user,
-                                                        _currentUser!)
-                                                ? FadeInImage(
-                                                    placeholder: const svg.Svg(
-                                                        'images/avatar.png'),
-                                                    image: NetworkImage(
-                                                      widget
-                                                          .user.profileImageUrl,
-                                                    ),
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    fit: BoxFit.fitWidth,
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.1,
-                                                    width: getSafeAreaWidth(
-                                                        context),
-                                                  ).image
-                                                : const ExactAssetImage(
-                                                    'images/avatar.png'),
-                                          ),
-                                          border: Border.all(
-                                            color: mobileBackgroundColor,
-                                            width: 2.0,
+                                    : GestureDetector(
+                                        onTap: () async {
+                                          await showDialog(
+                                              context: context,
+                                              builder: (_) => ImageDialog(
+                                                  image: getUserImage()));
+                                        },
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.12,
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.12,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.black54,
+                                            image: DecorationImage(
+                                              fit: BoxFit.cover,
+                                              image: getUserImage(),
+                                            ),
+                                            border: Border.all(
+                                              color: mobileBackgroundColor,
+                                              width: 2.0,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -680,6 +704,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        if (widget.user.isVerified)
+                                          const Icon(
+                                            Icons.verified_rounded,
+                                            color: primaryColor,
+                                            size: 12,
+                                          ),
                                       ],
                                     ),
                                     Wrap(
@@ -985,6 +1018,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         },
                                         child: Column(
                                           children: [
+                                            // connection profile photo
                                             Container(
                                               margin:
                                                   const EdgeInsets.symmetric(
@@ -1021,6 +1055,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 ),
                                               ),
                                             ),
+
+                                            // connection name
                                             Wrap(
                                               crossAxisAlignment:
                                                   WrapCrossAlignment.start,
@@ -1038,6 +1074,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     color: color575757,
                                                   ),
                                                 ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                if (connectedUsers[i]
+                                                    .isVerified)
+                                                  const Icon(
+                                                    Icons.verified_rounded,
+                                                    color: primaryColor,
+                                                    size: 12,
+                                                  ),
                                               ],
                                             ),
                                           ],
@@ -1047,226 +1093,296 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ],
                             ),
-                          ))
+                          ),
+                        )
                       : Card(
                           elevation: 0,
                           color: mobileBackgroundColor,
                           shape: const ContinuousRectangleBorder(),
                           child: Container(
                             padding: const EdgeInsets.all(10),
-                            child: (_swapInfo.containsKey(_currentUser!.uid) &&
-                                    (DateTime.now().difference(
-                                            _swapInfo[_currentUser!.uid]!
-                                                .lastSwappedAt)) <
-                                        const Duration(minutes: 10))
-                                ? Container(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                          'images/swap_submitted.svg',
-                                          width:
-                                              getSafeAreaWidth(context) * 0.1,
-                                          height:
-                                              getSafeAreaWidth(context) * 0.1,
-                                        ),
-                                        const SizedBox(height: 10),
-                                        const Text(
-                                          "Thank you for your submission",
-                                          style: TextStyle(
-                                            fontFamily: "Poppins",
-                                            fontSize: 14,
-                                            height: 1.5,
-                                            fontWeight: FontWeight.w500,
-                                            color: color808080,
-                                          ),
-                                        ),
-                                        Text(
-                                          "You can SWAP " +
-                                              widget.user.firstName
-                                                  .capitalize() +
-                                              " again after " +
-                                              getStringDuration(
-                                                  _swapInfo[_currentUser!.uid]!
+                            child: widget.user.connections
+                                        .containsKey(_currentUser!.uid) &&
+                                    widget.user.connections[_currentUser!.uid]!
+                                            .status >
+                                        3
+                                ? Container()
+                                : ((_swapInfo.containsKey(_currentUser!.uid) &&
+                                        (DateTime.now().difference(
+                                                _swapInfo[_currentUser!.uid]!
+                                                    .lastSwappedAt)) <
+                                            const Duration(minutes: 10))
+                                    ? Container(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SvgPicture.asset(
+                                              'images/swap_submitted.svg',
+                                              width: getSafeAreaWidth(context) *
+                                                  0.1,
+                                              height:
+                                                  getSafeAreaWidth(context) *
+                                                      0.1,
+                                            ),
+                                            const SizedBox(height: 10),
+                                            const Text(
+                                              "Thank you for your submission",
+                                              style: TextStyle(
+                                                fontFamily: "Poppins",
+                                                fontSize: 14,
+                                                height: 1.5,
+                                                fontWeight: FontWeight.w500,
+                                                color: color808080,
+                                              ),
+                                            ),
+                                            Text(
+                                              "You can SWAP " +
+                                                  widget.user.firstName
+                                                      .capitalize() +
+                                                  " again after " +
+                                                  getStringDuration(_swapInfo[
+                                                          _currentUser!.uid]!
                                                       .lastSwappedAt
                                                       .add(const Duration(
                                                           minutes: 10))
                                                       .difference(
                                                           DateTime.now())),
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontFamily: "Poppins",
-                                            fontSize: 12,
-                                            height: 1.5,
-                                            fontWeight: FontWeight.w500,
-                                            color: color808080,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        TextButton(
-                                            onPressed: (() async {
-                                              var swap = await AuthMethods()
-                                                  .getSwapFromID(_swapInfo[
-                                                          _currentUser!.uid]!
-                                                      .lastSwappedID);
-                                              if (swap != null) {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        NotificationDetail(
-                                                      swap: swap,
-                                                      uid: _currentUser!.uid,
-                                                      fromUserName:
-                                                          _currentUser!
-                                                              .firstName,
-                                                      toUserName:
-                                                          widget.user.firstName,
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                            }),
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.3,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontFamily: "Poppins",
+                                                fontSize: 12,
+                                                height: 1.5,
+                                                fontWeight: FontWeight.w500,
+                                                color: color808080,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            TextButton(
+                                                onPressed: (() async {
+                                                  if (lastSwap != null) {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            NotificationDetail(
+                                                          swap: lastSwap!,
+                                                          uid:
+                                                              _currentUser!.uid,
+                                                          fromUserName:
+                                                              _currentUser!
+                                                                  .firstName,
+                                                          toUserName: widget
+                                                              .user.firstName,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                }),
+                                                child: Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.3,
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
                                                       vertical: 10,
                                                       horizontal: 10),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(2),
-                                                color: primaryColor,
-                                              ),
-                                              child: const Text(
-                                                'View',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontSize: 12,
-                                                  height: 1.5,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: mobileBackgroundColor,
-                                                ),
-                                              ),
-                                            ))
-                                      ],
-                                    ),
-                                  )
-                                : Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Help " +
-                                            widget.user.firstName.capitalize() +
-                                            " to improve their skills",
-                                        style: const TextStyle(
-                                          fontFamily: "Poppins",
-                                          fontSize: 14,
-                                          height: 1.5,
-                                          fontWeight: FontWeight.w500,
-                                          color: color808080,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            2),
+                                                    color: primaryColor,
+                                                  ),
+                                                  child: const Text(
+                                                    'View',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontSize: 12,
+                                                      height: 1.5,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color:
+                                                          mobileBackgroundColor,
+                                                    ),
+                                                  ),
+                                                ))
+                                          ],
                                         ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Row(
+                                      )
+                                    : Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          const Text(
-                                            "SWAP anonymously",
-                                            style: TextStyle(
+                                          Text(
+                                            "Help " +
+                                                widget.user.firstName
+                                                    .capitalize() +
+                                                " to improve their skills",
+                                            style: const TextStyle(
                                               fontFamily: "Poppins",
-                                              fontSize: 13,
+                                              fontSize: 14,
                                               height: 1.5,
-                                              fontWeight: FontWeight.w400,
+                                              fontWeight: FontWeight.w500,
                                               color: color808080,
                                             ),
                                           ),
-                                          const Spacer(),
-                                          getSwitch(
-                                            activeColor: primaryColor,
-                                            inactiveColor: secondaryColor,
-                                            value: isAnonymousPost,
-                                            onChanged: (value) {
-                                              if (value) {
-                                                isAnonymousPost = true;
-                                              } else {
-                                                isAnonymousPost = false;
-                                              }
-                                              setState(() {});
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 20),
-                                      GridView(
-                                          shrinkWrap: true,
-                                          // padding: const EdgeInsets.all(10),
-                                          gridDelegate:
-                                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 2,
-                                            childAspectRatio: 2.5,
-                                            crossAxisSpacing: 50,
-                                          ),
-                                          children: [
-                                            for (var entry
-                                                in sliderValues.entries)
-                                              getSliderWidgetWithLabel(
-                                                entry.key,
-                                                entry.value,
-                                                (value) {
-                                                  sliderValues[entry.key] =
-                                                      value;
-                                                  setState(() {
-                                                    if (sliderValues.values.any(
-                                                        (element) =>
-                                                            element != 0)) {
-                                                      isSwapEnabled = true;
-                                                    } else {
-                                                      isSwapEnabled = false;
-                                                    }
-                                                  });
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                "SWAP anonymously",
+                                                style: TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontSize: 13,
+                                                  height: 1.5,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: color808080,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              getSwitch(
+                                                activeColor: primaryColor,
+                                                inactiveColor: secondaryColor,
+                                                value: isAnonymousPost,
+                                                onChanged: (value) {
+                                                  if (value) {
+                                                    isAnonymousPost = true;
+                                                  } else {
+                                                    isAnonymousPost = false;
+                                                  }
+                                                  setState(() {});
                                                 },
-                                              )
-                                          ]),
-                                      Container(
-                                        alignment: Alignment.topRight,
-                                        child: GestureDetector(
-                                          onTap: () async {
-                                            Map<String, double>?
-                                                newSliderValues =
-                                                await showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return MultiSelect(
-                                                          selectedValuesMap:
-                                                              sliderValues);
-                                                    });
-                                            if (newSliderValues != null) {
-                                              setState(() {
-                                                sliderValues = newSliderValues;
-                                              });
-                                            }
-                                          },
-                                          child: const Text(
-                                            "+ More",
-                                            style: TextStyle(
-                                                fontSize: 13,
-                                                color: primaryColor),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                      ),
-                                      Center(
-                                        child: (isSwapEnabled
-                                            ? (_isSwapping
-                                                ? Container(
+                                          const SizedBox(height: 20),
+                                          GridView(
+                                              shrinkWrap: true,
+                                              // padding: const EdgeInsets.all(10),
+                                              gridDelegate:
+                                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 2,
+                                                childAspectRatio: 2.5,
+                                                crossAxisSpacing: 50,
+                                              ),
+                                              children: [
+                                                for (var entry
+                                                    in sliderValues.entries)
+                                                  getSliderWidgetWithLabel(
+                                                    entry.key,
+                                                    entry.value,
+                                                    (value) {
+                                                      sliderValues[entry.key] =
+                                                          value;
+                                                      setState(() {
+                                                        if (sliderValues.values
+                                                            .any((element) =>
+                                                                element != 0)) {
+                                                          isSwapEnabled = true;
+                                                        } else {
+                                                          isSwapEnabled = false;
+                                                        }
+                                                      });
+                                                    },
+                                                  )
+                                              ]),
+                                          Container(
+                                            alignment: Alignment.topRight,
+                                            child: GestureDetector(
+                                              onTap: () async {
+                                                Map<String, double>?
+                                                    newSliderValues =
+                                                    await showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return MultiSelect(
+                                                              selectedValuesMap:
+                                                                  sliderValues);
+                                                        });
+                                                if (newSliderValues != null) {
+                                                  setState(() {
+                                                    sliderValues =
+                                                        newSliderValues;
+                                                  });
+                                                }
+                                              },
+                                              child: const Text(
+                                                "+ More",
+                                                style: TextStyle(
+                                                    fontSize: 13,
+                                                    color: primaryColor),
+                                              ),
+                                            ),
+                                          ),
+                                          Center(
+                                            child: (isSwapEnabled
+                                                ? (_isSwapping
+                                                    ? Container(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                vertical: 8),
+                                                        margin: const EdgeInsets
+                                                                .only(
+                                                            top: 40,
+                                                            bottom: 20),
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                                color:
+                                                                    primaryColor),
+                                                        width: getSafeAreaWidth(
+                                                                context) *
+                                                            0.25,
+                                                        child:
+                                                            const CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          color:
+                                                              mobileBackgroundColor,
+                                                        ),
+                                                      )
+                                                    : InkWell(
+                                                        onTap: () {
+                                                          swapUser();
+                                                        },
+                                                        child: Container(
+                                                          alignment:
+                                                              Alignment.center,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  vertical: 8),
+                                                          margin:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  top: 40,
+                                                                  bottom: 20),
+                                                          decoration:
+                                                              const BoxDecoration(
+                                                                  color:
+                                                                      primaryColor),
+                                                          width:
+                                                              getSafeAreaWidth(
+                                                                      context) *
+                                                                  0.25,
+                                                          child: const Text(
+                                                            "SWAP",
+                                                            style: TextStyle(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ))
+                                                : Container(
                                                     alignment: Alignment.center,
                                                     padding: const EdgeInsets
                                                         .symmetric(vertical: 8),
@@ -1274,78 +1390,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         const EdgeInsets.only(
                                                             top: 40,
                                                             bottom: 20),
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                            color:
-                                                                primaryColor),
+                                                    decoration: BoxDecoration(
+                                                      color: primaryColor
+                                                          .withOpacity(0.5),
+                                                    ),
                                                     width: getSafeAreaWidth(
                                                             context) *
                                                         0.25,
-                                                    child:
-                                                        const CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                      color:
-                                                          mobileBackgroundColor,
-                                                    ),
-                                                  )
-                                                : InkWell(
-                                                    onTap: () {
-                                                      swapUser();
-                                                    },
-                                                    child: Container(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      padding: const EdgeInsets
-                                                              .symmetric(
-                                                          vertical: 8),
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              top: 40,
-                                                              bottom: 20),
-                                                      decoration:
-                                                          const BoxDecoration(
-                                                              color:
-                                                                  primaryColor),
-                                                      width: getSafeAreaWidth(
-                                                              context) *
-                                                          0.25,
-                                                      child: const Text(
-                                                        "SWAP",
-                                                        style: TextStyle(
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
+                                                    child: const Text(
+                                                      "SWAP",
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                       ),
                                                     ),
-                                                  ))
-                                            : Container(
-                                                alignment: Alignment.center,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 8),
-                                                margin: const EdgeInsets.only(
-                                                    top: 40, bottom: 20),
-                                                decoration: BoxDecoration(
-                                                  color: primaryColor
-                                                      .withOpacity(0.5),
-                                                ),
-                                                width:
-                                                    getSafeAreaWidth(context) *
-                                                        0.25,
-                                                child: const Text(
-                                                  "SWAP",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              )),
-                                      ),
-                                    ],
-                                  ),
+                                                  )),
+                                          ),
+                                        ],
+                                      )),
                           ),
-                        )
+                        ),
                 ],
               ),
             ));
@@ -1466,5 +1531,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       result += "${duration.inSeconds} seconds ";
     }
     return result;
+  }
+}
+
+class ImageDialog extends StatelessWidget {
+  final ImageProvider image;
+  const ImageDialog({Key? key, required this.image}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: 200,
+        height: 200,
+        decoration: BoxDecoration(
+            image: DecorationImage(image: image, fit: BoxFit.cover)),
+      ),
+    );
   }
 }

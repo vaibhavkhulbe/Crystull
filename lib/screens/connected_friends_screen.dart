@@ -163,15 +163,31 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      doc.fullName.capitalize(),
-                                      style: const TextStyle(
-                                        fontFamily: "Poppins",
-                                        fontSize: 12,
-                                        height: 1.5,
-                                        fontWeight: FontWeight.w600,
-                                        color: color808080,
-                                      ),
+                                    Wrap(
+                                      alignment: WrapAlignment.start,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.start,
+                                      children: [
+                                        Text(
+                                          doc.fullName.capitalize(),
+                                          style: const TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 12,
+                                            height: 1.5,
+                                            fontWeight: FontWeight.w600,
+                                            color: color808080,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        if (doc.isVerified)
+                                          const Icon(
+                                            Icons.verified_rounded,
+                                            color: primaryColor,
+                                            size: 12,
+                                          ),
+                                      ],
                                     ),
                                     if (connectedFriends.isNotEmpty)
                                       Row(

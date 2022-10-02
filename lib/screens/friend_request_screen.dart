@@ -140,19 +140,19 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                   ? 0
                                   : snapshot.data!.length,
                               itemBuilder: (context, index) {
-                                var doc = snapshot.data![index];
-                                Set<String> connectedFriends =
-                                    Set<String>.from(doc.connections.keys)
-                                        .intersection(Set<String>.from(
-                                            _currentUser!.connections.keys));
+                                var friendRequestUser = snapshot.data![index];
+                                Set<String> connectedFriends = Set<String>.from(
+                                        friendRequestUser.connections.keys)
+                                    .intersection(Set<String>.from(
+                                        _currentUser!.connections.keys));
                                 return ListTile(
                                   title: InkWell(
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                ProfileScreen(user: doc)),
+                                            builder: (context) => ProfileScreen(
+                                                user: friendRequestUser)),
                                       );
                                     },
                                     child: Row(
@@ -161,21 +161,40 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                       children: [
                                         CircleAvatar(
                                           backgroundImage: NetworkImage(
-                                              doc.profileImageUrl.toString()),
+                                              friendRequestUser.profileImageUrl
+                                                  .toString()),
                                         ),
                                         const SizedBox(width: 10),
                                         Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              doc.fullName.capitalize(),
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                height: 1.5,
-                                                color: Colors.black54,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                            Wrap(
+                                              alignment: WrapAlignment.start,
+                                              crossAxisAlignment:
+                                                  WrapCrossAlignment.start,
+                                              children: [
+                                                Text(
+                                                  friendRequestUser.fullName
+                                                      .capitalize(),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    height: 1.5,
+                                                    color: Colors.black54,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                if (friendRequestUser
+                                                    .isVerified)
+                                                  const Icon(
+                                                    Icons.verified_rounded,
+                                                    color: primaryColor,
+                                                    size: 12,
+                                                  ),
+                                              ],
                                             ),
                                             if (connectedFriends.isNotEmpty)
                                               Row(
@@ -200,7 +219,7 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                                 ],
                                               ),
                                             Text(
-                                              doc.bio,
+                                              friendRequestUser.bio,
                                               style: const TextStyle(
                                                 fontSize: 12,
                                                 height: 1.5,
@@ -218,7 +237,7 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                                       await AuthMethods()
                                                           .addFriendRequest(
                                                               _currentUser!,
-                                                              doc,
+                                                              friendRequestUser,
                                                               3,
                                                               3);
                                                   handleResult(result);
@@ -235,7 +254,8 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                                 () async {
                                                   String result =
                                                       await AuthMethods()
-                                                          .removeFriend(doc,
+                                                          .removeFriend(
+                                                              friendRequestUser,
                                                               _currentUser!);
                                                   handleResult(result);
                                                 },

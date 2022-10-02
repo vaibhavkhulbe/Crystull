@@ -101,14 +101,29 @@ List<Widget> getDrawerList(
               ),
             ),
             const Spacer(),
-            Text(
-              user.fullName.capitalize(),
-              style: const TextStyle(
-                fontFamily: "Poppins",
-                color: color575757,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+            Wrap(
+              alignment: WrapAlignment.start,
+              crossAxisAlignment: WrapCrossAlignment.start,
+              children: [
+                Text(
+                  user.fullName.capitalize(),
+                  style: const TextStyle(
+                    fontFamily: "Poppins",
+                    color: color575757,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                if (user.isVerified)
+                  const Icon(
+                    Icons.verified_rounded,
+                    color: primaryColor,
+                    size: 12,
+                  ),
+              ],
             ),
           ],
         ),

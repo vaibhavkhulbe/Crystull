@@ -63,7 +63,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
               onPageChanged: onPageChanged,
               children: [
                 HomeScreen(user: _user),
-                const SearchScreen(),
+                SearchScreen(user: _user),
                 const FriendRequestScreen(),
                 NotificationsScreen(user: _user),
                 ProfileScreen(user: _user, isHome: true),

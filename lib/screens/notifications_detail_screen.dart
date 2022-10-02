@@ -46,28 +46,35 @@ class NotificationDetail extends StatelessWidget {
                             color: primaryColor, height: 28, width: 24),
                         const SizedBox(width: 37),
                         SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.6,
-                          child: Text(
-                            (swap.fromUid == uid
-                                    ? "You"
-                                    : (swap.anonymous
-                                        ? "Someone"
-                                        : fromUserName.capitalize())) +
-                                " has SWAPed " +
-                                (swap.toUid == uid
-                                    ? "you"
-                                    : toUserName.capitalize()) +
-                                " for " +
-                                (swap.swaps.length > 1
-                                    ? "multiple attributes"
-                                    : swap.swapList.first),
-                            style: const TextStyle(
-                              fontFamily: "Poppins",
-                              fontSize: 12,
-                              height: 1.5,
-                              fontWeight: FontWeight.w500,
-                              color: primaryColor,
-                            ),
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: Wrap(
+                            alignment: WrapAlignment.start,
+                            crossAxisAlignment: WrapCrossAlignment.start,
+                            children: [
+                              Text(
+                                (swap.fromUid == uid
+                                        ? "You"
+                                        : (swap.anonymous
+                                            ? "Someone has"
+                                            : fromUserName.capitalize() +
+                                                " has")) +
+                                    " SWAPed " +
+                                    (swap.toUid == uid
+                                        ? "you"
+                                        : toUserName.capitalize()) +
+                                    " for " +
+                                    (swap.swaps.length > 1
+                                        ? "multiple attributes"
+                                        : swap.swapList.first),
+                                style: const TextStyle(
+                                  fontFamily: "Poppins",
+                                  fontSize: 12,
+                                  height: 1.5,
+                                  fontWeight: FontWeight.w500,
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],

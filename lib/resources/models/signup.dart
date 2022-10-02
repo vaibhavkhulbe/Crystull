@@ -121,6 +121,7 @@ class CrystullUser {
   String password;
   String bio;
   bool isPrivate;
+  bool isVerified;
   String college;
   String degree;
   String mobileNumberWithCountryCode;
@@ -137,6 +138,7 @@ class CrystullUser {
     this.uid = "",
     this.bio = "",
     this.isPrivate = true,
+    this.isVerified = false,
     this.college = "",
     this.degree = "",
     this.mobileNumberWithCountryCode = "",
@@ -159,6 +161,7 @@ class CrystullUser {
       "uid": uid,
       'bio': bio,
       "isPrivate": isPrivate,
+      "isVerified": isVerified,
       'college': college,
       'degree': degree,
       'mobileNumberWithCountryCode': mobileNumberWithCountryCode,
@@ -178,6 +181,7 @@ class CrystullUser {
       map['email'] ?? "",
       "",
       isPrivate: map['isPrivate'] ?? false,
+      isVerified: map['isVerified'] ?? false,
       uid: map['uid'] ?? "",
       bio: map['bio'] ?? "",
       college: map['college'] ?? "",

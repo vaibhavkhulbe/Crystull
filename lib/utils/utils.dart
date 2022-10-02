@@ -48,6 +48,7 @@ Future<Uint8List> compressList(Uint8List list) async {
 
 bool isUnblocked(CrystullUser user1, CrystullUser user2) {
   return user1.uid == user2.uid ||
+      !user1.connections.containsKey(user2.uid) ||
       (user1.connections.containsKey(user2.uid) &&
           user1.connections[user2.uid]!.status <= 3);
 }

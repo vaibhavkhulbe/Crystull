@@ -6,6 +6,8 @@ import 'package:crystull/screens/profile_screen.dart';
 import 'package:crystull/utils/colors.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/utils.dart';
+
 class Debouncer {
   final int milliseconds;
   VoidCallback? action;
@@ -22,7 +24,8 @@ class Debouncer {
 }
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  CrystullUser user;
+  SearchScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -78,20 +81,32 @@ class _SearchScreenState extends State<SearchScreen> {
               fontWeight: FontWeight.w400,
             ),
             decoration: InputDecoration(
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              hintText: 'Search people',
-              hintStyle: const TextStyle(
-                fontFamily: "Poppins",
-                fontSize: 14,
-                height: 1.5,
-                color: colorB5B5B5,
-                fontWeight: FontWeight.w400,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(60),
-              ),
-            ),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                hintText: 'Search people',
+                hintStyle: const TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 14,
+                  height: 1.5,
+                  color: colorB5B5B5,
+                  fontWeight: FontWeight.w400,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(60),
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Icons.close_rounded,
+                    color: colorBCBCBC,
+                    size: MediaQuery.of(context).size.height * 0.02,
+                  ),
+                  onPressed: () {
+                    // Update the state i.e. toogle the state of passwordVisible variable
+                    setState(() {
+                      _searchController.text = "";
+                    });
+                  },
+                )),
           ),
         ),
       ),
@@ -130,6 +145,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   itemBuilder: (context, index) {
                     final DocumentSnapshot doc =
                         (snapshot.data! as dynamic).docs[index];
+                    final searchedUser = CrystullUser.fromSnapshot(doc);
                     return ListTile(
                       title: InkWell(
                         onTap: () {
@@ -137,27 +153,48 @@ class _SearchScreenState extends State<SearchScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ProfileScreen(
-                                    user: CrystullUser.fromSnapshot(doc))),
+                                builder: (context) =>
+                                    ProfileScreen(user: searchedUser)),
                           );
                         },
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                  doc['profileImageUrl'].toString()),
-                            ),
+                            searchedUser.profileImageUrl.isNotEmpty &&
+                                    isUnblocked(searchedUser, widget.user)
+                                ? CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                        searchedUser.profileImageUrl),
+                                  )
+                                : const CircleAvatar(
+                                    backgroundImage:
+                                        ExactAssetImage('images/avatar.png'),
+                                  ),
                             const SizedBox(width: 10),
-                            Text(
-                              (doc['fullName'] as String).capitalize(),
-                              style: const TextStyle(
-                                fontFamily: "Poppins",
-                                fontSize: 14,
-                                height: 1.5,
-                                fontWeight: FontWeight.w400,
-                                color: color808080,
-                              ),
+                            Wrap(
+                              alignment: WrapAlignment.start,
+                              crossAxisAlignment: WrapCrossAlignment.start,
+                              children: [
+                                Text(
+                                  searchedUser.fullName.capitalize(),
+                                  style: const TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontSize: 14,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w400,
+                                    color: color808080,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                if (searchedUser.isVerified)
+                                  const Icon(
+                                    Icons.verified_rounded,
+                                    color: primaryColor,
+                                    size: 12,
+                                  ),
+                              ],
                             ),
                             Container(
                               margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -167,7 +204,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   color: color808080, shape: BoxShape.circle),
                             ),
                             Text(
-                              doc['bio'],
+                              searchedUser.bio,
                               strutStyle:
                                   const StrutStyle(forceStrutHeight: true),
                               style: const TextStyle(
