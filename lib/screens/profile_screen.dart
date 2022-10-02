@@ -308,6 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       widget.user = userProvider.getUser!;
     }
+    // var data = await AuthMethods().getAttributes();
 
     var swapAttributes =
         await AuthMethods().getCombinedAttributes(widget.user.uid);
@@ -601,8 +602,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               image: getUserImage(),
                                             ),
                                             border: Border.all(
-                                              color: mobileBackgroundColor,
-                                              width: 2.0,
+                                              color: widget.user.isVerified
+                                                  ? Colors.orange
+                                                  : mobileBackgroundColor,
+                                              width: widget.user.isVerified
+                                                  ? 4.0
+                                                  : 2.0,
                                             ),
                                           ),
                                         ),
@@ -647,7 +652,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             value + element) /
                                                     (_swapValues.values.length *
                                                         10))
-                                                .round()
+                                                .toStringAsFixed(1)
                                                 .toString(),
                                         style: const TextStyle(
                                           fontFamily: "Poppins",
@@ -1305,35 +1310,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     },
                                                   )
                                               ]),
-                                          Container(
-                                            alignment: Alignment.topRight,
-                                            child: GestureDetector(
-                                              onTap: () async {
-                                                Map<String, double>?
-                                                    newSliderValues =
-                                                    await showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return MultiSelect(
-                                                              selectedValuesMap:
-                                                                  sliderValues);
-                                                        });
-                                                if (newSliderValues != null) {
-                                                  setState(() {
-                                                    sliderValues =
-                                                        newSliderValues;
-                                                  });
-                                                }
-                                              },
-                                              child: const Text(
-                                                "+ More",
-                                                style: TextStyle(
-                                                    fontSize: 13,
-                                                    color: primaryColor),
+                                          if (widget.user.connections
+                                                  .containsKey(
+                                                      _currentUser!.uid) &&
+                                              widget
+                                                      .user
+                                                      .connections[
+                                                          _currentUser!.uid]!
+                                                      .status ==
+                                                  3)
+                                            Container(
+                                              alignment: Alignment.topRight,
+                                              child: GestureDetector(
+                                                onTap: () async {
+                                                  Map<String, double>?
+                                                      newSliderValues =
+                                                      await showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return MultiSelect(
+                                                                selectedValuesMap:
+                                                                    sliderValues);
+                                                          });
+                                                  if (newSliderValues != null) {
+                                                    setState(() {
+                                                      sliderValues =
+                                                          newSliderValues;
+                                                    });
+                                                  }
+                                                },
+                                                child: const Text(
+                                                  "+ More",
+                                                  style: TextStyle(
+                                                      fontSize: 13,
+                                                      color: primaryColor),
+                                                ),
                                               ),
                                             ),
-                                          ),
                                           Center(
                                             child: (isSwapEnabled
                                                 ? (_isSwapping

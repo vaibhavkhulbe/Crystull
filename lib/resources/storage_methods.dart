@@ -23,4 +23,17 @@ class StorageMethods {
     Uint8List? image = await ref.getData();
     return image;
   }
+
+  Future<List<Uint8List>> downloadAllImage(String childName) async {
+    Reference ref = _storage.ref().child(childName);
+    List<Uint8List> images = [];
+    await ref.listAll().then((value) async {
+      for (var item in value.items) {
+        await item.getData().then((value) {
+          if (value != null) images.add(value);
+        });
+      }
+    });
+    return images;
+  }
 }

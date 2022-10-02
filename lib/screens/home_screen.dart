@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/resources/drawer_list.dart';
@@ -10,6 +12,8 @@ import 'package:crystull/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../resources/storage_methods.dart';
+
 class HomeScreen extends StatefulWidget {
   CrystullUser user;
   HomeScreen({Key? key, required this.user}) : super(key: key);
@@ -20,16 +24,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _current = 0;
+  bool isloading = false;
   Map<String, double> _swapValues = {};
   final CarouselController _controller = CarouselController();
   List<String> imgList = ['images/home/1.png', 'images/home/2.png'];
-  // CrystullUser? _user;
+  List<Uint8List> images = [];
   bool loadingWeeklyAttributes = true;
 
   @override
   initState() {
     super.initState();
-    // refreshSWAPScore();
+    getImagesFromServer();
   }
 
   @override
@@ -37,11 +42,14 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void refreshSWAPScore() async {
-    var swapAttributes =
-        await AuthMethods().getCombinedAttributes(widget.user.uid);
-
-    _swapValues = swapAttributes.attributes;
+  void getImagesFromServer() async {
+    setState(() {
+      isloading = true;
+    });
+    images = await StorageMethods().downloadAllImage("homePics");
+    setState(() {
+      isloading = false;
+    });
   }
 
   // this is the image slider for home screen images
@@ -67,7 +75,9 @@ class _HomeScreenState extends State<HomeScreen> {
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(i),
+                  image: i.runtimeType == String
+                      ? AssetImage(i)
+                      : Image.memory(i).image,
                 ),
               ),
             );
@@ -79,8 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // _user = Provider.of<UserProvider>(context).getUser;
-    // getWeeklyAttributes();
+    StorageMethods().downloadAllImage("homePics").then((value) => images);
     AuthMethods()
         .getCombinedAttributes(widget.user.uid)
         .then((value) => _swapValues = value.attributes);
@@ -110,55 +119,60 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ),
-        // actions: [
-        //   // Navigate to the Search Screen
-        //   IconButton(
-        //     onPressed: () => Navigator.of(context)
-        //         .push(MaterialPageRoute(builder: (_) => const SearchScreen())),
-        //     icon: SvgPicture.asset(
-        //       'images/icons/search.svg',
-        //       color: Colors.black54,
-        //     ),
-        //   ),
-        // ],
       ),
       backgroundColor: const Color.fromRGBO(0, 0, 0, 0.04),
       body: Container(
         decoration: const BoxDecoration(color: colorEEEEEE),
         child: ListView(
           children: [
-            Stack(
-              children: [
-                sliderPlugin(imgList, getSafeAreaHeight(context) * 0.5),
-                Positioned(
-                  left: getSafeAreaWidth(context) * 0.5,
-                  bottom: getSafeAreaHeight(context) * 0.06,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: imgList.asMap().entries.map(
-                      (entry) {
-                        return GestureDetector(
-                          onTap: () => _controller.animateToPage(entry.key),
-                          child: Container(
-                            width: 6.0,
-                            height: 6.0,
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 4.0),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: _current == entry.key
-                                  ? primaryColor
-                                  : Colors.black54,
-                            ),
-                          ),
-                        );
-                      },
-                    ).toList(),
+            if (isloading)
+              SizedBox(
+                height: getSafeAreaHeight(context) * 0.5,
+                width: getSafeAreaWidth(context),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: primaryColor,
+                    backgroundColor: mobileBackgroundColor,
                   ),
-                )
-              ],
-            ),
+                ),
+              ),
+            if (!isloading)
+              Stack(
+                children: [
+                  sliderPlugin(images.isEmpty ? imgList : images,
+                      getSafeAreaHeight(context) * 0.5),
+                  Positioned(
+                    left: getSafeAreaWidth(context) * 0.5,
+                    bottom: getSafeAreaHeight(context) * 0.06,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: (images.isEmpty ? imgList : images)
+                          .asMap()
+                          .entries
+                          .map(
+                        (entry) {
+                          return GestureDetector(
+                            onTap: () => _controller.animateToPage(entry.key),
+                            child: Container(
+                              width: 6.0,
+                              height: 6.0,
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 4.0),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _current == entry.key
+                                    ? primaryColor
+                                    : Colors.black54,
+                              ),
+                            ),
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  )
+                ],
+              ),
 
             // this is the trending users section
             Container(

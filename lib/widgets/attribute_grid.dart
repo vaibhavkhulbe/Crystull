@@ -7,6 +7,7 @@ Widget getAttributesGridFromValues(
 ) {
   return GridView(
     shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
     // padding: const EdgeInsets.all(10),
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 3,

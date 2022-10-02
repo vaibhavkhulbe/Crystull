@@ -787,4 +787,13 @@ class AuthMethods {
     }
     return null;
   }
+
+  // Future<Map<String, List<String>>> getAttributes() async {
+  //   Map<String, List<String>> attributes = {};
+  //   var snapshot = await _firestore.collection('attributes').;
+  //   for (var data in snapshot.data()) {
+
+  //   }
+  //   return attributes;
+  // }
 }
