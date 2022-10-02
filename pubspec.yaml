@@ -74,6 +74,8 @@ flutter:
     - images/avatar.png
     - images/notificationFilled.svg
     - images/swap_submitted.svg
+    - images/crystull_logo.png
+    - images/crystull_logo.jpeg
 
     # icons
     - images/icons/homeButton.svg
