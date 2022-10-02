@@ -153,33 +153,33 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Spacer(flex: 1),
 
                 // button to login with OTP
-                InkWell(
-                  onTap: () {
-                    // send OTP to user's email and open OTP screen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginWithOTPScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    child: const Text("Login with OTP",
-                        style: TextStyle(
-                          color: primaryColor,
-                          fontSize: 18,
-                        )),
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: primaryColor, width: 2),
-                      color: mobileBackgroundColor,
-                    ),
-                  ),
-                ),
+                // InkWell(
+                //   onTap: () {
+                //     // send OTP to user's email and open OTP screen
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => const LoginWithOTPScreen(),
+                //       ),
+                //     );
+                //   },
+                //   child: Container(
+                //     child: const Text("Login with OTP",
+                //         style: TextStyle(
+                //           color: primaryColor,
+                //           fontSize: 18,
+                //         )),
+                //     width: double.infinity,
+                //     alignment: Alignment.center,
+                //     padding: const EdgeInsets.symmetric(vertical: 12),
+                //     decoration: BoxDecoration(
+                //       border: Border.all(color: primaryColor, width: 2),
+                //       color: mobileBackgroundColor,
+                //     ),
+                //   ),
+                // ),
 
-                const Spacer(flex: 1),
+                // const Spacer(flex: 1),
 
                 // button to login
                 InkWell(

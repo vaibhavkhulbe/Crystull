@@ -242,6 +242,8 @@ class _SearchScreenState extends State<SearchScreen> {
 extension StringExtension on String {
   String capitalize() => replaceAll(RegExp(' +'), ' ')
       .split(' ')
-      .map((str) => "${str[0].toUpperCase()}${str.substring(1).toLowerCase()}")
+      .map((str) => str.isNotEmpty
+          ? "${str[0].toUpperCase()}${str.substring(1).toLowerCase()}"
+          : str)
       .join(' ');
 }

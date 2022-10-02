@@ -1556,10 +1556,8 @@ class ImageDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       child: Container(
-        width: 200,
-        height: 200,
         decoration: BoxDecoration(
-            image: DecorationImage(image: image, fit: BoxFit.cover)),
+            image: DecorationImage(image: image, fit: BoxFit.fitWidth)),
       ),
     );
   }

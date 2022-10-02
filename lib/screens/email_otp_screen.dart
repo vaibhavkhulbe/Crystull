@@ -10,6 +10,10 @@ import 'package:email_auth/email_auth.dart';
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/screens/signup_more_info.dart';
 
+import '../responsive/mobile_screen_layout.dart';
+import '../responsive/response_layout_screen.dart';
+import '../responsive/web_screen_layout.dart';
+
 class EmailOTPScreen extends StatefulWidget {
   final CrystullUser signupForm;
   final EmailAuth emailAuth;
@@ -184,7 +188,18 @@ class _EmailOTPScreenState extends State<EmailOTPScreen> {
                           // show OTP screen
                           showSnackBar("OTP validated successfully", context);
                           widget.isLoginWithOTP
-                              ? log("logged in")
+                              ? Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return ResponsiveLayout(
+                                          webScreenLayout:
+                                              const WebScreenLayout(),
+                                          mobileScreenLayout:
+                                              MobileScreenLayout());
+                                    },
+                                  ),
+                                )
                               : Navigator.push(
                                   context,
                                   MaterialPageRoute(
