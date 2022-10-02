@@ -463,9 +463,7 @@ class AuthMethods {
         Swap individual = Swap(
           id: swapId,
           fromUid: fromUserId,
-          fromName: fromUserName,
           toUid: toUserId,
-          toName: toUserName,
           addedAt: now,
           anonymous: isAnonymous,
           unread: true,

@@ -8,7 +8,7 @@ Widget getStatusButton(Color boxColor, Color borderColor, String text,
   return InkWell(
     onTap: function,
     child: Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 10),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
         border: Border.all(color: borderColor, width: 1),

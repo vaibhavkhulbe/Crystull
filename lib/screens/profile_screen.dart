@@ -83,7 +83,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return widget.user.profileImageUrl.isNotEmpty &&
             isUnblocked(widget.user, _currentUser!)
         ? FadeInImage(
-            placeholder: const svg.Svg('images/avatar.png'),
+            placeholder: const svg.Svg(
+              'images/avatar.svg',
+            ),
             image: NetworkImage(
               widget.user.profileImageUrl,
             ),
@@ -93,6 +95,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: getSafeAreaWidth(context),
           ).image
         : const ExactAssetImage('images/avatar.png');
+  }
+
+  ImageProvider getCoverImage() {
+    return widget.user.coverImageUrl.isNotEmpty &&
+            isUnblocked(widget.user, _currentUser!)
+        ? FadeInImage(
+            placeholder: const svg.Svg('images/crystull_logo.svg'),
+            image: NetworkImage(
+              widget.user.coverImageUrl,
+            ),
+          ).image
+        : const ExactAssetImage(
+            'images/crystull_logo.jpeg',
+          );
   }
 
   @override
@@ -499,33 +515,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         backgroundColor: mobileBackgroundColor,
                                       ),
                                     )
-                                  : widget.user.coverImageUrl.isNotEmpty &&
-                                          isUnblocked(
-                                              widget.user, _currentUser!)
-                                      ? FadeInImage(
-                                          placeholder: const svg.Svg(
-                                              'images/crystull_logo.svg'),
-                                          image: NetworkImage(
-                                            widget.user.coverImageUrl,
-                                          ),
-                                          alignment: Alignment.topLeft,
-                                          fit: BoxFit.fitWidth,
+                                  : GestureDetector(
+                                      onTap: () async {
+                                        await showDialog(
+                                            context: context,
+                                            builder: (_) => ImageDialog(
+                                                image: getCoverImage()));
+                                      },
+                                      child: Container(
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height *
                                               0.1,
-                                          width: getSafeAreaWidth(context),
-                                        )
-                                      : SvgPicture.asset(
-                                          'images/crystull_logo.svg',
-                                          alignment: Alignment.topLeft,
-                                          fit: BoxFit.fitWidth,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.1,
-                                          width: getSafeAreaWidth(context),
-                                        ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            image: DecorationImage(
+                                              alignment: Alignment.topLeft,
+                                              fit: BoxFit.fitWidth,
+                                              image: getCoverImage(),
+                                            ),
+                                            border: Border.all(
+                                              color: mobileBackgroundColor,
+                                              width: 2.0,
+                                            ),
+                                          ))),
 
                               // edit background image
                               if (isMe)
@@ -770,7 +783,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                                 user: widget
                                                                     .user),
                                                       ));
-                                                  setState(() {});
+                                                  setState(() {
+                                                    refreshUser();
+                                                  });
                                                 },
                                                 child: const Text(
                                                   "Edit Profile",

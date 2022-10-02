@@ -31,9 +31,7 @@ class SwapData {
 class Swap {
   String id;
   String fromUid;
-  String fromName;
   String toUid;
-  String toName;
   DateTime addedAt;
   bool anonymous;
   bool unread;
@@ -43,9 +41,7 @@ class Swap {
   Swap({
     required this.id,
     required this.fromUid,
-    required this.fromName,
     required this.toUid,
-    required this.toName,
     required this.addedAt,
     required this.anonymous,
     required this.unread,
@@ -56,9 +52,7 @@ class Swap {
   Map<String, dynamic> toJson() => {
         'id': id,
         'fromUid': fromUid,
-        'fromName': fromName,
         'toUid': toUid,
-        'toName': toName,
         'addedAt': addedAt,
         'unread': unread,
         'anonymous': anonymous,
@@ -79,9 +73,7 @@ class Swap {
     return Swap(
       id: swap['id'] as String,
       fromUid: swap["fromUid"] as String,
-      fromName: swap["fromName"] as String,
       toUid: swap["toUid"] as String,
-      toName: swap["toName"] as String,
       addedAt: _addedAt,
       anonymous: swap["anonymous"] as bool,
       swaps: _swaps,

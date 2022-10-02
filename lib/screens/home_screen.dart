@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
-    refreshSWAPScore();
+    // refreshSWAPScore();
   }
 
   @override
@@ -81,6 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     // _user = Provider.of<UserProvider>(context).getUser;
     // getWeeklyAttributes();
+    AuthMethods()
+        .getCombinedAttributes(widget.user.uid)
+        .then((value) => _swapValues = value.attributes);
     return Scaffold(
       drawer: SizedBox(
         width: MediaQuery.of(context).size.width * 0.6,

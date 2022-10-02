@@ -1,6 +1,7 @@
 import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/responsive/mobile_screen_layout.dart';
 import 'package:crystull/screens/activities_screen.dart';
+import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/screens/connected_friends_screen.dart';
 import 'package:crystull/screens/login_screen.dart';
 import 'package:crystull/screens/search_screen.dart';
@@ -78,22 +79,53 @@ List<Widget> getDrawerList(
                             width: 1,
                           ),
                         ),
-                        child: Text(
-                          _swapValues.isEmpty
-                              ? '0'
-                              : (_swapValues.values.reduce(
-                                          (value, element) => value + element) /
-                                      (_swapValues.values.length * 10))
-                                  .round()
-                                  .toString(),
-                          style: const TextStyle(
-                            fontFamily: "Poppins",
-                            fontSize: 9,
-                            height: 1.5,
-                            fontWeight: FontWeight.w600,
-                            color: primaryColor,
-                          ),
-                        ),
+                        // child: Text(
+                        //   _swapValues.isEmpty
+                        //       ? '0'
+                        //       : (_swapValues.values.reduce(
+                        //                   (value, element) => value + element) /
+                        //               (_swapValues.values.length * 10))
+                        //           .round()
+                        //           .toString(),
+                        child: FutureBuilder(
+                            future:
+                                AuthMethods().getCombinedAttributes(user.uid),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.waiting ||
+                                  !snapshot.hasData) {
+                                return const Text(
+                                  '0',
+                                  style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontSize: 9,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                  ),
+                                );
+                              }
+                              return Text(
+                                  ((snapshot.data as SwapAttributes)
+                                              .attributes
+                                              .values
+                                              .reduce((value, element) =>
+                                                  value + element) /
+                                          ((snapshot.data as SwapAttributes)
+                                                  .attributes
+                                                  .values
+                                                  .length *
+                                              10))
+                                      .round()
+                                      .toString(),
+                                  style: const TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontSize: 9,
+                                    height: 1.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                  ));
+                            }),
                       ),
                     ),
                   ],
