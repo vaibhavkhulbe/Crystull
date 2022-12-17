@@ -1,7 +1,9 @@
+import 'package:crystull/resources/models/signup.dart';
 import 'package:crystull/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 Widget getAttributesGridFromValues(
+  Map<String, AttributeDetails> _swapAttributeDetails,
   Map<String, double> _swapValues,
   BuildContext context,
 ) {
@@ -47,6 +49,21 @@ Widget getAttributesGridFromValues(
                   ),
                 ),
               ),
+              if (_swapAttributeDetails[entry.key] != null)
+                Text(
+                  "(" +
+                      _swapAttributeDetails[entry.key]!.count.toString() +
+                      (_swapAttributeDetails[entry.key]!.count != 1
+                          ? " SWAPs)"
+                          : " SWAP)"),
+                  style: const TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 10,
+                    height: 1.5,
+                    color: primaryColor,
+                    fontWeight: FontWeight.w400,
+                  ),
+                )
             ],
           ),
         )

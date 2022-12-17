@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,20 +21,31 @@ class StorageMethods {
 
   Future<Uint8List?> downloadUserImage(String childName, String userUid) async {
     Reference ref = _storage.ref().child(childName).child(userUid);
-    Uint8List? image = await ref.getData();
+    final m = await ref.getMetadata();
+    log(m.toString());
+    Uint8List? image;
+    try {
+      image = await ref.getData();
+    } catch (e) {
+      image = null;
+    }
     return image;
   }
 
   Future<List<Uint8List>> downloadAllImage(String childName) async {
     Reference ref = _storage.ref().child(childName);
     List<Uint8List> images = [];
-    await ref.listAll().then((value) async {
-      for (var item in value.items) {
-        await item.getData().then((value) {
-          if (value != null) images.add(value);
-        });
-      }
-    });
+    try {
+      await ref.listAll().then((value) async {
+        for (var item in value.items) {
+          await item.getData().then((value) {
+            if (value != null) images.add(value);
+          });
+        }
+      });
+    } catch (e) {
+      images = [];
+    }
     return images;
   }
 }

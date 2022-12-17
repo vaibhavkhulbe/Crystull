@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -11,7 +12,10 @@ import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svg;
+import 'package:provider/provider.dart';
 
+import '../providers/user_provider.dart';
 import '../resources/storage_methods.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,6 +27,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late final Future<WeeklyAttributes> weeklyAttributes;
   int _current = 0;
   bool isloading = false;
   Map<String, double> _swapValues = {};
@@ -34,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
+    weeklyAttributes = AuthMethods().getWeeklyUserWiseAttributes(widget.user);
     getImagesFromServer();
   }
 
@@ -46,6 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isloading = true;
     });
+
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    await userProvider.refreshUser();
     images = await StorageMethods().downloadAllImage("homePics");
     setState(() {
       isloading = false;
@@ -89,7 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    StorageMethods().downloadAllImage("homePics").then((value) => images);
     AuthMethods()
         .getCombinedAttributes(widget.user.uid)
         .then((value) => _swapValues = value.attributes);
@@ -195,8 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   FutureBuilder<WeeklyAttributes>(
-                    future:
-                        AuthMethods().getWeeklyUserWiseAttributes(widget.user),
+                    future: weeklyAttributes,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         List<Map<String, dynamic>> attributes =
@@ -237,11 +245,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         const SizedBox(width: 10),
                                         CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                              users[doc['uid']]!
-                                                  .profileImageUrl
-                                                  .toString()),
-                                        ),
+                                            backgroundImage: FadeInImage(
+                                          placeholder: Image.asset(
+                                            'images/avatar.png',
+                                          ).image,
+                                          image: users[doc['uid']]!
+                                                      .profileImage !=
+                                                  null
+                                              ? Image.memory(
+                                                  users[doc['uid']]!
+                                                      .profileImage!,
+                                                ).image
+                                              : Image.asset('images/avatar.png')
+                                                  .image,
+                                        ).image),
                                         const SizedBox(width: 10),
                                         Expanded(
                                           child: Wrap(

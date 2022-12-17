@@ -5,12 +5,14 @@ import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/screens/connected_friends_screen.dart';
 import 'package:crystull/screens/login_screen.dart';
 import 'package:crystull/screens/search_screen.dart';
+import 'package:crystull/screens/webview.dart';
 import 'package:crystull/utils/colors.dart';
 import 'package:crystull/utils/utils.dart';
 import 'package:crystull/widgets/drawer_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 List<Widget> getDrawerList(
     BuildContext context, CrystullUser user, Map<String, double> _swapValues) {
@@ -79,14 +81,6 @@ List<Widget> getDrawerList(
                             width: 1,
                           ),
                         ),
-                        // child: Text(
-                        //   _swapValues.isEmpty
-                        //       ? '0'
-                        //       : (_swapValues.values.reduce(
-                        //                   (value, element) => value + element) /
-                        //               (_swapValues.values.length * 10))
-                        //           .round()
-                        //           .toString(),
                         child: FutureBuilder(
                             future:
                                 AuthMethods().getCombinedAttributes(user.uid),
@@ -194,7 +188,18 @@ List<Widget> getDrawerList(
     SizedBox(
       height: getSafeAreaHeight(context) * 0.25,
     ),
-    DrawerWidget(imgURL: '', drawerKey: 'Terms and Policy', onTap: () {}),
+    DrawerWidget(
+      imgURL: '',
+      drawerKey: 'Terms and Policy',
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WebViewApp(
+              title: "Terms and Policy",
+              url: "https://www.crystull.com/about-1"),
+        ),
+      ),
+    ),
     DrawerWidget(
         imgURL: 'images/icons/settings.svg',
         drawerKey: 'Settings',

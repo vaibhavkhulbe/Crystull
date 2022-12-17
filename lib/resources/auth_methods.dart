@@ -11,6 +11,8 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:uuid/uuid.dart';
 
+import '../utils/utils.dart';
+
 class AuthMethods {
   final FacebookAuth fbSignIn = FacebookAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -72,7 +74,8 @@ class AuthMethods {
           if (photoUrl.isNotEmpty) {
             log("Photo uploaded " + photoUrl);
             signupForm.uid = credValue.user!.uid;
-            signupForm.profileImage = null;
+            signupForm.profileImage =
+                await compressList(signupForm.profileImage!);
             signupForm.profileImageUrl = photoUrl;
             await _firestore
                 .collection('users')
@@ -543,6 +546,7 @@ class AuthMethods {
   Future<SwapAttributes> getCombinedAttributes(
     String uid,
   ) async {
+    Map<String, AttributeDetails> attributeDetails = {};
     Map<String, double> attributes = {};
     Map<String, SwapInfo> swapInfo = {};
 
@@ -553,6 +557,8 @@ class AuthMethods {
       cumulative.forEach((key, value) {
         if (value['count'] != null && value['count'] != 0) {
           attributes[key] = value['sum'] / value['count'];
+          attributeDetails[key] =
+              AttributeDetails(count: value['count'], sum: value['sum']);
         }
       });
 
@@ -567,7 +573,10 @@ class AuthMethods {
         }
       }
     }
-    return SwapAttributes(attributes: attributes, swapInfo: swapInfo);
+    return SwapAttributes(
+        attributes: attributes,
+        swapInfo: swapInfo,
+        attributeDetails: attributeDetails);
   }
 
   Future<WeeklyAttributes> getWeeklyUserWiseAttributes(
@@ -636,23 +645,6 @@ class AuthMethods {
     }
 
     return WeeklyAttributes(attributes: attributes, users: users);
-
-    // return data.then((snapshot) {
-    //   if (snapshot.exists) {
-    //     Map<String, double> swap = snapshot.data() ?? {};
-    //     swap.forEach((key, value) {
-    //       Map<String, double> weekly = value;
-    //       weekly.forEach((key, value) {
-    //         attributes[key] = value;
-    //       });
-    //     });
-    //   }
-    //   return attributes;
-    // }).catchError((e) {
-    //   log(e.toString());
-    // });
-
-    // return SwapAttributes(attributes: attributes, swapInfo: swapInfo);
   }
 
   Future<Map<String, Map<String, int>>> getAttributesCounts(
@@ -738,12 +730,11 @@ class AuthMethods {
     try {
       String photoUrl =
           await StorageMethods().uploadImage("profilePics", image, false);
+      var profileImage = await compressList(image);
       if (photoUrl.isNotEmpty) {
         log("Photo uploaded " + photoUrl);
-        await _firestore
-            .collection('users')
-            .doc(_auth.currentUser!.uid)
-            .update({'profileImageUrl': photoUrl});
+        await _firestore.collection('users').doc(_auth.currentUser!.uid).update(
+            {'profileImageUrl': photoUrl, "profileImage": profileImage});
         res = "Success";
       } else {
         log("Photo upload failed " + photoUrl);
@@ -787,6 +778,34 @@ class AuthMethods {
     }
     return null;
   }
+
+  // Future<String> DeleteUser(CrystullUser user) async {
+  //   // 1. Delete all the individual swaps which were done by user or on user
+  //   var deletefromQuery = _firestore
+  //       .collection('individual')
+  //       .where('fromUid', isEqualTo: user.uid);
+  //   deletefromQuery.get().then((QuerySnapshot querySnapshot) async {
+  //     for (var doc in querySnapshot.docs) {
+  //       doc.reference.delete();
+  //     }
+  //   });
+  //   var deletetoQuery =
+  //       _firestore.collection('individual').where('toUid', isEqualTo: user.uid);
+  //   deletetoQuery.get().then((QuerySnapshot querySnapshot) async {
+  //     for (var doc in querySnapshot.docs) {
+  //       doc.reference.delete();
+  //     }
+  //   });
+
+  //   // 2. Delete all the entries in swaps collection which were done by given user uid
+  //   var deleteConnections =
+  //       _firestore.collection('individual').where('toUid', isEqualTo: user.uid);
+  //   deletetoQuery.get().then((QuerySnapshot querySnapshot) async {
+  //     for (var doc in querySnapshot.docs) {
+  //       doc.reference.delete();
+  //     }
+  //   });
+  // }
 
   // Future<Map<String, List<String>>> getAttributes() async {
   //   Map<String, List<String>> attributes = {};

@@ -71,6 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isSwapEnabled = false;
   CrystullUser? _currentUser;
   List<CrystullUser> connectedUsers = [];
+  Map<String, AttributeDetails> _swapAttributeDetails = {};
   Map<String, double> _swapValues = {};
   Map<String, SwapInfo> _swapInfo = {};
   final Map<String, double> _topSwapValues = {};
@@ -83,13 +84,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return widget.user.profileImageUrl.isNotEmpty &&
             isUnblocked(widget.user, _currentUser!)
         ? FadeInImage(
-            placeholder: const svg.Svg(
-              'images/avatar.svg',
-            ),
+            placeholder: Image.asset(
+              'images/avatar.png',
+            ).image,
             image: NetworkImage(
               widget.user.profileImageUrl,
             ),
             alignment: Alignment.topLeft,
+            placeholderFit: BoxFit.fitWidth,
             fit: BoxFit.fitWidth,
             height: MediaQuery.of(context).size.height * 0.1,
             width: getSafeAreaWidth(context),
@@ -150,13 +152,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Uint8List _croppedImageAsList = await _croppedImage.readAsBytes();
         return _croppedImageAsList;
       }
-      // removing compression so that image looks good
-      // if (_croppedImage != null) {
-      //   Uint8List _croppedImageAsList = await _croppedImage.readAsBytes();
-      //   Uint8List _compressedImage;
-      //   _compressedImage = await compressList(_croppedImageAsList);
-      //   return _compressedImage;
-      // }
     }
 
     return null;
@@ -313,6 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     var swapAttributes =
         await AuthMethods().getCombinedAttributes(widget.user.uid);
 
+    _swapAttributeDetails = swapAttributes.attributeDetails;
     _swapValues = swapAttributes.attributes;
     _swapInfo = swapAttributes.swapInfo;
     if (_currentUser!.uid != widget.user.uid) {
@@ -599,7 +595,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             color: Colors.black54,
                                             image: DecorationImage(
                                               fit: BoxFit.cover,
-                                              image: getUserImage(),
+                                              image: widget.user.profileImage !=
+                                                      null
+                                                  ? MemoryImage(
+                                                      widget.user.profileImage!)
+                                                  : Image.asset(
+                                                          "images/avatar.png")
+                                                      .image,
                                             ),
                                             border: Border.all(
                                               color: widget.user.isVerified
@@ -875,7 +877,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               _primarySwapValues.isNotEmpty
                                   ? getAttributesGridFromValues(
-                                      _primarySwapValues, context)
+                                      _swapAttributeDetails,
+                                      _primarySwapValues,
+                                      context)
                                   : Container(
                                       alignment: Alignment.center,
                                       margin: const EdgeInsets.only(bottom: 10),
@@ -901,7 +905,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               _moreSwapValues.isNotEmpty
                                   ? getAttributesGridFromValues(
-                                      _moreSwapValues, context)
+                                      _swapAttributeDetails,
+                                      _moreSwapValues,
+                                      context)
                                   : Container(
                                       alignment: Alignment.center,
                                       margin: const EdgeInsets.only(bottom: 10),
@@ -936,7 +942,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                                 getAttributesGridFromValues(
-                                    _topSwapValues, context),
+                                    _swapAttributeDetails,
+                                    _topSwapValues,
+                                    context),
                                 const Center(
                                   child: Text(
                                     "Send connection request to see all attributes",
@@ -1054,12 +1062,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         Radius.circular(4)),
                                                 image: DecorationImage(
                                                   image: FadeInImage(
-                                                    placeholder: const svg.Svg(
-                                                        'images/avatar.png'),
-                                                    image: NetworkImage(
-                                                      connectedUsers[i]
-                                                          .profileImageUrl,
-                                                    ),
+                                                    placeholder: Image.asset(
+                                                            'images/avatar.png')
+                                                        .image,
+                                                    image: connectedUsers[i]
+                                                                .profileImage !=
+                                                            null
+                                                        ? Image.memory(
+                                                                connectedUsers[
+                                                                        i]
+                                                                    .profileImage!)
+                                                            .image
+                                                        : Image.asset(
+                                                                'images/avatar.png')
+                                                            .image,
                                                     alignment:
                                                         Alignment.topLeft,
                                                     fit: BoxFit.fitWidth,
@@ -1301,7 +1317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       setState(() {
                                                         if (sliderValues.values
                                                             .any((element) =>
-                                                                element != 0)) {
+                                                                element > 1)) {
                                                           isSwapEnabled = true;
                                                         } else {
                                                           isSwapEnabled = false;

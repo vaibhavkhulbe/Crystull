@@ -30,7 +30,6 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     "all": [],
     'unread': [],
   };
-  Map<String, Uint8List> eventsPics = {};
   Set<String> userIds = {};
   Map<String, CrystullUser> users = {};
 
@@ -44,6 +43,13 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         vsync: this, length: tabs.length, animationDuration: Duration.zero);
 
     super.initState();
+    refreshUser();
+  }
+
+  void refreshUser() async {
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    await userProvider.refreshUser();
   }
 
   String getUserName(String uid) {
@@ -73,15 +79,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
     for (var eventEntries in events.values) {
       for (var event in eventEntries) {
-        if (eventsPics.containsKey(event.fromUid)) {
-          continue;
-        }
         userIds.addAll([event.fromUid, event.toUid]);
-        var eventPic = await StorageMethods()
-            .downloadUserImage("profilePics", event.fromUid);
-        if (eventPic != null) {
-          eventsPics[event.fromUid] = eventPic;
-        }
       }
     }
     users = await AuthMethods().getUserDetailsFromid(userIds.toList());
@@ -226,8 +224,11 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                           color: Colors.black54,
                           image: DecorationImage(
                             fit: BoxFit.cover,
-                            image: eventsPics[e.fromUid] != null && !e.anonymous
-                                ? Image.memory(eventsPics[e.fromUid]!).image
+                            image: users[e.fromUid] != null &&
+                                    users[e.fromUid]!.profileImage != null &&
+                                    !e.anonymous
+                                ? Image.memory(users[e.fromUid]!.profileImage!)
+                                    .image
                                 : const ExactAssetImage('images/avatar.png'),
                           ),
                         )),

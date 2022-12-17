@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter_svg_provider/flutter_svg_provider.dart' as svgn;
 import 'package:crystull/providers/user_provider.dart';
 import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/resources/models/signup.dart';
@@ -156,9 +157,10 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      doc.profileImageUrl.toString()),
-                                ),
+                                    backgroundImage: doc.profileImage != null
+                                        ? Image.memory(doc.profileImage!).image
+                                        : Image.asset('images/avatar.png')
+                                            .image),
                                 const SizedBox(width: 10),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

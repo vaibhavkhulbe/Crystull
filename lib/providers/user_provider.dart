@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:typed_data';
 
 import 'package:crystull/resources/auth_methods.dart';
 import 'package:crystull/resources/models/signup.dart';
@@ -15,17 +14,10 @@ class UserProvider extends ChangeNotifier {
     log("Refreshing user");
     CrystullUser? user = await _authMethods.getUserDetails();
     if (user != null) {
-      Uint8List? image = await _authMethods.getUserImage();
-      if (image != null) {
-        user.profileImage = image;
-      } else {
-        log("No image found");
-        user.profileImage = null;
-      }
+      _user = user;
     } else {
       log("No user found");
     }
-    _user = user;
     notifyListeners();
   }
 }

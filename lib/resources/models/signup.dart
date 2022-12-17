@@ -9,11 +9,22 @@ class SwapInfo {
   SwapInfo({required this.lastSwappedAt, required this.lastSwappedID});
 }
 
+class AttributeDetails {
+  double sum;
+  int count;
+
+  AttributeDetails({required this.sum, required this.count});
+}
+
 class SwapAttributes {
+  Map<String, AttributeDetails> attributeDetails;
   Map<String, double> attributes;
   Map<String, SwapInfo> swapInfo;
 
-  SwapAttributes({required this.attributes, required this.swapInfo});
+  SwapAttributes(
+      {required this.attributes,
+      required this.swapInfo,
+      required this.attributeDetails});
 }
 
 class SwapData {
@@ -167,6 +178,10 @@ class CrystullUser {
   static CrystullUser fromMap(Map<String, dynamic> map) {
     final connections = Map<String, Friend>.from(map['connections']
         ?.map((key, value) => MapEntry(key, Friend.fromMap(value))));
+    Uint8List? profileImage;
+    if (map['profileImage'] != null) {
+      profileImage = Uint8List.fromList(map['profileImage'].cast<int>());
+    }
     var user = CrystullUser(
       map['firstName'] ?? "",
       map['lastName'] ?? "",
@@ -180,6 +195,7 @@ class CrystullUser {
       degree: map['degree'] ?? "",
       mobileNumberWithCountryCode: map['mobileNumberWithCountryCode'] ?? "",
       profileImageUrl: map['profileImageUrl'] ?? "",
+      profileImage: profileImage,
       coverImageUrl: map['coverImageUrl'] ?? "",
       connections: connections,
       posts: map['posts'] ?? const [],

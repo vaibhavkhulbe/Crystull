@@ -23,6 +23,27 @@ class FriendRequestScreen extends StatefulWidget {
 class _FriendRequestScreenState extends State<FriendRequestScreen> {
   CrystullUser? _currentUser;
   List<int> friendCount = [0, 0, 0, 0, 0, 0];
+  bool isloading = false;
+
+  @override
+  initState() {
+    super.initState();
+    refreshUser();
+  }
+
+  void refreshUser() async {
+    setState(() {
+      isloading = true;
+    });
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    await userProvider.refreshUser();
+    if (mounted) {
+      setState(() {
+        isloading = false;
+      });
+    }
+  }
 
   void handleResult(String result) {
     if (result == "Success") {
@@ -160,10 +181,15 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                              friendRequestUser.profileImageUrl
-                                                  .toString()),
-                                        ),
+                                            backgroundImage: friendRequestUser
+                                                        .profileImage !=
+                                                    null
+                                                ? Image.memory(friendRequestUser
+                                                        .profileImage!)
+                                                    .image
+                                                : Image.asset(
+                                                        'images/avatar.png')
+                                                    .image),
                                         const SizedBox(width: 10),
                                         Column(
                                           crossAxisAlignment:

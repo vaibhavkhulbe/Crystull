@@ -1,11 +1,16 @@
 import 'dart:async';
+import 'dart:typed_data';
 
+import 'package:crystull/resources/auth_methods.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crystull/resources/models/signup.dart';
+import 'package:crystull/resources/storage_methods.dart';
 import 'package:crystull/screens/profile_screen.dart';
 import 'package:crystull/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/user_provider.dart';
 import '../utils/utils.dart';
 
 class Debouncer {
@@ -32,14 +37,28 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final StorageMethods _storageMethods = StorageMethods();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _searchController = TextEditingController();
   bool _isShowUsers = false;
   final _debouncer = Debouncer(milliseconds: 500);
 
   @override
+  void initState() {
+    super.initState();
+    refreshUser();
+  }
+
+  @override
   void dispose() {
     super.dispose();
     _searchController.dispose();
+  }
+
+  void refreshUser() async {
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    await userProvider.refreshUser();
   }
 
   @override
@@ -146,6 +165,19 @@ class _SearchScreenState extends State<SearchScreen> {
                     final DocumentSnapshot doc =
                         (snapshot.data! as dynamic).docs[index];
                     final searchedUser = CrystullUser.fromSnapshot(doc);
+                    if (searchedUser.profileImageUrl.isNotEmpty &&
+                        searchedUser.profileImage == null) {
+                      StorageMethods()
+                          .downloadUserImage("profilePics", searchedUser.uid)
+                          .then((imgvalue) =>
+                              compressList(imgvalue!).then((value) {
+                                searchedUser.profileImage = value;
+                                _firestore
+                                    .collection('users')
+                                    .doc(searchedUser.uid)
+                                    .update({"profileImage": value});
+                              }));
+                    }
                     return ListTile(
                       title: InkWell(
                         onTap: () {
@@ -160,15 +192,16 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            searchedUser.profileImageUrl.isNotEmpty &&
+                            searchedUser.profileImage != null &&
                                     isUnblocked(searchedUser, widget.user)
                                 ? CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                        searchedUser.profileImageUrl),
-                                  )
-                                : const CircleAvatar(
                                     backgroundImage:
-                                        ExactAssetImage('images/avatar.png'),
+                                        Image.memory(searchedUser.profileImage!)
+                                            .image,
+                                  )
+                                : CircleAvatar(
+                                    backgroundImage:
+                                        Image.asset('images/avatar.png').image,
                                   ),
                             const SizedBox(width: 10),
                             Wrap(

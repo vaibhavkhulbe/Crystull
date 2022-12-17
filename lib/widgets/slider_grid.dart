@@ -82,8 +82,8 @@ Widget getSliderWidgetWithLabel(
           thumbShape: const CircleThumbShape(thumbRadius: 11),
         ),
         child: Slider(
-          value: value.roundToDouble(),
-          label: value.roundToDouble().toString(),
+          value: value.round().toDouble(),
+          label: value.round().toString(),
           min: min,
           max: max,
           onChanged: onchanged,

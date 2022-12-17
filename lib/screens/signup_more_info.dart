@@ -9,6 +9,7 @@ import 'package:crystull/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:crystull/widgets/text_field_widget.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crystull/resources/models/signup.dart';
 import '../utils/utils.dart';
@@ -49,13 +50,20 @@ class _MoreInfoScreenState extends State<MoreInfoScreen> {
   }
 
   void selectImage() async {
-    Uint8List? _image = await pickImage(ImageSource.gallery);
-    Uint8List _compressedImage;
+    XFile? _image = await pickImage(ImageSource.gallery);
+    CroppedFile? _croppedImage;
     if (_image != null) {
-      _compressedImage = await compressList(_image);
-      setState(() {
-        _profileImage = _compressedImage;
-      });
+      _croppedImage = await ImageCropper().cropImage(
+        sourcePath: _image.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+      );
+
+      if (_croppedImage != null) {
+        Uint8List _croppedImageAsList = await _croppedImage.readAsBytes();
+        setState(() {
+          _profileImage = _croppedImageAsList;
+        });
+      }
     } else {
       //User canceled the picker. You need do something here, or just add return
       return;

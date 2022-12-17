@@ -12,6 +12,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../resources/auth_methods.dart';
+
 class MobileScreenLayout extends StatefulWidget {
   int screen;
   MobileScreenLayout({Key? key, this.screen = 0}) : super(key: key);
@@ -22,6 +24,7 @@ class MobileScreenLayout extends StatefulWidget {
 
 class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   late PageController _pageController;
+  int notificationsCount = 0;
 
   @override
   void initState() {
@@ -56,6 +59,16 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   @override
   Widget build(BuildContext context) {
     CrystullUser? _user = Provider.of<UserProvider>(context).getUser;
+    int requestCount = 0;
+    if (_user != null) {
+      _user.connections.forEach((key, value) {
+        if (value.status == 2) requestCount++;
+      });
+
+      AuthMethods()
+          .getIndividualAttributes("", _user.uid, "", unreadOnly: true)
+          .then((value) => notificationsCount = value.length);
+    }
     return _user != null
         ? Scaffold(
             body: PageView(
@@ -78,9 +91,11 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
                   getBottomNavBarWidget(
                       widget.screen, 1, 'images/icons/search.svg'),
                   getBottomNavBarWidget(
-                      widget.screen, 2, 'images/icons/friendRequests.svg'),
+                      widget.screen, 2, 'images/icons/friendRequests.svg',
+                      imageCount: requestCount),
                   getBottomNavBarWidget(
-                      widget.screen, 3, 'images/icons/notifications.svg'),
+                      widget.screen, 3, 'images/icons/notifications.svg',
+                      imageCount: notificationsCount),
                   getBottomNavBarWidget(widget.screen, 4, 'images/avatar.png',
                       isProfile: true, profileImage: _user.profileImage),
                 ]),
