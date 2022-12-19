@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -33,15 +34,25 @@ class AuthMethods {
   Future<Map<String, CrystullUser>> getUserDetailsFromid(
       List<String> uids) async {
     Map<String, CrystullUser> users = {};
-    await _firestore
-        .collection('users')
-        .where('uid', whereIn: uids)
-        .get()
-        .then((QuerySnapshot snapshot) async {
-      for (var doc in snapshot.docs) {
-        users[doc['uid']] = CrystullUser.fromSnapshot(doc);
-      }
-    });
+    var len = uids.length;
+    var size = 10;
+    List<List<String>> chunks = [];
+
+    for (var i = 0; i < len; i += size) {
+      var end = (i + size < len) ? i + size : len;
+      chunks.add(uids.sublist(i, end));
+    }
+    for (var i = 0; i < chunks.length; i++) {
+      await _firestore
+          .collection('users')
+          .where('uid', whereIn: chunks[i])
+          .get()
+          .then((QuerySnapshot snapshot) async {
+        for (var doc in snapshot.docs) {
+          users[doc['uid']] = CrystullUser.fromSnapshot(doc);
+        }
+      });
+    }
     return users;
   }
 
@@ -412,7 +423,7 @@ class AuthMethods {
   }
 
   static Future<List<CrystullUser>> getConnections(CrystullUser user,
-      {int status = 3}) async {
+      {int status = 3, bool limitCount = false, String filter = ""}) async {
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
     List<CrystullUser> connections = [];
     try {
@@ -423,15 +434,37 @@ class AuthMethods {
         }
       });
       if (connectionUsers.isNotEmpty) {
-        await _firestore
-            .collection('users')
-            .where('uid', whereIn: connectionUsers)
-            .get()
-            .then((QuerySnapshot snapshot) async {
-          for (var doc in snapshot.docs) {
-            connections.add(CrystullUser.fromSnapshot(doc));
+        var len = connectionUsers.length;
+        var size = 10;
+        if (limitCount) {
+          len = math.min(len, size);
+        }
+        List<List<String>> chunks = [];
+
+        for (var i = 0; i < len; i += size) {
+          var end = (i + size < len) ? i + size : len;
+          chunks.add(connectionUsers.sublist(i, end));
+        }
+        for (var i = 0; i < chunks.length; i++) {
+          await _firestore
+              .collection('users')
+              .where('uid', whereIn: chunks[i])
+              .get()
+              .then((QuerySnapshot snapshot) async {
+            for (var doc in snapshot.docs) {
+              connections.add(CrystullUser.fromSnapshot(doc));
+            }
+          });
+        }
+        if (filter.isNotEmpty) {
+          var newConnection = <CrystullUser>[];
+          for (var connection in connections) {
+            if (connection.fullName.contains(filter)) {
+              newConnection.add(connection);
+            }
           }
-        });
+          connections = newConnection;
+        }
       }
     } catch (e) {
       log(e.toString());
@@ -596,34 +629,45 @@ class AuthMethods {
     DateTime now = DateTime.now();
     DateTime weekBefore = DateTime(now.year, now.month, now.day)
         .subtract(const Duration(days: 7));
-    var snapshot = await _firestore
-        .collection('weekly')
-        .doc(weekBefore.toString())
-        .collection('swaps')
-        .where(FieldPath.documentId, whereIn: uids)
-        .get();
 
-    if (snapshot.size != 0) {
-      for (var doc in snapshot.docs) {
-        Map<String, dynamic> swap = doc.data();
-        for (var entry in swap.entries) {
-          double score = entry.value['count'] > 0
-              ? entry.value['sum'] / entry.value['count']
-              : 0;
-          if (attributes.containsKey(entry.key)) {
-            if (attributes[entry.key]!['score'] < score) {
+    var len = uids.length;
+    var size = 10;
+    List<List<String>> chunks = [];
+
+    for (var i = 0; i < len; i += size) {
+      var end = (i + size < len) ? i + size : len;
+      chunks.add(uids.toList().sublist(i, end));
+    }
+    for (var i = 0; i < chunks.length; i++) {
+      var snapshot = await _firestore
+          .collection('weekly')
+          .doc(weekBefore.toString())
+          .collection('swaps')
+          .where(FieldPath.documentId, whereIn: chunks[i])
+          .get();
+
+      if (snapshot.size != 0) {
+        for (var doc in snapshot.docs) {
+          Map<String, dynamic> swap = doc.data();
+          for (var entry in swap.entries) {
+            double score = entry.value['count'] > 0
+                ? entry.value['sum'] / entry.value['count']
+                : 0;
+            if (attributes.containsKey(entry.key)) {
+              if (attributes[entry.key]!['score'] < score) {
+                attributes[entry.key] = {
+                  'attribute': entry.key,
+                  'score': score,
+                  'uid': doc.id,
+                };
+              }
+            } else if (score > 50) {
               attributes[entry.key] = {
                 'attribute': entry.key,
                 'score': score,
                 'uid': doc.id,
               };
             }
-          } else if (score > 50) {
-            attributes[entry.key] = {
-              'attribute': entry.key,
-              'score': score,
-              'uid': doc.id,
-            };
           }
         }
       }
@@ -633,15 +677,25 @@ class AuthMethods {
     Set<String> uniqueUids = Set.from(attributes.values.map((e) => e['uid']));
 
     if (uniqueUids.isNotEmpty) {
-      await _firestore
-          .collection('users')
-          .where('uid', whereIn: uniqueUids.toList())
-          .get()
-          .then((QuerySnapshot snapshot) async {
-        for (var doc in snapshot.docs) {
-          users[doc.id] = CrystullUser.fromSnapshot(doc);
-        }
-      });
+      var len = uniqueUids.length;
+      var size = 10;
+      List<List<String>> chunks = [];
+
+      for (var i = 0; i < len; i += size) {
+        var end = (i + size < len) ? i + size : len;
+        chunks.add(uniqueUids.toList().sublist(i, end));
+      }
+      for (var i = 0; i < chunks.length; i++) {
+        await _firestore
+            .collection('users')
+            .where('uid', whereIn: chunks[i])
+            .get()
+            .then((QuerySnapshot snapshot) async {
+          for (var doc in snapshot.docs) {
+            users[doc.id] = CrystullUser.fromSnapshot(doc);
+          }
+        });
+      }
     }
 
     return WeeklyAttributes(attributes: attributes, users: users);

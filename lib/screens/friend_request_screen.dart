@@ -146,166 +146,160 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                       ),
                     ),
                   )
-                : ListView(
-                    shrinkWrap: true,
-                    children: [
-                      FutureBuilder<List<CrystullUser>>(
-                        future: AuthMethods.getConnections(_currentUser!,
-                            status: 2),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: snapshot.data == null
-                                  ? 0
-                                  : snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                var friendRequestUser = snapshot.data![index];
-                                Set<String> connectedFriends = Set<String>.from(
-                                        friendRequestUser.connections.keys)
-                                    .intersection(Set<String>.from(
-                                        _currentUser!.connections.keys));
-                                return ListTile(
-                                  title: InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => ProfileScreen(
-                                                user: friendRequestUser)),
-                                      );
-                                    },
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        CircleAvatar(
-                                            backgroundImage: friendRequestUser
-                                                        .profileImage !=
-                                                    null
-                                                ? Image.memory(friendRequestUser
-                                                        .profileImage!)
-                                                    .image
-                                                : Image.asset(
-                                                        'images/avatar.png')
-                                                    .image),
-                                        const SizedBox(width: 10),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Wrap(
-                                              alignment: WrapAlignment.start,
-                                              crossAxisAlignment:
-                                                  WrapCrossAlignment.start,
+                : Expanded(
+                    child: FutureBuilder<List<CrystullUser>>(
+                      future:
+                          AuthMethods.getConnections(_currentUser!, status: 2),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: snapshot.data == null
+                                ? 0
+                                : snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              var friendRequestUser = snapshot.data![index];
+                              Set<String> connectedFriends = Set<String>.from(
+                                      friendRequestUser.connections.keys)
+                                  .intersection(Set<String>.from(
+                                      _currentUser!.connections.keys));
+                              return ListTile(
+                                title: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => ProfileScreen(
+                                              user: friendRequestUser)),
+                                    );
+                                  },
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      CircleAvatar(
+                                          backgroundImage: friendRequestUser
+                                                      .profileImage !=
+                                                  null
+                                              ? Image.memory(friendRequestUser
+                                                      .profileImage!)
+                                                  .image
+                                              : Image.asset('images/avatar.png')
+                                                  .image),
+                                      const SizedBox(width: 10),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Wrap(
+                                            alignment: WrapAlignment.start,
+                                            crossAxisAlignment:
+                                                WrapCrossAlignment.start,
+                                            children: [
+                                              Text(
+                                                friendRequestUser.fullName
+                                                    .capitalize(),
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  height: 1.5,
+                                                  color: Colors.black54,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              if (friendRequestUser.isVerified)
+                                                const Icon(
+                                                  Icons.verified_rounded,
+                                                  color: primaryColor,
+                                                  size: 12,
+                                                ),
+                                            ],
+                                          ),
+                                          if (connectedFriends.isNotEmpty)
+                                            Row(
                                               children: [
+                                                SvgPicture.asset(
+                                                  'images/icons/otherConnections.svg',
+                                                  color: Colors.black54,
+                                                  width: 12,
+                                                  height: 12,
+                                                ),
+                                                const SizedBox(width: 5),
                                                 Text(
-                                                  friendRequestUser.fullName
-                                                      .capitalize(),
+                                                  '${connectedFriends.length} other shared connections',
                                                   style: const TextStyle(
-                                                    fontSize: 14,
+                                                    fontSize: 12,
                                                     height: 1.5,
+                                                    decoration: TextDecoration
+                                                        .underline,
                                                     color: Colors.black54,
-                                                    fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                if (friendRequestUser
-                                                    .isVerified)
-                                                  const Icon(
-                                                    Icons.verified_rounded,
-                                                    color: primaryColor,
-                                                    size: 12,
-                                                  ),
                                               ],
                                             ),
-                                            if (connectedFriends.isNotEmpty)
-                                              Row(
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    'images/icons/otherConnections.svg',
-                                                    color: Colors.black54,
-                                                    width: 12,
-                                                    height: 12,
-                                                  ),
-                                                  const SizedBox(width: 5),
-                                                  Text(
-                                                    '${connectedFriends.length} other shared connections',
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                      height: 1.5,
-                                                      decoration: TextDecoration
-                                                          .underline,
-                                                      color: Colors.black54,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            Text(
-                                              friendRequestUser.bio,
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                height: 1.5,
-                                                color: Colors.black54,
-                                              ),
+                                          Text(
+                                            friendRequestUser.bio,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              height: 1.5,
+                                              color: Colors.black54,
                                             ),
-                                            Row(children: [
-                                              getStatusButton(
-                                                mobileBackgroundColor,
-                                                primaryColor,
-                                                "Accept",
-                                                primaryColor,
-                                                () async {
-                                                  String result =
-                                                      await AuthMethods()
-                                                          .addFriendRequest(
-                                                              _currentUser!,
-                                                              friendRequestUser,
-                                                              3,
-                                                              3);
-                                                  handleResult(result);
-                                                },
-                                                radius: 20.0,
-                                                fontSize: 12,
-                                                fontWeight: null,
-                                              ),
-                                              getStatusButton(
-                                                mobileBackgroundColor,
-                                                Colors.black54,
-                                                "Remove",
-                                                Colors.black54,
-                                                () async {
-                                                  String result =
-                                                      await AuthMethods()
-                                                          .removeFriend(
-                                                              friendRequestUser,
-                                                              _currentUser!);
-                                                  handleResult(result);
-                                                },
-                                                radius: 20.0,
-                                                fontSize: 12,
-                                                fontWeight: null,
-                                              )
-                                            ]),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                          ),
+                                          Row(children: [
+                                            getStatusButton(
+                                              mobileBackgroundColor,
+                                              primaryColor,
+                                              "Accept",
+                                              primaryColor,
+                                              () async {
+                                                String result =
+                                                    await AuthMethods()
+                                                        .addFriendRequest(
+                                                            _currentUser!,
+                                                            friendRequestUser,
+                                                            3,
+                                                            3);
+                                                handleResult(result);
+                                              },
+                                              radius: 20.0,
+                                              fontSize: 12,
+                                              fontWeight: null,
+                                            ),
+                                            getStatusButton(
+                                              mobileBackgroundColor,
+                                              Colors.black54,
+                                              "Remove",
+                                              Colors.black54,
+                                              () async {
+                                                String result =
+                                                    await AuthMethods()
+                                                        .removeFriend(
+                                                            friendRequestUser,
+                                                            _currentUser!);
+                                                handleResult(result);
+                                              },
+                                              radius: 20.0,
+                                              fontSize: 12,
+                                              fontWeight: null,
+                                            )
+                                          ]),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                );
-                              },
-                            );
-                          } else if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
-                          }
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        },
-                      ),
-                    ],
+                                ),
+                              );
+                            },
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text("${snapshot.error}");
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    ),
                   ),
           ],
         ));

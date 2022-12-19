@@ -25,7 +25,7 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
   CrystullUser? _currentUser;
   int friendCount = 0;
   final TextEditingController _searchController = TextEditingController();
-  bool _isShowUsers = false;
+  bool _isShowUsers = true;
 
   void handleResult(String result) {
     if (result == "Success") {
@@ -123,243 +123,244 @@ class _ConnectedFriendsScreenState extends State<ConnectedFriendsScreen> {
                     ),
                   ),
                 ),
-          ListView(
-            shrinkWrap: true,
-            children: [
-              FutureBuilder<List<CrystullUser>>(
-                future: AuthMethods.getConnections(_currentUser!),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      itemCount:
-                          snapshot.data == null ? 0 : snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        var doc = snapshot.data![index];
-                        Set<String> connectedFriends =
-                            Set<String>.from(doc.connections.keys).intersection(
-                          Set<String>.from(_currentUser!.connections.keys),
-                        );
-                        return ListTile(
-                          title: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ProfileScreen(user: doc),
-                                ),
-                              );
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                    backgroundImage: doc.profileImage != null
-                                        ? Image.memory(doc.profileImage!).image
-                                        : Image.asset('images/avatar.png')
-                                            .image),
-                                const SizedBox(width: 10),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Wrap(
-                                      alignment: WrapAlignment.start,
-                                      crossAxisAlignment:
-                                          WrapCrossAlignment.start,
+          // Column(
+          //   // shrinkWrap: true,
+          //   children: [
+          Expanded(
+            child: FutureBuilder<List<CrystullUser>>(
+              future: AuthMethods.getConnections(_currentUser!,
+                  filter: _searchController.text),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount:
+                        snapshot.data == null ? 0 : snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      var doc = snapshot.data![index];
+                      Set<String> connectedFriends =
+                          Set<String>.from(doc.connections.keys).intersection(
+                        Set<String>.from(_currentUser!.connections.keys),
+                      );
+                      return ListTile(
+                        title: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfileScreen(user: doc),
+                              ),
+                            );
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                  backgroundImage: doc.profileImage != null
+                                      ? Image.memory(doc.profileImage!).image
+                                      : Image.asset('images/avatar.png').image),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Wrap(
+                                    alignment: WrapAlignment.start,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.start,
+                                    children: [
+                                      Text(
+                                        doc.fullName.capitalize(),
+                                        style: const TextStyle(
+                                          fontFamily: "Poppins",
+                                          fontSize: 12,
+                                          height: 1.5,
+                                          fontWeight: FontWeight.w600,
+                                          color: color808080,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      if (doc.isVerified)
+                                        const Icon(
+                                          Icons.verified_rounded,
+                                          color: primaryColor,
+                                          size: 12,
+                                        ),
+                                    ],
+                                  ),
+                                  if (connectedFriends.isNotEmpty)
+                                    Row(
                                       children: [
+                                        SvgPicture.asset(
+                                          'images/icons/otherConnections.svg',
+                                          color: color7A7A7A,
+                                          width: 12,
+                                          height: 9,
+                                        ),
+                                        const SizedBox(width: 5),
                                         Text(
-                                          doc.fullName.capitalize(),
+                                          '${connectedFriends.length} other shared connections',
                                           style: const TextStyle(
                                             fontFamily: "Poppins",
-                                            fontSize: 12,
+                                            fontSize: 9,
                                             height: 1.5,
-                                            fontWeight: FontWeight.w600,
-                                            color: color808080,
+                                            fontWeight: FontWeight.w400,
+                                            decoration:
+                                                TextDecoration.underline,
+                                            color: color7A7A7A,
                                           ),
                                         ),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        if (doc.isVerified)
-                                          const Icon(
-                                            Icons.verified_rounded,
-                                            color: primaryColor,
-                                            size: 12,
-                                          ),
                                       ],
                                     ),
-                                    if (connectedFriends.isNotEmpty)
-                                      Row(
-                                        children: [
-                                          SvgPicture.asset(
-                                            'images/icons/otherConnections.svg',
-                                            color: color7A7A7A,
-                                            width: 12,
-                                            height: 9,
-                                          ),
-                                          const SizedBox(width: 5),
-                                          Text(
-                                            '${connectedFriends.length} other shared connections',
-                                            style: const TextStyle(
-                                              fontFamily: "Poppins",
-                                              fontSize: 9,
-                                              height: 1.5,
-                                              fontWeight: FontWeight.w400,
-                                              decoration:
-                                                  TextDecoration.underline,
-                                              color: color7A7A7A,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                                const Spacer(),
-                                IconButton(
-                                  onPressed: () => {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return Container(
-                                          height:
-                                              getSafeAreaHeight(context) * 0.2,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          color: mobileBackgroundColor,
-                                          child: Center(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    String message =
-                                                        "Are you sure you want to block " +
-                                                            doc.firstName
-                                                                .capitalize() +
-                                                            "?";
-                                                    showAlertDialog(
-                                                      context,
-                                                      "Block " +
+                                ],
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                onPressed: () => {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        height:
+                                            getSafeAreaHeight(context) * 0.2,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        color: mobileBackgroundColor,
+                                        child: Center(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              InkWell(
+                                                onTap: () {
+                                                  String message =
+                                                      "Are you sure you want to block " +
                                                           doc.firstName
-                                                              .capitalize(),
-                                                      message,
-                                                      () {},
-                                                      () async {
-                                                        String res =
-                                                            await AuthMethods()
-                                                                .addFriendRequest(
-                                                                    _currentUser!,
-                                                                    doc,
-                                                                    4,
-                                                                    5);
-                                                        handleResult(res);
-                                                        Navigator.pop(context);
-                                                      },
-                                                    );
-                                                  },
-                                                  child: Row(children: const [
-                                                    Icon(
-                                                      Icons.block,
+                                                              .capitalize() +
+                                                          "?";
+                                                  showAlertDialog(
+                                                    context,
+                                                    "Block " +
+                                                        doc.firstName
+                                                            .capitalize(),
+                                                    message,
+                                                    () {},
+                                                    () async {
+                                                      String res =
+                                                          await AuthMethods()
+                                                              .addFriendRequest(
+                                                                  _currentUser!,
+                                                                  doc,
+                                                                  4,
+                                                                  5);
+                                                      handleResult(res);
+                                                      Navigator.pop(context);
+                                                    },
+                                                  );
+                                                },
+                                                child: Row(children: const [
+                                                  Icon(
+                                                    Icons.block,
+                                                    color: color808080,
+                                                    size: 20,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Text(
+                                                    'Block',
+                                                    style: TextStyle(
+                                                      fontFamily: "Poppins",
                                                       color: color808080,
-                                                      size: 20,
+                                                      fontSize: 14,
+                                                      height: 1.5,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
-                                                    SizedBox(
+                                                  ),
+                                                ]),
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  String message =
+                                                      "Are you sure you want to remove " +
+                                                          doc.firstName
+                                                              .capitalize() +
+                                                          " from your connections?";
+                                                  showAlertDialog(
+                                                    context,
+                                                    "Remove " +
+                                                        doc.firstName
+                                                            .capitalize(),
+                                                    message,
+                                                    () {},
+                                                    () async {
+                                                      String res =
+                                                          await AuthMethods()
+                                                              .removeFriend(
+                                                                  _currentUser!,
+                                                                  doc);
+                                                      handleResult(res);
+                                                      Navigator.pop(context);
+                                                    },
+                                                  );
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    SvgPicture.asset(
+                                                      'images/icons/removeFriend.svg',
+                                                      color: colorFF3225,
+                                                      width: 20,
+                                                      height: 20,
+                                                    ),
+                                                    const SizedBox(
                                                       width: 10,
                                                     ),
-                                                    Text(
-                                                      'Block',
+                                                    const Text(
+                                                      'Remove',
                                                       style: TextStyle(
                                                         fontFamily: "Poppins",
-                                                        color: color808080,
+                                                        color: colorFF3225,
                                                         fontSize: 14,
                                                         height: 1.5,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                       ),
                                                     ),
-                                                  ]),
+                                                  ],
                                                 ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    String message =
-                                                        "Are you sure you want to remove " +
-                                                            doc.firstName
-                                                                .capitalize() +
-                                                            " from your connections?";
-                                                    showAlertDialog(
-                                                      context,
-                                                      "Remove " +
-                                                          doc.firstName
-                                                              .capitalize(),
-                                                      message,
-                                                      () {},
-                                                      () async {
-                                                        String res =
-                                                            await AuthMethods()
-                                                                .removeFriend(
-                                                                    _currentUser!,
-                                                                    doc);
-                                                        handleResult(res);
-                                                        Navigator.pop(context);
-                                                      },
-                                                    );
-                                                  },
-                                                  child: Row(
-                                                    children: [
-                                                      SvgPicture.asset(
-                                                        'images/icons/removeFriend.svg',
-                                                        color: colorFF3225,
-                                                        width: 20,
-                                                        height: 20,
-                                                      ),
-                                                      const SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      const Text(
-                                                        'Remove',
-                                                        style: TextStyle(
-                                                          fontFamily: "Poppins",
-                                                          color: colorFF3225,
-                                                          fontSize: 14,
-                                                          height: 1.5,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              ],
-                                            ),
+                                              )
+                                            ],
                                           ),
-                                        );
-                                      },
-                                    )
-                                  },
-                                  icon: const Icon(
-                                    Icons.more_vert,
-                                    size: 24,
-                                    color: color808080,
-                                  ),
+                                        ),
+                                      );
+                                    },
+                                  )
+                                },
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                  size: 24,
+                                  color: color808080,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                    );
-                  } else if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
-                  }
-                  return const Center(child: CircularProgressIndicator());
-                },
-              ),
-            ],
+                        ),
+                      );
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
           ),
+          //   ],
+          // ),
         ],
       ),
     );

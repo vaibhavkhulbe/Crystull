@@ -71,6 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isSwapEnabled = false;
   CrystullUser? _currentUser;
   List<CrystullUser> connectedUsers = [];
+  int totalConnectedUsers = 0;
   Map<String, AttributeDetails> _swapAttributeDetails = {};
   Map<String, double> _swapValues = {};
   Map<String, SwapInfo> _swapInfo = {};
@@ -417,10 +418,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     } else {
       List<CrystullUser> localConnectedUsers =
-          await AuthMethods.getConnections(widget.user);
+          await AuthMethods.getConnections(widget.user, limitCount: true);
       if (mounted) {
         setState(() {
           connectedUsers = localConnectedUsers;
+          widget.user.connections.forEach((key, value) {
+            if (value.status == 3) {
+              totalConnectedUsers++;
+            }
+          });
         });
       }
     }
@@ -987,7 +993,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Row(
                                   children: [
                                     Text(
-                                      connectedUsers.length.toString() +
+                                      totalConnectedUsers.toString() +
                                           " Connections",
                                       style: const TextStyle(
                                         fontFamily: "Poppins",
